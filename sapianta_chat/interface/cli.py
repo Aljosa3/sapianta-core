@@ -9,11 +9,16 @@ class ChatCLI:
         self.orchestrator = ChatOrchestrator()
         self.renderer = CLIOutputRenderer()
         self.mode = "text"
+        self.detail = "full"
 
     def run_once(self, user_input: str) -> str:
         request = self.router.route(user_input)
         response = self.orchestrator.handle(request)
-        return self.renderer.render(response, mode=self.mode)
+        return self.renderer.render(
+            response,
+            mode=self.mode,
+            detail=self.detail,
+        )
 
     def handle_command(self, user_input: str) -> bool:
         if user_input.startswith(":mode"):
@@ -24,6 +29,16 @@ class ChatCLI:
             else:
                 print("Usage: :mode text|markdown|json")
             return True
+
+        if user_input.startswith(":detail"):
+            parts = user_input.split()
+            if len(parts) == 2 and parts[1] in {"short", "normal", "full"}:
+                self.detail = parts[1]
+                print(f"(detail set to {self.detail})")
+            else:
+                print("Usage: :detail short|normal|full")
+            return True
+
         return False
 
 
