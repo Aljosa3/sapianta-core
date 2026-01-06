@@ -1,12 +1,21 @@
 from datetime import datetime
 
 from sapianta_chat.models import ChatRequest, ChatResponse
+from sapianta_chat.reasoning import ReasoningStrategySelector
 
 
 class ChatOrchestrator:
+    def __init__(self):
+        self.reasoning_selector = ReasoningStrategySelector()
+
     def handle(self, request: ChatRequest) -> ChatResponse:
-        handler = self._select_handler(request.interaction_type)
-        response_text, response_type = handler(request)
+        strategy = self.reasoning_selector.select(request)
+        explanation = strategy.explain(request)
+
+        response_text, response_type = self._base_response(
+            request,
+            explanation
+        )
 
         return ChatResponse(
             response_text=response_text,
@@ -14,45 +23,22 @@ class ChatOrchestrator:
             metadata={
                 "handled_at": datetime.utcnow().isoformat(),
                 "orchestrator": self.__class__.__name__,
-                "interaction_type": request.interaction_type
+                "interaction_type": request.interaction_type,
+                "reasoning_strategy": strategy.__class__.__name__,
             }
         )
 
-    def _select_handler(self, interaction_type: str):
-        return {
-            "informational": self._handle_informational,
-            "explanatory": self._handle_explanatory,
-            "structural": self._handle_structural,
-            "boundary": self._handle_boundary,
-            "unknown": self._handle_unknown,
-        }.get(interaction_type, self._handle_unknown)
+    def _base_response(self, request: ChatRequest, explanation: str):
+        if request.interaction_type == "informational":
+            return explanation, "informational"
 
-    def _handle_informational(self, request: ChatRequest):
-        return (
-            "Podan je informativni odgovor na zastavljeno vprašanje.",
-            "informational"
-        )
+        if request.interaction_type == "explanatory":
+            return explanation, "explanatory"
 
-    def _handle_explanatory(self, request: ChatRequest):
-        return (
-            "Podana je razlaga zahtevanega koncepta ali delovanja.",
-            "explanatory"
-        )
+        if request.interaction_type == "structural":
+            return explanation, "structural"
 
-    def _handle_structural(self, request: ChatRequest):
-        return (
-            "Podan je strukturni opis zahtevanega dela sistema.",
-            "structural"
-        )
+        if request.interaction_type == "boundary":
+            return explanation, "boundary"
 
-    def _handle_boundary(self, request: ChatRequest):
-        return (
-            "Podan je odgovor glede zmožnosti ali omejitev sistema.",
-            "boundary"
-        )
-
-    def _handle_unknown(self, request: ChatRequest):
-        return (
-            "Zahteve ni bilo mogoče zanesljivo razvrstiti.",
-            "unknown"
-        )
+        return explanation, "unknown"
