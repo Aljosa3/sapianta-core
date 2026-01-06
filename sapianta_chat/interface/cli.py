@@ -24,6 +24,8 @@ class ChatCLI:
             detail=self.detail,
         )
 
+    # ---------------- COMMANDS ----------------
+
     def handle_command(self, user_input: str) -> bool:
         if user_input.startswith(":mode"):
             parts = user_input.split()
@@ -67,8 +69,31 @@ class ChatCLI:
 
             return True
 
+        if user_input == ":state":
+            self._print_state()
+            return True
+
         return False
 
+    # ---------------- STATE ----------------
+
+    def _print_state(self) -> None:
+        print("=== SAPIANTA STATE (read-only) ===")
+        print(f"Mode: {self.mode}")
+        print(f"Detail: {self.detail}")
+
+        if self._last_response is None:
+            print("Last response: NO")
+            return
+
+        meta = self._last_response.metadata or {}
+        print("Last response: YES")
+        print(f"Interaction type: {meta.get('interaction_type')}")
+        print(f"Response type: {self._last_response.response_type}")
+        print(f"Reasoning strategy: {meta.get('reasoning_strategy')}")
+        print(f"Planning strategy: {meta.get('planning_strategy')}")
+
+    # ---------------- MAIN ----------------
 
 if __name__ == "__main__":
     cli = ChatCLI()
