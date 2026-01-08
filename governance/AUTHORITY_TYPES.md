@@ -11,210 +11,224 @@
 
 ## 1. Purpose
 
-This document defines the **canonical types of authority**
-recognized by the SAPIANTA system.
+This document defines **types of authority** recognized by the SAPIANTA system.
 
-It answers the foundational question:
+It answers the question:
 
-> Who is allowed to authorize what — and why?
+Who is allowed to authorize execution — and in what capacity?
 
-Authority Types form the **root layer** for:
-- authority verification
-- execution eligibility
-- permission enforcement
-- revocation and lifecycle handling
+The goal is to:
+- separate *capability* from *permission*
+- prevent implicit authority
+- avoid single-point-of-trust failures
+- make execution approval explicit, auditable, and revocable
 
-No authority type → no valid authority.
+No authority → no execution.
 
 ---
 
 ## 2. Core Principle
 
-All authority in the system MUST:
-- belong to exactly one Authority Type
-- be explicitly declared
-- be verifiable
-- be revocable
+Execution is never authorized by the system itself.
 
-Implicit authority is forbidden.
+Execution is authorized **only** by an explicit Authority
+recognized by governance rules.
 
----
-
-## 3. Authority Type Overview
-
-The system recognizes **five** authority types.
-
-| Code | Authority Type | Description |
-|-----:|---------------|-------------|
-| A0 | System Authority | Inherent system-level authority |
-| A1 | Canon Authority | Authority derived from locked canon |
-| A2 | Governance Authority | Authority granted by governance rules |
-| A3 | Human Authority | Authority originating from a human actor |
-| A4 | Delegated Authority | Authority delegated by another authority |
-
-No other authority types are permitted.
+Authority is:
+- external to reasoning
+- external to planning
+- required before execution eligibility
+- evaluated before gate opening
 
 ---
 
-## 4. A0 — System Authority
+## 3. Authority vs Role vs Identity
 
-### Definition
-Authority inherent to the SAPIANTA system itself.
+These concepts MUST NOT be conflated:
 
-### Characteristics
-- Exists by definition
-- Cannot be delegated
-- Cannot be revoked
-- Bound to system identity
+- **Identity** — who someone is
+- **Role** — what they normally do
+- **Authority** — what they are allowed to approve
 
-### Scope
-- Canon enforcement
-- Phase locking
-- Integrity guarantees
-- Fatal failure handling
-
-### Restrictions
-- MUST NOT authorize execution
-- MUST NOT impersonate human intent
+Authority is:
+- contextual
+- scoped
+- revocable
+- explicit
 
 ---
 
-## 5. A1 — Canon Authority
+## 4. Authority Types Overview
 
-### Definition
-Authority derived directly from locked canonical documents.
+The system recognizes the following authority types:
 
-### Characteristics
-- Emerges from LOCKED canon
-- Immutable once locked
-- Applies universally
-
-### Scope
-- Normative rules
-- Invariant enforcement
-- Structural constraints
-
-### Restrictions
-- Cannot be overridden
-- Cannot be revoked individually
-- Changes require new canon phase
+| Code | Authority Type        | Description |
+|----:|-----------------------|-------------|
+| A0  | None                  | No authority |
+| A1  | Human Operator        | Explicit human approval |
+| A2  | Delegated Authority   | Human-delegated approval |
+| A3  | Multi-Party Authority | Consensus-based approval |
+| A4  | Emergency Authority   | Exceptional override |
+| A5  | System Authority      | Non-human, rule-bound |
 
 ---
 
-## 6. A2 — Governance Authority
+## 5. A0 — No Authority
 
-### Definition
-Authority defined by governance processes and documents.
+### Meaning
+- No execution approval capability
+- Default state for all contexts
 
-### Characteristics
-- Explicitly granted
-- Context-dependent
-- Time-bound if specified
+### Rules
+- Execution is forbidden
+- Any execution attempt → R2 Denial
 
-### Scope
-- Permission granting
-- Role definition
-- Operational constraints
-
-### Restrictions
-- MUST be verifiable
-- MAY be revoked
-- MUST respect Canon Authority
+This is the **default authority**.
 
 ---
 
-## 7. A3 — Human Authority
+## 6. A1 — Human Operator Authority
 
-### Definition
-Authority originating from an identifiable human actor.
+### Meaning
+- Direct approval by a human
+- Conscious, intentional consent
 
-### Characteristics
-- Requires explicit identity
-- Requires explicit intent
-- Contextual and scoped
+### Properties
+- Must be explicit
+- Must be traceable
+- Must be time-bound (optionally)
+- Must be revocable
 
-### Scope
-- Execution approval
-- High-risk decisions
-- External commitments
-
-### Restrictions
-- MUST be authenticated
-- MUST NOT be inferred
-- MAY be revoked or expire
+### Typical usage
+- Manual execution approval
+- Sensitive operations
+- First-time execution paths
 
 ---
 
-## 8. A4 — Delegated Authority
+## 7. A2 — Delegated Authority
 
-### Definition
-Authority delegated from another valid authority.
+### Meaning
+- Authority delegated by a human operator
+- Delegation is explicit and limited
 
-### Characteristics
-- Always derivative
-- Limited to delegation scope
-- Traceable to origin authority
+### Properties
+- Delegation scope MUST be defined
+- Delegation MUST be revocable
+- Delegation MUST reference source authority
 
-### Scope
-- Operational convenience
-- Automation boundaries
-- Temporary permissions
+### Typical usage
+- Trusted automation
+- Narrow execution domains
+- Scheduled or repeated actions
 
-### Restrictions
-- Cannot exceed parent authority
-- Revoked if parent is revoked
-- MUST declare delegator
+Delegation never exceeds original authority.
 
 ---
 
-## 9. Authority Type Constraints
+## 8. A3 — Multi-Party Authority
 
-The system MUST enforce:
+### Meaning
+- Execution requires multiple approvals
+- No single entity can authorize alone
 
-- One authority → one type
-- No authority stacking across types
-- No circular delegation
-- No anonymous authority
-- No authority escalation by inference
+### Properties
+- Required quorum MUST be defined
+- Approval aggregation MUST be explicit
+- Partial approval is insufficient
 
-Violations default to **E2 Refusal**.
-
----
-
-## 10. Relationship to Other Phases
-
-This document is the foundation for:
-
-- FAZA 26B — Authority Verification & Validity
-- FAZA 26C — Authority Revocation & Lifecycle
-- FAZA 25 — Execution Eligibility
-- FAZA 24 — Message Routing & Refusal
-
-Without Authority Types, those phases are undefined.
+### Typical usage
+- High-risk execution
+- Governance-sensitive actions
+- Shared ownership environments
 
 ---
 
-## 11. Design-Time Constraint
+## 9. A4 — Emergency Authority
+
+### Meaning
+- Exceptional authority used only under defined emergency conditions
+
+### Properties
+- Strictly limited scope
+- Mandatory post-action review
+- Strong audit requirements
+
+### Rules
+- Cannot bypass core invariants
+- Cannot disable governance logging
+- Cannot self-grant permanence
+
+Emergency does not mean unaccountable.
+
+---
+
+## 10. A5 — System Authority
+
+### Meaning
+- Authority granted to the system itself
+- Only under predefined, verifiable conditions
+
+### Properties
+- Fully rule-bound
+- No discretion
+- No self-extension
+
+### Typical usage
+- Self-protection
+- Integrity preservation
+- Automatic safe shutdowns
+
+System Authority never authorizes *new* capabilities.
+
+---
+
+## 11. Authority Scope
+
+Every authority MUST declare scope:
+
+- execution_type (what can be executed)
+- duration (how long it is valid)
+- context (where it applies)
+
+Out-of-scope execution is forbidden.
+
+---
+
+## 12. Prohibited Authority Behavior
+
+The system MUST NOT:
+- infer authority
+- escalate authority implicitly
+- reuse expired authority
+- merge authorities silently
+- allow authority without traceability
+
+---
+
+## 13. Design-Time Constraint
 
 This document:
-- defines authority taxonomy only
-- performs no verification
+- defines authority categories only
+- performs no authorization
 - performs no execution
-- performs no routing
+- performs no evaluation
 
-It is purely normative.
+Evaluation is defined in:
+- Execution Eligibility Rules
+- Execution Gate Definition
+- Authority Verification Protocol (future)
 
 ---
 
-## 12. Closing Statement
+## 14. Closing Statement
 
-Authority is not power.
+Authority is **power with responsibility**.
 
-Authority is **permission under law**.
+If execution occurs:
+- someone authorized it
+- the authority can be named
+- the authority can be audited
+- the authority can be revoked
 
-If authority is unclear:
-- the system must refuse
-- the system must not guess
-- the system must not act
-
-No authority type → no legitimacy.
+No authority → no execution.
