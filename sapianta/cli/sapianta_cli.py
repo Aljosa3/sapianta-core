@@ -1,12 +1,17 @@
 from sapianta.interaction.adapters.cli_adapter import handle_cli_input
+from sapianta.runtime import RuntimeDecision
 
 
 def main():
     user_input = input("Sapianta > ")
-    response = handle_cli_input(user_input)
+    result = handle_cli_input(user_input)
 
-    core_response = response.core_response
-    print(f"[{core_response.status}] {core_response.reason}")
+    print(f"Runtime: {result.decision}")
+
+    if result.decision == RuntimeDecision.HALT:
+        print(f"Reason: {result.reason}")
+
+    print(f"Core: {result.core_response.status} {result.core_response.reason}")
 
 
 if __name__ == "__main__":
