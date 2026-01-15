@@ -49,8 +49,6 @@ def sp2_permission_intent(ctx: ExecutionContext):
 def sp3_output_sanity(ctx: ExecutionContext):
     """
     SP-3: Output Sanity / Validation Pass
-
-    Preveri, ali je rezultat tehnično varen za izpis.
     """
 
     if ctx.result is None:
@@ -65,3 +63,37 @@ def sp3_output_sanity(ctx: ExecutionContext):
 
     ctx.add_decision("SP-3 output sanity passed")
     return True
+
+
+def sp4_explain_trace(ctx: ExecutionContext):
+    """
+    SP-4: Explain / Trace Pass
+
+    Ustvari razlagalni zapis o poteku izvajanja.
+    Mora biti odporen na manjkajoče metapodatke.
+    """
+
+    try:
+        # varen ID (fallback, če ni eksplicitnega)
+        context_id = (
+            getattr(ctx, "id", None)
+            or getattr(ctx, "context_id", None)
+            or "UNKNOWN"
+        )
+
+        explanation = {
+            "context_id": context_id,
+            "status": ctx.status.name,
+            "phase": ctx.phase.name,
+            "decisions": ctx.decisions,
+            "violations": ctx.violations,
+        }
+
+        ctx.explain = explanation
+        ctx.add_decision("SP-4 explain trace generated")
+        return True
+
+    except Exception as e:
+        ctx.add_violation(f"SP-4 failed: {str(e)}")
+        ctx.finalize(status=Status.HARD_FAIL, error="Explain trace failure")
+        return False
