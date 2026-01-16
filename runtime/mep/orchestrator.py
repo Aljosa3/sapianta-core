@@ -9,6 +9,9 @@ from .sp_passes import (
 )
 from .sp6_audit_export import sp6_audit_export
 
+# 👉 UC-2: Controlled LLM Answer
+from runtime.use_cases.uc2_llm_controlled_answer import execute_uc2
+
 
 class Orchestrator:
     """
@@ -19,7 +22,7 @@ class Orchestrator:
     Guards
       → SP-1 (Input Sanity)
       → SP-2 (Permission / Intent)
-      → EXECUTION (decision + result)
+      → EXECUTION (UC-2)
       → SP-3 (Output Sanity)
       → SP-4 (Explain / Trace)        [post-decision]
       → SP-5 (Policy Binding)
@@ -54,16 +57,12 @@ class Orchestrator:
         if not sp2_permission_intent(ctx):
             return ctx
 
-        # 5. EXECUTION (normative decision path)
+        # 5. EXECUTION (UC-2: Controlled LLM Answer)
         try:
             ctx.add_decision("Orchestrator execution started")
 
-            ctx.result = {
-                "message": (
-                    "MEP execution completed successfully "
-                    "(with SP-1 + SP-2 + SP-3 + SP-4 + SP-5 + SP-6)"
-                )
-            }
+            # 🔒 UC-2 je izvedbena enota, ne avtoriteta
+            ctx.result = execute_uc2(ctx)
 
             ctx.add_decision("Orchestrator execution completed")
 

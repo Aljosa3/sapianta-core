@@ -1,34 +1,36 @@
-# runtime/mep/runner.py
-
-from context import ExecutionContext
-from orchestrator import Orchestrator
+from runtime.mep.context import ExecutionContext
+from runtime.mep.orchestrator import Orchestrator
 
 
 def main():
-    # 1. Ustvari Execution Context (MEP dovoljuje samo source="chat")
+    """
+    Entry point za MEP execution.
+    Zaženemo ga iz root projekta kot modul:
+        python -m runtime.mep.runner
+    """
+
+    # Minimalni testni kontekst
     ctx = ExecutionContext(
         source="chat",
-        raw_input="Hello, Sapianta MEP"
+        raw_input="Razloži razliko med odgovornostjo in avtoriteto."
     )
 
-    # 2. Zaženi Orchestrator
     orchestrator = Orchestrator()
-    final_ctx = orchestrator.run(ctx)
+    ctx = orchestrator.run(ctx)
 
-    # 3. Izpis končnega stanja
     print("\n=== MEP EXECUTION RESULT ===")
-    print(f"Context ID : {final_ctx.context_id}")
-    print(f"Status     : {final_ctx.status}")
-    print(f"Phase      : {final_ctx.phase}")
-    print(f"Result     : {final_ctx.result}")
-    print(f"Error      : {final_ctx.error}")
+    print("Context ID :", ctx.context_id)
+    print("Status     :", ctx.status)
+    print("Phase      :", ctx.phase)
+    print("Result     :", ctx.result)
+    print("Error      :", ctx.error)
 
     print("\nDecisions:")
-    for d in final_ctx.decisions:
+    for d in ctx.decisions:
         print(f" - [{d['time']}] {d['note']}")
 
     print("\nViolations:")
-    for v in final_ctx.violations:
+    for v in ctx.violations:
         print(f" - [{v['time']}] {v['note']}")
 
 
