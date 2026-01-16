@@ -8,6 +8,7 @@ from .sp_passes import (
     sp5_policy_binding
 )
 from .sp6_audit_export import sp6_audit_export
+from .sp7_output_redaction import sp7_output_redaction
 
 # 👉 UC-2: Controlled LLM Answer
 from runtime.use_cases.uc2_llm_controlled_answer import execute_uc2
@@ -24,13 +25,14 @@ class Orchestrator:
       → SP-2 (Permission / Intent)
       → EXECUTION (UC-2)
       → SP-3 (Output Sanity)
-      → SP-4 (Explain / Trace)        [post-decision]
+      → SP-7 (Output Redaction / Safety)   [non-normative]
+      → SP-4 (Explain / Trace)             [post-decision]
       → SP-5 (Policy Binding)
       → FINALIZE (normative closure)
       → SP-6 (Audit export, best-effort)
 
     NOTE:
-    Explain and audit layers MUST NOT influence normative decisions.
+    Explain, redaction and audit layers MUST NOT influence normative decisions.
     """
 
     def run(self, ctx: ExecutionContext) -> ExecutionContext:
@@ -70,18 +72,22 @@ class Orchestrator:
             if not sp3_output_sanity(ctx):
                 return ctx
 
-            # 7. SP-4: Explain / trace (post-decision artifact)
+            # 7. SP-7: Output redaction / safety (NON-NORMATIVE)
+            # Nikoli ne blokira, nikoli ne spreminja statusa
+            sp7_output_redaction(ctx)
+
+            # 8. SP-4: Explain / trace (post-decision artifact)
             if not sp4_explain_trace(ctx):
                 return ctx
 
-            # 8. SP-5: Policy binding
+            # 9. SP-5: Policy binding
             if not sp5_policy_binding(ctx):
                 return ctx
 
-            # 9. FINALIZE (normative closure)
+            # 10. FINALIZE (normative closure)
             ctx.finalize(status=Status.FINAL, result=ctx.result)
 
-            # 10. SP-6: Audit export (best-effort, AFTER finalize)
+            # 11. SP-6: Audit export (best-effort, AFTER finalize)
             sp6_audit_export(ctx, target="stdout")
 
             return ctx
