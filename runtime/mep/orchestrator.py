@@ -9,6 +9,7 @@ from .sp_passes import (
 )
 from .sp6_audit_export import sp6_audit_export
 from .sp7_output_redaction import sp7_output_redaction
+from .sp8_rate_cost_guard import sp8_rate_cost_guard
 
 # 👉 UC-2: Controlled LLM Answer
 from runtime.use_cases.uc2_llm_controlled_answer import execute_uc2
@@ -23,6 +24,7 @@ class Orchestrator:
     Guards
       → SP-1 (Input Sanity)
       → SP-2 (Permission / Intent)
+      → SP-8 (Rate / Cost Guard)        [NORMATIVE — pre-execution]
       → EXECUTION (UC-2)
       → SP-3 (Output Sanity)
       → SP-7 (Output Redaction / Safety)   [non-normative]
@@ -57,6 +59,10 @@ class Orchestrator:
 
         # 4. SP-2: Permission / intent
         if not sp2_permission_intent(ctx):
+            return ctx
+
+        # 4.5 SP-8: Rate / Cost guard (NORMATIVE, pre-execution)
+        if not sp8_rate_cost_guard(ctx):
             return ctx
 
         # 5. EXECUTION (UC-2: Controlled LLM Answer)
