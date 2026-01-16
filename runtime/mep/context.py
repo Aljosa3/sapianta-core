@@ -27,22 +27,39 @@ class ExecutionContext:
     """
 
     def __init__(self, source: str, raw_input: str):
+        # --- Identiteta in čas ---
         self.context_id = str(uuid.uuid4())
         self.created_at = datetime.utcnow().isoformat()
 
+        # --- Izvor ---
         self.source = source
 
+        # --- Status in faza ---
         self.status = Status.PENDING
         self.phase = Phase.INIT
 
+        # --- Vhod ---
         self.input = raw_input
         self.normalized_input = raw_input.strip()
 
+        # --- Sledi odločitev in kršitev ---
         self.decisions = []
         self.violations = []
 
+        # --- Rezultat ---
         self.result = None
         self.error = None
+
+        # --- SP-5: Policy binding (minimalno) ---
+        self.policy = {
+            "source": "CANON",
+            "version": "F47+",
+            "bindings": ["MEP"]
+        }
+        self.policy_ok = None
+
+        # --- SP-4: Explain layer (nastane kasneje) ---
+        self.explain = None
 
     def add_decision(self, note: str):
         self.decisions.append({

@@ -1,6 +1,4 @@
-# runtime/mep/sp_passes.py
-
-from context import ExecutionContext, Status
+from .context import ExecutionContext, Status
 
 
 def sp1_input_sanity(ctx: ExecutionContext):
@@ -71,10 +69,13 @@ def sp4_explain_trace(ctx: ExecutionContext):
 
     Ustvari razlagalni zapis o poteku izvajanja.
     Mora biti odporen na manjkajoče metapodatke.
+
+    NOTE (CORE LOCK):
+    Explain trace is a post-decision artifact.
+    It MUST NOT influence ctx.status, ctx.result, or any normative decision.
     """
 
     try:
-        # varen ID (fallback, če ni eksplicitnega)
         context_id = (
             getattr(ctx, "id", None)
             or getattr(ctx, "context_id", None)
@@ -89,7 +90,9 @@ def sp4_explain_trace(ctx: ExecutionContext):
             "violations": ctx.violations,
         }
 
+        # Explain is attached strictly as metadata
         ctx.explain = explanation
+
         ctx.add_decision("SP-4 explain trace generated")
         return True
 
@@ -97,3 +100,41 @@ def sp4_explain_trace(ctx: ExecutionContext):
         ctx.add_violation(f"SP-4 failed: {str(e)}")
         ctx.finalize(status=Status.HARD_FAIL, error="Explain trace failure")
         return False
+
+
+def sp5_policy_binding(ctx: ExecutionContext):
+    """
+    SP-5: Policy Binding Pass
+    """
+
+    policy = getattr(ctx, "policy", None)
+
+    if not policy:
+        ctx.add_violation("SP-5 blocked: missing policy")
+        ctx.finalize(
+            status=Status.DENY,
+            error="Missing policy binding"
+        )
+        return False
+
+    if not isinstance(policy, dict):
+        ctx.add_violation("SP-5 blocked: invalid policy format")
+        ctx.finalize(
+            status=Status.DENY,
+            error="Invalid policy binding"
+        )
+        return False
+
+    if "version" not in policy:
+        ctx.add_violation("SP-5 blocked: policy version missing")
+        ctx.finalize(
+            status=Status.DENY,
+            error="Policy version missing"
+        )
+        return False
+
+    ctx.policy_ok = True
+    ctx.add_decision(
+        f"SP-5 policy bound ({policy.get('source')} {policy.get('version')})"
+    )
+    return True
