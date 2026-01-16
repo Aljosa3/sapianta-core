@@ -1,5 +1,3 @@
-# runtime/mep/context.py
-
 from datetime import datetime
 from enum import Enum
 import uuid
@@ -38,9 +36,13 @@ class ExecutionContext:
         self.status = Status.PENDING
         self.phase = Phase.INIT
 
-        # --- Vhod ---
+        # --- Vhod (KANONIČNO: vedno string) ---
         self.input = raw_input
         self.normalized_input = raw_input.strip()
+
+        # --- Metapodatki (SP-8, SP-9, stroški, kvote, rate, tenant …) ---
+        # NE vpliva na normativne odločitve
+        self.metadata = {}
 
         # --- Sledi odločitev in kršitev ---
         self.decisions = []
