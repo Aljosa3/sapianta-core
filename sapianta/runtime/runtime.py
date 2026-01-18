@@ -13,18 +13,24 @@ It does not:
 """
 
 from sapianta.runtime.flow import ExecutionFlow
+from sapianta.runtime.guard.guard import Guard
 
 
 class Runtime:
     def __init__(self, trace):
         self.trace = trace
         self.flow = ExecutionFlow(trace=self.trace)
+        self.guard = Guard(trace=self.trace)
 
     def run(self, context):
         """
         Execute the runtime flow with the given context.
         """
         self.trace.record("runtime.run.start")
+
+        # Guard invocation (no-op, no semantics)
+        verdict = self.guard.evaluate(context)
+        self.trace.record(f"runtime.guard.verdict:{verdict}")
 
         # delegate execution to the flow
         self.flow.execute(context)
