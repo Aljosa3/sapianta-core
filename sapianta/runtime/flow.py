@@ -6,6 +6,7 @@ of modules without interpreting their meaning or results.
 """
 
 from sapianta.modules.dummy_module import DummyModule
+from sapianta.modules.dummy_module_2 import DummyModule2
 
 
 class ExecutionFlow:
@@ -13,7 +14,8 @@ class ExecutionFlow:
         self.trace = trace
         # initialize modules (no logic, fixed order)
         self.modules = [
-            DummyModule(trace=self.trace)
+            DummyModule(trace=self.trace),
+            DummyModule2(trace=self.trace),
         ]
 
     def execute(self, context):
