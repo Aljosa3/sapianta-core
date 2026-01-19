@@ -1,27 +1,45 @@
-from sapianta.execution.types import ExecutionDecision, ExecutionResult
-from sapianta.runtime.types import RuntimeDecision, RuntimeResult
+"""
+Execution Gate.
+
+The Execution Gate is the only allowed entry point
+into execution adapters.
+
+It enforces the invariant:
+No execution without explicit Decision.
+"""
+
+from sapianta.decision.decision import Decision
 
 
 class ExecutionGate:
     """
-    Execution Gate:
-    - edina dovoljena točka za execution
-    - trenutno NO-OP
-    - nikoli ne spreminja Runtime odločitve
+    Runtime execution safety gate.
+
+    Responsibilities:
+    - require explicit Decision instance
+    - prevent execution without decision
+    - delegate execution to adapter
     """
 
-    def process(self, runtime_result: RuntimeResult) -> ExecutionResult:
-        # Če runtime ne dovoli nadaljevanja → NO-OP
-        if runtime_result.decision != RuntimeDecision.PROCEED:
-            return ExecutionResult(
-                decision=ExecutionDecision.NO_OP,
-                runtime_result=runtime_result,
-                note="Runtime halted execution"
+    def __init__(self, adapter):
+        self.adapter = adapter
+
+    def run(self, decision, context):
+        # 1. Decision must exist
+        if decision is None:
+            raise RuntimeError(
+                "ExecutionGate: execution denied — missing Decision."
             )
 
-        # Tudi če runtime dovoli → še vedno NO-OP (za zdaj)
-        return ExecutionResult(
-            decision=ExecutionDecision.NO_OP,
-            runtime_result=runtime_result,
-            note="Execution gate present but execution disabled"
+        # 2. Decision must be a Decision object
+        if not isinstance(decision, Decision):
+            raise TypeError(
+                "ExecutionGate: invalid decision type. "
+                "Expected Decision instance."
+            )
+
+        # 3. Delegate to execution adapter (dry-run or real)
+        return self.adapter.run(
+            decision=decision,
+            context=context
         )
