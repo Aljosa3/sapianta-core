@@ -22,7 +22,7 @@ class DryRunExecutionAdapter:
     def run(self, decision, context):
         """
         Inputs:
-        - decision: structured decision output (or demo substitute)
+        - decision: Decision object (normative decision)
         - context: system context
 
         Output:
@@ -36,11 +36,20 @@ class DryRunExecutionAdapter:
 
         plan = {
             "adapter_id": self.ADAPTER_ID,
+            "version": self.VERSION,
             "mode": "dry-run",
             "would_execute": False,
-            "decision_reference": decision.get("id", "demo-decision"),
+            "decision_reference": decision.decision_id,
+            "decision_outcome": decision.outcome,
+            "authority": decision.authority,
+            "binding": decision.binding,
             "summary": "No execution performed. This is a simulation.",
-            "steps": decision.get("proposed_steps", []),
+            "steps": [
+                "Validate decision reference",
+                "Verify execution is not permitted",
+                "Generate non-binding execution plan",
+                "Return simulation result"
+            ],
         }
 
         return plan
