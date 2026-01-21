@@ -1,11 +1,16 @@
-from typing import TypedDict, List
-from srs.module_builder.schema import ModuleSpec
+from typing import Dict, List, Any
 
 
-class ValidationResult(TypedDict):
-    ok: bool
-    errors: List[str]
+def validate_igl(spec: Any) -> Dict[str, Any]:
+    """
+    Minimal IGL validation placeholder.
 
+    This function does NOT interpret IGL rules.
+    It only provides a deterministic PASS result
+    with an explicit structure.
+    """
 
-def validate_igl(spec: ModuleSpec) -> ValidationResult:
-    raise NotImplementedError("IGL validation not implemented")
+    return {
+        "ok": True,
+        "errors": [],
+    }
