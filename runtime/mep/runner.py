@@ -1,25 +1,51 @@
-from runtime.mep.context import ExecutionContext
+# runtime/mep/runner.py
+
+from runtime.guard_lifecycle.orchestrator import GuardLifecycleOrchestrator
+from runtime.guard_lifecycle.modes import ExecutionMode
+from runtime.guard_lifecycle.errors import ProtocolViolation
+
 from runtime.mep.orchestrator import Orchestrator
+from runtime.mep.context import Phase
 
 
 def main():
     """
-    Entry point za MEP execution.
-    Zaženemo ga iz root projekta kot modul:
-        python -m runtime.mep.runner
+    Canonical MEP entry point.
+
+    Execution MUST pass through GuardLifecycle.
+    Direct calls to Orchestrator.run(ctx) are forbidden.
     """
 
-    # Minimalni testni kontekst
-    ctx = ExecutionContext(
-        source="chat",
-        raw_input="Razloži razliko med odgovornostjo in avtoriteto."
-    )
+    # --- Build canonical request ---
+    request = {
+        "execution_mode": ExecutionMode.EXECUTION.value,
+        "source": "chat",
+        "raw_input": "Razloži razliko med odgovornostjo in avtoriteto."
+    }
 
-    orchestrator = Orchestrator()
-    ctx = orchestrator.run(ctx)
+    try:
+        # --- ENTER GUARD LIFECYCLE (SINGLE EXECUTION GATE) ---
+        ctx = GuardLifecycleOrchestrator.run(request)
 
+        # --- HARD CHECK: execution allowed ---
+        if ctx.phase != Phase.EXECUTION:
+            raise ProtocolViolation(
+                f"MEP execution attempted outside EXECUTION phase (phase={ctx.phase})"
+            )
+
+        # --- Delegate to MEP orchestrator ---
+        orchestrator = Orchestrator()
+        ctx = orchestrator.run(ctx)
+
+    except ProtocolViolation as e:
+        print("\n=== GUARD LIFECYCLE VIOLATION ===")
+        print(str(e))
+        return
+
+    # --- Output ---
     print("\n=== MEP EXECUTION RESULT ===")
     print("Context ID :", ctx.context_id)
+    print("Origin     :", ctx._origin)
     print("Status     :", ctx.status)
     print("Phase      :", ctx.phase)
     print("Result     :", ctx.result)

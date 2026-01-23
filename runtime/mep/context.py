@@ -32,6 +32,11 @@ class ExecutionContext:
         # --- Izvor ---
         self.source = source
 
+        # --- HARD INVARIANT: origin marker ---
+        # Nastavi ga IZKLJUČNO GuardLifecycleOrchestrator
+        # MEP, guards, SP-ji ga NE smejo spreminjati
+        self._origin = None
+
         # --- Status in faza ---
         self.status = Status.PENDING
         self.phase = Phase.INIT
@@ -60,8 +65,9 @@ class ExecutionContext:
         }
         self.policy_ok = None
 
-        # --- SP-4: Explain layer (nastane kasneje) ---
-        self.explain = None
+        # --- SP-4: Explain layer (post-decision artifact, NON-NORMATIVE) ---
+        # Mora vedno obstajati in ne sme vplivati na status
+        self.explain = {}
 
     def add_decision(self, note: str):
         self.decisions.append({

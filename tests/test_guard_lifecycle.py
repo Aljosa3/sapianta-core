@@ -27,7 +27,7 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 # ------------------------------------------------------------
-# Imports (now safe)
+# Imports
 # ------------------------------------------------------------
 
 from runtime.mep.context import ExecutionContext, Status, Phase
@@ -62,16 +62,32 @@ def guard_allow(ctx: ExecutionContext):
 def run_with_guard(mock_guard, ctx):
     """
     Run orchestrator with injected guard function.
+
+    NOTE:
+    This helper SIMULATES GuardLifecycle entry.
+    Real UC-2 execution is DISABLED.
     """
+
     import runtime.mep.orchestrator as orch_module
 
+    # 🔐 simulate GuardLifecycle entry
+    ctx._origin = "TEST"
+    ctx.phase = Phase.EXECUTION
+    ctx.status = Status.PENDING
+
     original_guards = orch_module.runtime_guards
+    original_execute = orch_module.execute_uc2
+
+    # --- patch ---
     orch_module.runtime_guards = mock_guard
+    orch_module.execute_uc2 = lambda ctx: {"mock": "ok"}
 
     try:
         return Orchestrator().run(ctx)
     finally:
         orch_module.runtime_guards = original_guards
+        orch_module.execute_uc2 = original_execute
+
 
 
 # ------------------------------------------------------------

@@ -10,20 +10,29 @@ class GuardViolation(Exception):
 
 def runtime_guards(ctx: ExecutionContext):
     """
-    Runtime Guards
+    Runtime Guards (MEP)
 
     Guards are the ONLY place where:
     - Status may transition from PENDING → ALLOW
-    - Phase may transition from INIT → EXECUTION
 
+    Guards are NOT allowed to:
+    - transition Phase (INIT → EXECUTION)
+
+    Phase transition is owned exclusively by GuardLifecycle.
     Any failure here MUST prevent execution.
     """
 
-    # Basic structural validation
+    # --- Structural validation ---
     if not isinstance(ctx, ExecutionContext):
         raise GuardViolation("Invalid execution context")
 
-    # Source must be present
+    # --- Phase enforcement (NO mutation) ---
+    if ctx.phase != Phase.EXECUTION:
+        raise GuardViolation(
+            "Execution attempted outside EXECUTION phase"
+        )
+
+    # --- Source validation ---
     if not ctx.source:
         ctx.add_violation("Guard blocked: missing source")
         ctx.finalize(
@@ -32,6 +41,5 @@ def runtime_guards(ctx: ExecutionContext):
         )
         raise GuardViolation("Missing source")
 
-    # Allow execution
+    # --- Allow execution (status only) ---
     ctx.status = Status.ALLOW
-    ctx.phase = Phase.EXECUTION
