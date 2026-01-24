@@ -1,0 +1,31 @@
+{
+  "module_id": "interaction_echo_runtime_v1",
+  "module_type": "execution",
+  "version": "1.0",
+
+  "entrypoint": {
+    "module": "modules.interaction_echo_runtime_v1.module",
+    "callable": "handle_interaction"
+  },
+
+  "permissions": {
+    "read_context": true,
+    "write_result": true,
+    "write_explain": false,
+    "mutate_status": false,
+    "mutate_phase": false,
+    "call_finalize": false
+  },
+
+  "requires": {
+    "guard_lifecycle": true,
+    "mep": true
+  },
+
+  "forbidden": [
+    "orchestrator_call",
+    "origin_mutation",
+    "finalize_call",
+    "phase_mutation"
+  ]
+}
