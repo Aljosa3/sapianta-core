@@ -2,8 +2,8 @@
 Manual runner for KERNEL_INTROSPECTION_PROBE with DummyKernel.
 """
 
-from kernel_introspection_probe.probe import KernelIntrospectionProbe
-from kernel_introspection_probe.dummy_kernel import DummyKernel
+from .probe import KernelIntrospectionProbe
+from .dummy_kernel import DummyKernel
 
 
 def main():
