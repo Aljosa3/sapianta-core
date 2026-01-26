@@ -18,3 +18,9 @@ It exists to validate:
 
 Any addition of persistence, heuristics, or adaptation
 constitutes a scope violation.
+
+## Governance Linkage
+
+This module may surface signals relevant to the Human Orientation Safeguard (HOS),
+specifically situations where system continuation would occur
+without clear human orientation or actionable control.
