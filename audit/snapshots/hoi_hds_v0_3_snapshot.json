@@ -23,6 +23,12 @@
   ],
   "meta": {
     "version": "hds-json-output-v0.3",
-    "disclaimer": "Decision authority rests solely with the human operator."
+    "disclaimer": "Decision authority rests solely with the human operator.",
+    "timestamp": "2026-01-27T11:25:40Z",
+    "trace_id": "172a212b-f532-409e-acf0-82188553f59e",
+    "source": "cli",
+    "correlation_id": "hoi-adapter-v0.1",
+    "execution_context": "hoi->hds",
+    "audit_hint": "stdout-only"
   }
 }
