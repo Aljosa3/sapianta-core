@@ -1,0 +1,28 @@
+{
+  "options": [
+    {
+      "id": "opt-1",
+      "title": "Proceed conservatively",
+      "rationale": "Maintains system stability under uncertainty.",
+      "consequences": [
+        "Lower short-term gain",
+        "Reduced risk exposure"
+      ],
+      "uncertainty": "Medium"
+    },
+    {
+      "id": "opt-2",
+      "title": "Delay decision",
+      "rationale": "Allows additional human assessment.",
+      "consequences": [
+        "Opportunity cost",
+        "Improved contextual clarity"
+      ],
+      "uncertainty": "Low"
+    }
+  ],
+  "meta": {
+    "version": "hds-json-output-v0.3",
+    "disclaimer": "Decision authority rests solely with the human operator."
+  }
+}
