@@ -6,3 +6,4 @@ out.md
 response.json
 .venv/
 sandbox/
+audit_logs/
