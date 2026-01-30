@@ -1,12 +1,12 @@
-from sapianta_chat.routing import ChatRouter
-from sapianta_chat.orchestrator import ChatOrchestrator
-from sapianta_chat.output import CLIOutputRenderer, OutputExporter
+# /home/pisarna/sapianta_system/sapianta_chat/interface/cli.py
+
+from sapianta_chat.output.renderer import CLIOutputRenderer
+from sapianta_chat.output.exporter import OutputExporter
+from sapianta_chat.wiring import delegate_to_hoi
 
 
 class ChatCLI:
     def __init__(self):
-        self.router = ChatRouter()
-        self.orchestrator = ChatOrchestrator()
         self.renderer = CLIOutputRenderer()
         self.exporter = OutputExporter()
 
@@ -15,8 +15,7 @@ class ChatCLI:
         self._last_response = None
 
     def run_once(self, user_input: str) -> str:
-        request = self.router.route(user_input)
-        response = self.orchestrator.handle(request)
+        response = delegate_to_hoi(user_input)
         self._last_response = response
         return self.renderer.render(
             response,
@@ -88,12 +87,11 @@ class ChatCLI:
 
         meta = self._last_response.metadata or {}
         print("Last response: YES")
-        print(f"Interaction type: {meta.get('interaction_type')}")
+        print(f"Source: {meta.get('source')}")
         print(f"Response type: {self._last_response.response_type}")
-        print(f"Reasoning strategy: {meta.get('reasoning_strategy')}")
-        print(f"Planning strategy: {meta.get('planning_strategy')}")
 
     # ---------------- MAIN ----------------
+
 
 if __name__ == "__main__":
     cli = ChatCLI()
