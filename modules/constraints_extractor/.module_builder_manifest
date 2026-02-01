@@ -1,0 +1,4 @@
+module: constraints_extractor
+type: analysis
+version: 0.1
+author: claude_code
