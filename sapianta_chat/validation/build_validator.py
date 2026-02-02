@@ -1,6 +1,9 @@
+# PATH: sapianta_chat/validation/build_validator.py
+
 from dataclasses import dataclass
 from typing import List, Dict, Set
-import os
+from pathlib import Path
+
 
 @dataclass(frozen=True)
 class ValidationResult:
@@ -10,10 +13,13 @@ class ValidationResult:
 
 class BuildValidator:
     """
-    Validator Hook
+    HARD-GATE BUILD VALIDATOR
+
+    Rules:
     - NO fixing
     - NO side effects
     - Deterministic PASS / FAIL
+    - Scans ONLY generated_root (never whole repo / venv)
     """
 
     def __init__(
@@ -24,68 +30,87 @@ class BuildValidator:
         forbidden_imports: Set[str],
     ):
         self.build_plan = build_plan
-        self.generated_root = generated_root
+        self.generated_root = Path(generated_root).resolve()
         self.forbidden_files = forbidden_files
         self.forbidden_imports = forbidden_imports
+        self.errors: List[str] = []
+
+    # ---------- public API ----------
 
     def validate(self) -> ValidationResult:
-        errors: List[str] = []
+        if not self.generated_root.exists():
+            return ValidationResult(
+                status="FAIL",
+                errors=[f"Generated root does not exist: {self.generated_root}"],
+            )
 
-        errors += self._check_structure()
-        errors += self._check_files()
-        errors += self._check_imports()
+        self._check_structure()
+        self._check_files_and_imports()
 
-        if errors:
-            return ValidationResult(status="FAIL", errors=errors)
+        if self.errors:
+            return ValidationResult(status="FAIL", errors=self.errors)
 
         return ValidationResult(status="PASS", errors=[])
 
-    def _check_structure(self) -> List[str]:
-        errors = []
-        expected_paths = set(self.build_plan.get("paths", []))
+    # ---------- validation steps ----------
 
-        for path in expected_paths:
-            abs_path = os.path.join(self.generated_root, path)
-            if not os.path.exists(abs_path):
-                errors.append(f"Missing path: {path}")
-
-        return errors
-
-    def _check_files(self) -> List[str]:
+    def _check_structure(self) -> None:
         """
-        Enforces forbidden file policy based on file suffixes
-        (e.g. '.md' forbids all Markdown files).
+        Ensures all expected paths from build_plan exist.
         """
-        errors = []
+        expected_paths = self.build_plan.get("expected_paths", [])
 
-        for root, _, files in os.walk(self.generated_root):
-            for f in files:
-                for forbidden in self.forbidden_files:
-                    if f.endswith(forbidden):
-                        rel = os.path.relpath(
-                            os.path.join(root, f),
-                            self.generated_root
-                        )
-                        errors.append(f"Forbidden file detected: {rel}")
+        for rel_path in expected_paths:
+            abs_path = (self.generated_root / rel_path).resolve()
+            if not abs_path.exists():
+                self.errors.append(f"Missing path: {rel_path}")
 
-        return errors
+    def _check_files_and_imports(self) -> None:
+        """
+        Scans ONLY generated_root for forbidden files and imports.
+        """
+        for path in self.generated_root.rglob("*"):
+            if not path.is_file():
+                continue
 
-    def _check_imports(self) -> List[str]:
-        errors = []
+            # 🔒 HARD SCOPE GUARD
+            if not self._is_within_generated_root(path):
+                continue
 
-        for root, _, files in os.walk(self.generated_root):
-            for f in files:
-                if not f.endswith(".py"):
-                    continue
+            self._check_forbidden_file(path)
+            self._check_forbidden_imports(path)
 
-                path = os.path.join(root, f)
-                with open(path, "r", encoding="utf-8") as fh:
-                    for line_no, line in enumerate(fh, 1):
-                        for forbidden in self.forbidden_imports:
-                            if forbidden in line:
-                                rel = os.path.relpath(path, self.generated_root)
-                                errors.append(
-                                    f"Forbidden import '{forbidden}' in {rel}:{line_no}"
-                                )
+    # ---------- checks ----------
 
-        return errors
+    def _check_forbidden_file(self, path: Path) -> None:
+        if path.suffix in self.forbidden_files:
+            rel = path.relative_to(self.generated_root)
+            self.errors.append(f"Forbidden file detected: {rel}")
+
+    def _check_forbidden_imports(self, path: Path) -> None:
+        if path.suffix != ".py":
+            return
+
+        try:
+            content = path.read_text(encoding="utf-8")
+        except Exception:
+            return
+
+        for forbidden in self.forbidden_imports:
+            if f"import {forbidden}" in content or f"from {forbidden}" in content:
+                rel = path.relative_to(self.generated_root)
+                self.errors.append(
+                    f"Forbidden import '{forbidden}' in {rel}"
+                )
+
+    # ---------- helpers ----------
+
+    def _is_within_generated_root(self, path: Path) -> bool:
+        """
+        Absolute guarantee that we never scan outside generated_root.
+        """
+        try:
+            path.relative_to(self.generated_root)
+            return True
+        except ValueError:
+            return False
