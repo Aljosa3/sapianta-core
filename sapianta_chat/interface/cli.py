@@ -1,8 +1,11 @@
-# /home/pisarna/sapianta_system/sapianta_chat/interface/cli.py
+# PATH: sapianta_chat/interface/cli.py
 
 from sapianta_chat.output.renderer import CLIOutputRenderer
 from sapianta_chat.output.exporter import OutputExporter
 from sapianta_chat.wiring import delegate_to_hoi
+
+from sapianta_chat.interface.cli_proposal_gate import proposal_gate
+from sapianta_chat.output.build_plan_exporter import export_build_plan
 
 
 class ChatCLI:
@@ -16,7 +19,10 @@ class ChatCLI:
 
     def run_once(self, user_input: str) -> str:
         response = delegate_to_hoi(user_input)
+        response = proposal_gate(response)
+
         self._last_response = response
+
         return self.renderer.render(
             response,
             mode=self.mode,
@@ -42,6 +48,27 @@ class ChatCLI:
                 print(f"(detail set to {self.detail})")
             else:
                 print("Usage: :detail short|normal|full")
+            return True
+
+        if user_input.startswith(":export-build"):
+            parts = user_input.split(maxsplit=1)
+            if len(parts) != 2:
+                print("Usage: :export-build <path>")
+                return True
+
+            if self._last_response is None:
+                print("No build proposal to export.")
+                return True
+
+            try:
+                export_build_plan(
+                    reviewed_response=self._last_response,
+                    path=parts[1],
+                )
+                print(f"(build plan exported to {parts[1]})")
+            except Exception as e:
+                print(f"Export failed: {e}")
+
             return True
 
         if user_input.startswith(":export"):
@@ -85,10 +112,7 @@ class ChatCLI:
             print("Last response: NO")
             return
 
-        meta = self._last_response.metadata or {}
         print("Last response: YES")
-        print(f"Source: {meta.get('source')}")
-        print(f"Response type: {self._last_response.response_type}")
 
     # ---------------- MAIN ----------------
 
