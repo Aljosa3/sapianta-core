@@ -1,6 +1,3 @@
-# PATH: sapianta_chat/cli/build_flow.py
-
-import json
 import sys
 from pathlib import Path
 from typing import Dict, Any
@@ -9,7 +6,7 @@ from sapianta_chat.validation.build_validator import BuildValidator
 from sapianta_chat.validation.repair_plan import RepairPlanGenerator
 
 from runtime.claude_executor import ClaudeExecutor
-from runtime.module_writer import ModuleWriter
+from runtime.raw_module_writer import parse_files, write_files
 
 
 FORBIDDEN_FILES = {".md"}
@@ -61,7 +58,7 @@ def run_build_pipeline(
 
     Flow:
     1. Execute Claude Code (raw output)
-    2. Write files to disk (ModuleWriter) INTO workdir
+    2. Materialize modules from RAW output (### FILE markers)
     3. Run post-Claude validator AGAINST workdir (HARD GATE)
     """
 
@@ -83,19 +80,23 @@ def run_build_pipeline(
         print("[BUILD] FAIL: Claude produced no output")
         sys.exit(1)
 
-    with raw_output_path.open("r", encoding="utf-8") as f:
-        claude_output = json.load(f)
-
-    # 2️⃣ Write generated modules STRICTLY into workdir
-    writer = ModuleWriter(project_root=str(workdir_path))
-
+    # 2️⃣ Read RAW output as STRING (no JSON interpretation)
     try:
-        writer.write(claude_output)
+        with raw_output_path.open("r", encoding="utf-8") as f:
+            raw_text = f.read()
     except Exception as e:
-        print(f"[BUILD] FAIL during write phase: {e}")
+        print(f"[BUILD] FAIL: Could not read raw output: {e}")
         sys.exit(1)
 
-    # 3️⃣ Post-Claude hard-gate validation (ONLY workdir is scanned)
+    # 3️⃣ Parse + write files using ### FILE markers
+    try:
+        files = parse_files(raw_text)
+        write_files(files, project_root=str(workdir_path))
+    except Exception as e:
+        print(f"[BUILD] FAIL during materialization phase: {e}")
+        sys.exit(1)
+
+    # 4️⃣ Post-Claude hard-gate validation (ONLY workdir is scanned)
     run_post_claude_validation(
         build_plan=build_plan,
         generated_root=str(workdir_path),
