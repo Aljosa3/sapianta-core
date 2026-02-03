@@ -87,3 +87,12 @@ class ClaudeClient:
             raise ClaudeClientError(
                 f"Invalid Claude response format: {data}"
             ) from e
+
+    # --- adapter compatibility (LOCKED contract) ---
+
+    def complete(self, prompt: str) -> str:
+        """
+        Alias for adapter compatibility.
+        Adapter contract is LOCKED (v0.13).
+        """
+        return self.call(prompt)
