@@ -22,7 +22,7 @@ class ClaudeClient:
     """
 
     API_URL = "https://api.anthropic.com/v1/messages"
-    MODEL = "claude-3-sonnet-20240229"
+    MODEL = "claude-3-haiku-20240307"
     MAX_TOKENS = 4096
 
     def __init__(self, api_key: str):
