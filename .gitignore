@@ -10,6 +10,7 @@ generated_output/
 build_plan.json
 out.md
 response.json
+out/
 
 # ------------------------------------------------------------
 # Test / demo modules (outputs of the builder)
@@ -21,6 +22,7 @@ modules/__pycache__/
 # Python runtime artefacts
 # ------------------------------------------------------------
 __pycache__/
+**/__pycache__/
 *.pyc
 *.pyo
 *.pyd
@@ -65,6 +67,7 @@ Thumbs.db
 .pytest_cache/
 .coverage
 htmlcov/
+tests/runtime/
 
 # ------------------------------------------------------------
 # Explicit NON-ignore (safety net — canonical domains)
@@ -74,3 +77,4 @@ htmlcov/
 !sapianta_chat/**
 !srs/**
 !docs/**
+!tests/validation/**
