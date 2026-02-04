@@ -31,6 +31,13 @@ class RawModuleWriter:
         if not matches:
             raise RawModuleWriterError("No FILE markers found in raw output")
 
+        # ❌ HARD FAIL: any text before first FILE marker
+        prefix = raw_text[:matches[0].start()]
+        if prefix.strip():
+            raise RawModuleWriterError(
+                "Text found outside FILE blocks (before first FILE marker)"
+            )
+
         files: Dict[str, str] = {}
 
         for i, match in enumerate(matches):
@@ -38,7 +45,7 @@ class RawModuleWriter:
 
             start = match.end()
             end = matches[i + 1].start() if i + 1 < len(matches) else len(raw_text)
-            content = raw_text[start:end].lstrip("\n")
+            content = raw_text[start:end]
 
             if not content.strip():
                 raise RawModuleWriterError(f"Empty content for file: {path}")
@@ -49,11 +56,13 @@ class RawModuleWriter:
             if not any(path.startswith(root) for root in self.allowed_roots):
                 raise RawModuleWriterError(f"Path outside allowed roots: {path}")
 
-            files[path] = content
+            files[path] = content.lstrip("\n")
 
+        # materialize files
         for rel_path, content in files.items():
             out_path = (self.project_root / rel_path).resolve()
 
+            # ❌ HARD FAIL: path traversal
             if not str(out_path).startswith(str(self.project_root)):
                 raise RawModuleWriterError(f"Path traversal detected: {rel_path}")
 
