@@ -527,3 +527,135 @@ INVALID DECISION PREVIEW OUTPUT
 in se **ne prikaže uporabniku**.
 
 ---
+
+## 9. VALIDACIJSKA PRAVILA (MACHINE-CHECKABLE)
+
+Ta razdelek normativno določa **strojno preverljiva pravila**, po katerih se ugotavlja veljavnost izpisa *Decision Preview*.
+
+Vsako pravilo v tem razdelku je:
+- deterministično
+- binarno (PASS / FAIL)
+- neinterpretativno
+
+Če katerokoli pravilo ni izpolnjeno, je izpis **INVALID DECISION PREVIEW OUTPUT** in se **ne prikaže uporabniku**.
+
+---
+
+### 9.1. VALIDACIJA STRUKTURE SEKCIJ
+
+Validator mora preveriti:
+
+- da izpis vsebuje **točno 6 sekcij**
+- da so sekcije prisotne **brez izjem**
+- da so sekcije v **točno določenem zaporedju**
+
+Dovoljene sekcije (in samo te):
+1. PREVIEW_HEADER
+2. PREVIEW_SCOPE
+3. PREVIEW_INPUT_REFERENCE
+4. PREVIEW_DECISION_SPACE
+5. PREVIEW_CONSTRAINTS
+6. PREVIEW_DISCLAIMER
+
+**FAIL**, če:
+- manjka katerakoli sekcija
+- obstaja dodatna sekcija
+- je vrstni red spremenjen
+
+---
+
+### 9.2. VALIDACIJA NASLOVOV SEKCIJ
+
+Validator mora preveriti:
+
+- da so naslovi sekcij **implicitni** (izpeljani iz strukture)
+- da v izpisu **ni eksplicitnih naslovov sekcij**, razen vsebine, določene v allowlisti
+
+**FAIL**, če:
+- se pojavi katerikoli naslov, ki ni del dovoljenih nizov
+- se pojavi oznaka sekcije kot besedilo (npr. “PREVIEW_SCOPE:”)
+
+---
+
+### 9.3. VALIDACIJA STRING-LEVEL ALLOWLISTE
+
+Validator mora preveriti, da:
+
+- vsak niz v izpisu obstaja v razdelku **6. DOVOLJENE FORMULACIJE**
+- vsak niz je **bit-for-bit identičen** (vključno s presledki, ločili, vrstnim redom)
+
+**FAIL**, če:
+- se pojavi neznan niz
+- se pojavi dovoljen niz v spremenjeni obliki
+- je dovoljen niz razbit ali združen v nov niz
+
+---
+
+### 9.4. VALIDACIJA DINAMIČNIH VSTAVKOV
+
+Validator mora preveriti, da:
+
+- je uporabljen **samo** dinamični vstavek `<CANONICAL_INPUT_ID>`
+- se dinamični vstavek pojavi **samo na dovoljenem mestu**
+- dinamični vstavek ustreza pravilom iz razdelka 6.3
+
+**FAIL**, če:
+- obstaja drug dinamični element
+- je dinamični element večkrat ponovljen
+- je dinamični element na napačnem mestu
+
+---
+
+### 9.5. VALIDACIJA PREPOVEDANIH SEKCIJ
+
+Validator mora preveriti, da:
+
+- ne obstaja nobena sekcija, ki ni navedena v razdelku 3
+- ne obstaja nobena sekcija, ki ustreza prepovedim iz razdelka 7
+
+**FAIL**, če:
+- obstaja dodatna ali skrita sekcija
+- obstaja sekcija z implicitno prepovedano vsebino
+
+---
+
+### 9.6. VALIDACIJA PREPOVEDANIH FORMULACIJ
+
+Validator mora preveriti, da:
+
+- noben niz iz razdelka **8. PREPOVEDANE FORMULACIJE** ni prisoten v izpisu
+
+**FAIL**, če:
+- se pojavi katerikoli prepovedan niz
+- je prepovedan niz del daljšega niza
+
+---
+
+### 9.7. VALIDACIJA PRAZNIH VRSTIC IN LOČIL
+
+Validator mora preveriti:
+
+- da so sekcije ločene **izključno z eno prazno vrstico**
+- da ni dodatnih praznih vrstic na začetku ali koncu izpisa
+- da ni vizualnih ločil (črte, znaki, simboli)
+
+**FAIL**, če:
+- je več zaporednih praznih vrstic
+- so uporabljeni simbolni ločevalniki
+
+---
+
+### 9.8. KONČNA VALIDACIJA
+
+Izpis *Decision Preview* je označen kot **VALID**, če in samo če:
+
+- vsa pravila iz razdelka 9.1–9.7 vrnejo **PASS**
+
+V nasprotnem primeru je izpis:
+
+INVALID DECISION PREVIEW OUTPUT
+
+
+in se **ne prikaže uporabniku**.
+
+---
