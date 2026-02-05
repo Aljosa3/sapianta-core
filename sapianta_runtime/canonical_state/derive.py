@@ -1,30 +1,36 @@
-# sapianta_runtime/canonical_state/derive.py
+from sapianta_runtime.validator.validate import ValidationError
+
 
 def derive_canonical_state(cdrs):
     state = {}
 
     for cdr in cdrs:
-        decision_type = cdr.get("decision_type")
-        target = cdr.get("target")
+        decision_type = cdr["decision_type"]
+        target = cdr["target"]
 
         if decision_type == "ADD":
+            if target in state:
+                raise ValidationError(f"ADD on existing target: {target}")
             state[target] = "ACTIVE"
 
         elif decision_type == "REPLACE":
-            replaced = cdr.get("replaces")
-            if replaced in state:
-                state[replaced] = "SUPERSEDED"
+            replaced = cdr["replaces"]
+            if replaced not in state:
+                raise ValidationError(f"REPLACE refers to unknown target: {replaced}")
+            state[replaced] = "SUPERSEDED"
             state[target] = "ACTIVE"
 
         elif decision_type == "DEPRECATE":
-            if target in state:
-                state[target] = "DEPRECATED"
+            if target not in state:
+                raise ValidationError(f"DEPRECATE refers to unknown target: {target}")
+            state[target] = "DEPRECATED"
 
         elif decision_type == "REVOKE":
-            if target in state:
-                state[target] = "REVOKED"
+            if target not in state:
+                raise ValidationError(f"REVOKE refers to unknown target: {target}")
+            state[target] = "REVOKED"
 
         else:
-            raise RuntimeError("Unknown decision type")
+            raise ValidationError("Unreachable decision type")
 
     return state

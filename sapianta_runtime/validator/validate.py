@@ -1,23 +1,43 @@
-# sapianta_runtime/validator/validate.py
-
 ALLOWED_DECISIONS = {"ADD", "REPLACE", "DEPRECATE", "REVOKE"}
 
 
-def validate_cdr(cdr):
-    if "decision_type" not in cdr:
-        return False
+class ValidationError(RuntimeError):
+    pass
 
-    if cdr["decision_type"] not in ALLOWED_DECISIONS:
-        return False
+
+def validate_cdr(cdr):
+    if not isinstance(cdr, dict):
+        raise ValidationError("CDR must be a dict")
+
+    if "decision_type" not in cdr:
+        raise ValidationError("Missing decision_type")
+
+    decision_type = cdr["decision_type"]
+
+    if decision_type not in ALLOWED_DECISIONS:
+        raise ValidationError(f"Unknown decision_type: {decision_type}")
 
     if "target" not in cdr:
-        return False
+        raise ValidationError("Missing target")
+
+    if decision_type == "REPLACE":
+        if "replaces" not in cdr:
+            raise ValidationError("REPLACE requires 'replaces' field")
+        if cdr["replaces"] == cdr["target"]:
+            raise ValidationError("REPLACE target and replaces cannot be identical")
+
+    if decision_type in {"DEPRECATE", "REVOKE"}:
+        # target must exist logically; existence is checked later against state
+        pass
 
     return True
 
 
 def validate_all(cdrs):
+    if not isinstance(cdrs, list):
+        raise ValidationError("CDRs must be a list")
+
     for cdr in cdrs:
-        if not validate_cdr(cdr):
-            return False
+        validate_cdr(cdr)
+
     return True
