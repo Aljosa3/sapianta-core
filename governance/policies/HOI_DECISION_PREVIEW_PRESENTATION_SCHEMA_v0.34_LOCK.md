@@ -364,7 +364,161 @@ HOI ne sme:
 
 Če *Decision Preview* vsebuje:
 - sekcijo, ki ni navedena v razdelku 3
-- ali sekcijo, ki ustreza katerikoli prepovedi iz razdelka 8
+- ali sekcijo, ki ustreza katerikoli prepovedi iz razdelka 7
+
+se izpis označi kot:
+INVALID DECISION PREVIEW OUTPUT
+
+
+in se **ne prikaže uporabniku**.
+
+---
+
+## 8. PREPOVEDANE FORMULACIJE (STRING-LEVEL DENYLIST)
+
+Ta razdelek normativno določa **prepovedane nize (strings)**, ki jih HOI **NE SME** uporabiti kjerkoli v izpisu *Decision Preview*.
+
+Prisotnost kateregakoli prepovedanega niza pomeni:
+- **INVALID DECISION PREVIEW OUTPUT**
+- **avtomatsko zavrnitev prikaza**
+- **kršitev v0.34**
+
+---
+
+### 8.1. SPLOŠNA PRAVILA
+
+- Prepoved velja za **točne nize**, njihove:
+  - parafraze
+  - sopomenke
+  - skrajšave
+  - prevode
+  - morfološke variante (ednina/množina, časi)
+- Prepoved velja **neodvisno od velikosti črk**.
+- Prepoved velja **v vseh sekcijah**, vključno z dovoljenimi sekcijami iz razdelka 3.
+- Prepoved velja tudi, če je niz del daljšega stavka.
+
+---
+
+### 8.2. PRIPOROČILNE IN NORMATIVNE FORMULACIJE
+
+HOI ne sme uporabiti nizov, ki neposredno ali posredno pomenijo priporočilo ali usmerjanje:
+
+- recommend
+- recommendation
+- suggested
+- suggestion
+- advise
+- advice
+- guidance
+- should
+- should consider
+- best option
+- optimal
+- preferred
+- encouraged
+- discourage
+- must
+- ought to
+
+---
+
+### 8.3. ODLOČITVENE IN IZBIRNE FORMULACIJE
+
+Prepovedani so nizi, ki implicirajo izbiro, odločitev ali vrednotenje:
+
+- choose
+- choice
+- select
+- selection
+- decide
+- decision
+- pick
+- option
+- alternative
+- path to take
+- next step
+- action
+
+---
+
+### 8.4. NAPOVEDNE IN PREDIKTIVNE FORMULACIJE
+
+HOI ne sme napovedovati izidov ali verjetnosti:
+
+- will
+- will result
+- likely
+- unlikely
+- probability
+- chance
+- predict
+- prediction
+- forecast
+- outcome
+- expected
+- expectation
+- risk
+- benefit
+
+---
+
+### 8.5. VREDNOSTNE IN KVALITATIVNE FORMULACIJE
+
+Prepovedani so nizi, ki izražajo vrednotenje ali kvalitativno presojo:
+
+- good
+- bad
+- better
+- worse
+- best
+- worst
+- positive
+- negative
+- favorable
+- unfavorable
+- important
+- significant
+- critical
+
+---
+
+### 8.6. INTENCIONALNE IN EMOCIONALNE FORMULACIJE
+
+HOI ne sme izražati namena, namere ali čustvene obarvanosti:
+
+- intend
+- intention
+- goal
+- aim
+- want
+- desire
+- feel
+- believe
+- think
+- confidence
+
+---
+
+### 8.7. UPORABNIŠKO-OSREDOTOČENE FORMULACIJE
+
+Prepovedani so nizi, ki neposredno nagovarjajo uporabnika ali implicirajo dejanje uporabnika:
+
+- you should
+- you can
+- you may
+- your decision
+- for you
+- consider doing
+- what you should do
+
+---
+
+### 8.8. VALIDACIJSKO PRAVILO
+
+Če *Decision Preview* vsebuje katerikoli niz iz razdelka 8:
+- samostojno
+- kot del daljšega niza
+- v drugačni slovnični obliki
 
 se izpis označi kot:
 INVALID DECISION PREVIEW OUTPUT
