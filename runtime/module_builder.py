@@ -1,3 +1,11 @@
+class ModuleBuilder:
+    def __init__(self, canon: dict):
+        self.canon = canon
+
+    def prepare(self, request: dict) -> dict:
+        return prepare_build_task(request, self.canon)
+
+
 def prepare_build_task(request: dict, canon: dict) -> dict:
     return {
         "instruction": (
