@@ -11,6 +11,7 @@ build_plan.json
 out.md
 response.json
 out/
+artifacts/                 # ← DODANO (runtime self-build artefacts)
 
 # ------------------------------------------------------------
 # Test / demo modules (outputs of the builder)
@@ -23,6 +24,7 @@ modules/__pycache__/
 # ------------------------------------------------------------
 __pycache__/
 **/__pycache__/
+tests/**/__pycache__/       # ← DODANO (test runtime noise)
 *.pyc
 *.pyo
 *.pyd
