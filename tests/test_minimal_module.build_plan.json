@@ -1,0 +1,26 @@
+{
+  "build_plan_version": "SAPIANTA_BUILD_PLAN_V1",
+  "intent": "TEST_ONLY_MINIMAL_MODULE",
+  "module": {
+    "name": "hello_world",
+    "path": "modules/hello_world",
+    "description": "Minimal test module for SAPIANTA controlled build pipeline"
+  },
+  "files": [
+    {
+      "path": "modules/hello_world/__init__.py",
+      "content_intent": "Initialize hello_world module. File must be empty."
+    },
+    {
+      "path": "modules/hello_world/main.py",
+      "content_intent": "Define a function run() that returns the string 'hello world'. No imports."
+    }
+  ],
+  "constraints": {
+    "allowed_languages": ["python"],
+    "forbidden_imports": ["openai", "requests", "subprocess"],
+    "forbidden_files": [".md"],
+    "no_network": true,
+    "no_filesystem_outside_module": true
+  }
+}
