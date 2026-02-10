@@ -10,6 +10,9 @@ from sapianta_chat.validation.repair_plan import RepairPlanGenerator
 from runtime.claude_executor import ClaudeExecutor
 from runtime.raw_module_writer import RawModuleWriter, RawModuleWriterError
 
+# HASBT (governance enforcement)
+from governance.hasbt import evaluate_hasbt
+
 
 FORBIDDEN_FILES = {".md"}
 FORBIDDEN_IMPORTS = {"openai", "requests", "subprocess"}
@@ -67,6 +70,11 @@ def run_build_pipeline(
     # 🔒 Dedicated build output root
     workdir_path = Path(workdir).resolve()
     workdir_path.mkdir(parents=True, exist_ok=True)
+
+    # 🔒 HASBT — Human Authorization Step Before Transformation
+    # LOCKED invocation point (see DECISION_HASBT_INSERTION_POINT_v0.1)
+    # FAIL-CLOSED by design: missing or invalid payload aborts execution
+    evaluate_hasbt(hasbt_payload)
 
     # 1️⃣ Claude execution (writes raw output only)
     executor = ClaudeExecutor(
