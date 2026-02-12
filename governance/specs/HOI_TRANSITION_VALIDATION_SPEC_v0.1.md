@@ -1,5 +1,5 @@
 # HOI_TRANSITION_VALIDATION_SPEC_v0.1
-Status: DRAFT  
+Status: LOCK  
 Layer: HOI Execution Layer  
 Scope: Deterministic Transition Validation  
 Compatibility:

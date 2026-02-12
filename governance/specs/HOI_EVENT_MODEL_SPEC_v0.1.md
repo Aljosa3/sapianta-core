@@ -1,5 +1,5 @@
 # HOI_EVENT_MODEL_SPEC_v0.1
-Status: DRAFT  
+Status: LOCK 
 Layer: HOI Execution Layer  
 Scope: Deterministic Event Model  
 Compatibility:

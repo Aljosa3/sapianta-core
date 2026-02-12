@@ -1,5 +1,5 @@
 # HOI_CANONICAL_STATE_OBJECT_SPEC_v0.1
-Status: DRAFT
+Status: LOCK
 Layer: Execution Layer
 Scope: Deterministic Core
 Related: HOI_BUILD_FLOW_SPEC_v0.1_LOCK, MODULE_FORMAT_SPEC_v0.1_LOCK

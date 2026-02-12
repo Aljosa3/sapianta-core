@@ -1,5 +1,5 @@
 # HOI_EXECUTION_LOOP_CONTRACT_v0.1
-Status: DRAFT  
+Status: LOCK  
 Layer: HOI Execution Layer  
 Scope: Deterministic Execution Loop Contract  
 Compatibility:

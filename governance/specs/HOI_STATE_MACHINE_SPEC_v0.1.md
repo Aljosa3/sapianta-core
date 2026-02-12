@@ -1,5 +1,5 @@
 # HOI_STATE_MACHINE_SPEC_v0.1
-Status: DRAFT  
+Status: LOCK  
 Layer: HOI Execution Layer  
 Scope: Deterministic State Machine Specification  
 Compatibility: HOI_CANONICAL_STATE_OBJECT_SPEC_v0.1  
