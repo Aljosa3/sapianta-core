@@ -1,5 +1,5 @@
 """
-PHASE 5.0 — CLI Integration Bridge
+PHASE 7.1 — Advisory CLI Overlay
 
 Deterministic CLI wrapper around HOIAdapter.
 
@@ -7,26 +7,32 @@ Responsibilities:
 - Accept raw CLI input
 - Pass input into HOIAdapter
 - Print deterministic canonical export
-- No advisory logic
+- Print prompt payload
+- Print advisory overlay (non-invasive)
 - No LLM call
-- No side effects beyond stdout
+- No execution side effects beyond stdout
 """
 
-import sys
 from sapianta_hoi.integration.hoi_adapter import HOIAdapter
 from sapianta_hoi.prompt_export.prompt_builder import build_prompt_payload
+from sapianta_hoi.advisory.advisory_engine import AdvisoryEngine
 
 
 class HOICLI:
     """
-    Minimal deterministic CLI interface.
+    Deterministic CLI interface with advisory overlay.
 
     Flow:
-    CLI → HOIAdapter → Canonical State → Prompt Payload
+    CLI → HOIAdapter → Canonical State
+                              ↓
+                        Prompt Payload
+                              ↓
+                        Advisory Overlay
     """
 
     def __init__(self):
         self._adapter = HOIAdapter()
+        self._advisory_engine = AdvisoryEngine()
 
     def run(self):
         print("SAPIANTA HOI CLI — Deterministic Mode")
@@ -41,15 +47,23 @@ class HOICLI:
                 break
 
             try:
-                canonical_state = self._adapter.handle_input(user_input)
+                canonical_snapshot = self._adapter.handle_input(user_input)
 
-                prompt_payload = build_prompt_payload(canonical_state)
+                prompt_payload = build_prompt_payload(canonical_snapshot)
 
-                print("\n--- CANONICAL STATE ---")
-                print(canonical_state)
+                advisory_overlay = self._advisory_engine.generate(
+                    canonical_snapshot
+                )
+
+                print("\n--- CANONICAL EXPORT ---")
+                print(canonical_snapshot)
 
                 print("\n--- PROMPT PAYLOAD ---")
                 print(prompt_payload)
+
+                print("\n--- ADVISORY OVERLAY ---")
+                print(advisory_overlay)
+
                 print("\n")
 
             except Exception as e:
