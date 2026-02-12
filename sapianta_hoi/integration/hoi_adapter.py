@@ -1,16 +1,20 @@
 from sapianta_hoi.execution.session_controller import SessionController
 from sapianta_hoi.runtime_stub.event import Event
 from sapianta_hoi.runtime_contracts.exporter import export_canonical_state
+from sapianta_hoi.runtime_contracts.event_registry import validate_event
 
 
 class HOIAdapter:
     """
     Deterministic HOI integration bridge.
 
-    Responsibilities:
-    - Map user input to event (strict mapping)
-    - Dispatch event via SessionController
-    - Export canonical state deterministically
+    Strict guarantees:
+    - Closed event domain (validated against formal registry)
+    - Deterministic state transition
+    - Export-only observable surface
+    - No advisory logic
+    - No interpretation
+    - No external I/O
     """
 
     def __init__(self, initial_state: str = "INITIAL") -> None:
@@ -18,31 +22,37 @@ class HOIAdapter:
 
     @property
     def current_state(self) -> str:
+        """
+        Returns only the state name.
+        Internal state object is not exposed.
+        """
         return self._controller.current_state.state_name
 
     def handle_input(self, user_input: str) -> dict:
         """
         Deterministic input handling.
 
-        Current phase:
-        - Direct string-to-event mapping
-        - No interpretation
+        Rules:
+        - Input must exactly match a registered event
+        - No fuzzy matching
         - No inference
+        - No interpretation
         """
 
-        event = self._map_input_to_event(user_input)
+        # Fail-fast if event is not part of the closed registry
+        validate_event(user_input)
+
+        event = Event(event_type=user_input)
 
         new_state = self._controller.dispatch(event)
 
         return export_canonical_state(new_state)
 
-    def _map_input_to_event(self, user_input: str) -> Event:
+    def get_export_snapshot(self) -> dict:
         """
-        Strict deterministic mapping:
-        user_input must exactly equal event_type.
+        Official observable export surface.
 
-        No fuzzy matching.
-        No interpretation.
+        Used by regression harness.
+        No internal state exposure.
         """
-
-        return Event(event_type=user_input)
+        return export_canonical_state(self._controller.current_state)
