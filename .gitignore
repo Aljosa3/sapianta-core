@@ -1,6 +1,5 @@
 # ============================================================
 # SAPIANTA — Canonical .gitignore
-# (merged + aligned)
 # ============================================================
 
 # ------------------------------------------------------------
@@ -11,23 +10,13 @@ build_plan.json
 out.md
 response.json
 out/
-artifacts/                 # ← DODANO (runtime self-build artefacts)
-
-# ------------------------------------------------------------
-# Test / demo modules (outputs of the builder)
-# ------------------------------------------------------------
-modules/test_module/
-modules/__pycache__/
+artifacts/
 
 # ------------------------------------------------------------
 # Python runtime artefacts
 # ------------------------------------------------------------
 __pycache__/
-**/__pycache__/
-tests/**/__pycache__/       # ← DODANO (test runtime noise)
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
 
 # ------------------------------------------------------------
 # Virtual environments
@@ -72,7 +61,7 @@ htmlcov/
 tests/runtime/
 
 # ------------------------------------------------------------
-# Explicit NON-ignore (safety net — canonical domains)
+# Explicit NON-ignore (canonical domains — safety net)
 # ------------------------------------------------------------
 !governance/**
 !runtime/**
