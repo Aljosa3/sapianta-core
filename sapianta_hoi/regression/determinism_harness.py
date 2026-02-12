@@ -7,11 +7,12 @@ from sapianta_hoi.integration.hoi_adapter import HOIAdapter
 
 class DeterminismHarness:
     """
-    Deterministic regression harness.
+    Production-grade determinism regression harness.
 
     Guarantees:
-    - Same input sequence → identical export output
-    - Hash-based verification
+    - Same input sequence → identical export snapshot
+    - Hash-based verification using canonical JSON
+    - No access to private runtime internals
     - Fail-fast on mismatch
     """
 
@@ -24,20 +25,21 @@ class DeterminismHarness:
         for e in events:
             adapter.handle_input(e)
 
-        final_payload = adapter.handle_input("NOOP") if False else adapter._controller.current_state
+        # Use official observable export surface only
+        snapshot = adapter.get_export_snapshot()
 
-        exported = adapter.handle_input(events[-1]) if False else adapter._controller.current_state
-
-        payload = adapter._controller.current_state
-
+        # Canonical JSON serialization
         serialized = json.dumps(
-            payload.__dict__,
-            sort_keys=True
+            snapshot,
+            sort_keys=True,
+            separators=(",", ":"),
         )
 
+        hash_value = hashlib.sha256(serialized.encode()).hexdigest()
+
         return {
-            "state": payload.state_name,
-            "hash": hashlib.sha256(serialized.encode()).hexdigest(),
+            "snapshot": snapshot,
+            "hash": hash_value,
         }
 
     def assert_deterministic(self, events: List[str]) -> None:
