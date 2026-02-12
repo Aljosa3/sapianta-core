@@ -13,13 +13,13 @@ It intentionally contains:
 Its purpose is to hold the interaction loop and enforce silence.
 """
 
-from sapianta_hoi.runtime_stub.rules import (
+from sapianta_hoi.hoi_boundary.rules import (
     FORBIDDEN_ACTS,
     FORBIDDEN_PHRASES,
     FORBIDDEN_IMPLICIT_BEHAVIORS,
 )
 
-from sapianta_hoi.runtime_stub.stop_conditions import (
+from sapianta_hoi.hoi_boundary.stop_conditions import (
     STOP_CONDITIONS,
     SILENCE_REQUIREMENTS,
 )
