@@ -1,5 +1,14 @@
 #!/bin/sh
 
+echo "---------------------------------------------"
+echo "SAPIANTA PRE-COMMIT VALIDATION"
+echo "---------------------------------------------"
+
+# ------------------------------------------------
+# 1️⃣ IGL INIT CHECK
+# ------------------------------------------------
+
+echo ""
 echo "Running IGL Init Check..."
 python3 sapianta/igl/igl_init.py sapianta/chat/
 IGL_STATUS=$?
@@ -10,6 +19,12 @@ if [ $IGL_STATUS -ne 0 ]; then
     exit 1
 fi
 
+
+# ------------------------------------------------
+# 2️⃣ KERNEL BOUNDARY CHECK
+# ------------------------------------------------
+
+echo ""
 echo "Running Kernel Boundary Check..."
 python3 scripts/kernel_boundary_check.py
 KERNEL_STATUS=$?
@@ -21,5 +36,58 @@ if [ $KERNEL_STATUS -ne 0 ]; then
     exit 1
 fi
 
+
+# ------------------------------------------------
+# 3️⃣ KERNEL LAYER DEPENDENCY CHECK
+# ------------------------------------------------
+
+echo ""
+echo "Running Kernel Layer Dependency Check..."
+python3 scripts/kernel_layer_dependency_check.py
+LAYER_STATUS=$?
+
+if [ $LAYER_STATUS -ne 0 ]; then
+    echo ""
+    echo "❌ Commit blocked: Layer dependency violation detected."
+    echo "Resolve illegal cross-layer imports before committing."
+    exit 1
+fi
+
+
+# ------------------------------------------------
+# 4️⃣ KERNEL DETERMINISM CHECK
+# ------------------------------------------------
+
+echo ""
+echo "Running Kernel Determinism Check..."
+python3 scripts/kernel_determinism_check.py
+DET_STATUS=$?
+
+if [ $DET_STATUS -ne 0 ]; then
+    echo ""
+    echo "❌ Commit blocked: Kernel determinism violation detected."
+    echo "Remove nondeterministic constructs from Layer 0."
+    exit 1
+fi
+
+
+# ------------------------------------------------
+# 5️⃣ KERNEL RUNTIME REPEATABILITY TEST
+# ------------------------------------------------
+
+echo ""
+python3 scripts/kernel_repeatability_test.py
+REP_STATUS=$?
+
+if [ $REP_STATUS -ne 0 ]; then
+    echo ""
+    echo "❌ Commit blocked: Kernel runtime is not repeatable."
+    exit 1
+fi
+
+
+echo ""
+echo "---------------------------------------------"
 echo "✅ All pre-commit checks passed."
+echo "---------------------------------------------"
 exit 0
