@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
 
 """
-Kernel Boundary Auto-Check Script
-----------------------------------
+Kernel Boundary Auto-Check Script (Governance-Bound)
+-----------------------------------------------------
 
-Enforces namespace whitelist freeze for HOI Kernel v1.x.
+Validates that sapianta_hoi/ namespaces match the whitelist
+defined in:
 
-This script verifies that only approved top-level namespaces
-exist under sapianta_hoi/.
+governance/kernel/KERNEL_PUBLIC_SURFACE_SNAPSHOT_v1.0.md
 
-If any additional namespace appears, the script exits with
-non-zero status.
+The governance document is treated as the source of truth.
 
 Deterministic.
 No external dependencies.
@@ -20,23 +19,43 @@ import os
 import sys
 
 
-# Whitelisted namespaces aligned with
-# KERNEL_PUBLIC_SURFACE_SNAPSHOT_v1.0.md (v1.1 freeze state)
-ALLOWED_NAMESPACES = {
-    "runtime_stub",
-    "execution",
-    "guards",
-    "runtime_contracts",
-    "advisory",
-    "audit",
-    "cli",
-    "cli_bridge",
-    "hoi_boundary",
-    "integration",
-    "prompt_export",
-    "regression",
-    "validator",
-}
+SNAPSHOT_FILE = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "governance",
+    "kernel",
+    "KERNEL_PUBLIC_SURFACE_SNAPSHOT_v1.0.md",
+)
+
+
+def extract_whitelist(snapshot_path):
+    """
+    Extract allowed namespaces from snapshot markdown.
+
+    Expected format inside markdown:
+
+    - sapianta_hoi.runtime_stub
+    - sapianta_hoi.execution
+    """
+
+    if not os.path.isfile(snapshot_path):
+        print("ERROR: Kernel snapshot file not found.")
+        sys.exit(1)
+
+    allowed = set()
+
+    with open(snapshot_path, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+
+            if line.startswith("- sapianta_hoi."):
+                namespace = line.replace("- sapianta_hoi.", "").strip()
+                allowed.add(namespace)
+
+    if not allowed:
+        print("ERROR: No namespaces extracted from snapshot.")
+        sys.exit(1)
+
+    return allowed
 
 
 def main():
@@ -47,6 +66,8 @@ def main():
         print("ERROR: sapianta_hoi directory not found.")
         sys.exit(1)
 
+    allowed_namespaces = extract_whitelist(SNAPSHOT_FILE)
+
     detected = set()
 
     for entry in os.listdir(kernel_root):
@@ -55,16 +76,25 @@ def main():
         if os.path.isdir(path) and not entry.startswith("__"):
             detected.add(entry)
 
-    violations = detected - ALLOWED_NAMESPACES
+    unauthorized = detected - allowed_namespaces
+    missing = allowed_namespaces - detected
 
-    if violations:
+    if unauthorized or missing:
         print("KERNEL BOUNDARY VIOLATION DETECTED")
-        print("Unauthorized namespaces found:")
-        for v in sorted(violations):
-            print(f" - sapianta_hoi.{v}")
+
+        if unauthorized:
+            print("Unauthorized namespaces:")
+            for ns in sorted(unauthorized):
+                print(f" - sapianta_hoi.{ns}")
+
+        if missing:
+            print("Missing namespaces declared in snapshot:")
+            for ns in sorted(missing):
+                print(f" - sapianta_hoi.{ns}")
+
         sys.exit(1)
 
-    print("Kernel boundary check: PASS")
+    print("Kernel boundary check (governance-bound): PASS")
     sys.exit(0)
 
 
