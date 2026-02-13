@@ -1,0 +1,25 @@
+#!/bin/sh
+
+echo "Running IGL Init Check..."
+python3 sapianta/igl/igl_init.py sapianta/chat/
+IGL_STATUS=$?
+
+if [ $IGL_STATUS -ne 0 ]; then
+    echo ""
+    echo "❌ Commit blocked: IGL init check failed."
+    exit 1
+fi
+
+echo "Running Kernel Boundary Check..."
+python3 scripts/kernel_boundary_check.py
+KERNEL_STATUS=$?
+
+if [ $KERNEL_STATUS -ne 0 ]; then
+    echo ""
+    echo "❌ Commit blocked: Kernel boundary violation detected."
+    echo "Fix namespace violations before committing."
+    exit 1
+fi
+
+echo "✅ All pre-commit checks passed."
+exit 0
