@@ -1,7 +1,7 @@
 from sapianta_hoi.execution.session_controller import SessionController
 from sapianta_hoi.runtime_stub.event import Event
 from sapianta_hoi.runtime_contracts.exporter import export_canonical_state
-from sapianta_hoi.runtime_contracts.event_registry import validate_event
+from sapianta_hoi.runtime_contracts.event_registry import validate_event_type
 
 
 class HOIAdapter:
@@ -40,7 +40,7 @@ class HOIAdapter:
         """
 
         # Fail-fast if event is not part of the closed registry
-        validate_event(user_input)
+        validate_event_type(user_input)
 
         event = Event(event_type=user_input)
 
