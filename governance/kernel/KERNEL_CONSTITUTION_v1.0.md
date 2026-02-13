@@ -34,7 +34,7 @@ The HOI Kernel consists exclusively of:
 
 All other namespaces are considered higher layers.
 
-The Kernel is not a product feature layer.
+The Kernel is not a product feature layer.  
 It is a runtime substrate.
 
 ---
@@ -144,16 +144,19 @@ No silent modification is permitted.
 
 ## 9. Enforcement
 
-Enforcement mechanisms must include:
+Kernel v1.x defines structural invariants only.
 
-- Interface Contract Validator
-- Determinism Validator
-- Boundary Import Validator
-- Regression Harness
+Formal enforcement mechanisms (Boundary Import Validation, Closed Event Domain Enforcement, Coverage Enforcement, etc.) are deferred to Phase 2 architecture.
 
-If enforcement detects violation:
+Kernel v1.x guarantees:
 
-Kernel freeze status is automatically suspended pending review.
+- Deterministic execution boundary
+- Frozen public surface
+- Guard-based execution control
+- Write-gate protection
+- No hidden execution paths
+
+External validation layers are not part of the Kernel v1.x runtime and are considered out-of-scope for this phase.
 
 ---
 
