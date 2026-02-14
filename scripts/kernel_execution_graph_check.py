@@ -2,10 +2,6 @@
 """
 Kernel Execution Graph Check (STATIC + STRUCTURAL)
 
-- Zero external dependencies (stdlib only)
-- Deterministic output ordering
-- CI-safe: nonzero exit on violation
-
 Governance mode: B (Controlled Recovery)
 
 Validates:
@@ -15,9 +11,6 @@ Validates:
 4) Dead-ends (reported)
 5) Cycles (ONLY RUNNING <-> ERROR allowed)
 6) Orphan events (reported)
-
-Target module:
-- sapianta_hoi.runtime_stub.transitions
 """
 
 from __future__ import annotations
@@ -31,29 +24,15 @@ from typing import Any, Dict, Iterable, List, Mapping, Set, Tuple
 TARGET_MODULE = "sapianta_hoi.runtime_stub.transitions"
 
 
-# ------------------------------------------------------------
-# Allowed Recovery Policy
-# Only this cycle is allowed:
-# RUNNING -> ERROR -> RUNNING
-# ------------------------------------------------------------
-
-ALLOWED_RECOVERY_CYCLE = ["RUNNING", "ERROR", "RUNNING"]
-
-
 def _fail(lines: List[str], exit_code: int = 1) -> None:
     for line in lines:
         print(line)
     sys.exit(exit_code)
 
 
-def _deterministic_sorted(iterable: Iterable[str]) -> List[str]:
-    return sorted(set(iterable))
-
-
 def _import_transitions_module() -> Any:
     try:
-        mod = __import__(TARGET_MODULE, fromlist=["*"])
-        return mod
+        return __import__(TARGET_MODULE, fromlist=["*"])
     except Exception:
         tb = traceback.format_exc()
         _fail(
@@ -64,87 +43,47 @@ def _import_transitions_module() -> Any:
                 tb.rstrip(),
             ]
         )
-    raise RuntimeError("unreachable")
 
 
 def _extract_required(mod: Any) -> Tuple[Set[str], Dict[Tuple[str, str], str], str]:
-    violations: List[str] = []
-
     if not hasattr(mod, "TRANSITIONS"):
-        violations.append("Missing required export: TRANSITIONS")
+        _fail(["Missing required export: TRANSITIONS"])
 
     if not hasattr(mod, "ALL_STATES"):
-        violations.append("Missing required export: ALL_STATES (governance mode B)")
+        _fail(["Missing required export: ALL_STATES (governance mode B)"])
 
-    if violations:
-        _fail(["FAIL: missing required exports:"] + [f"- {v}" for v in violations])
-
-    transitions = getattr(mod, "TRANSITIONS")
-    all_states = getattr(mod, "ALL_STATES")
-
+    transitions = dict(getattr(mod, "TRANSITIONS"))
+    all_states = set(getattr(mod, "ALL_STATES"))
     initial_state = getattr(mod, "INITIAL_STATE", "INITIAL")
 
-    if not isinstance(initial_state, str) or not initial_state:
-        _fail(["FAIL: INITIAL_STATE must be a non-empty str"])
+    if initial_state not in all_states:
+        _fail([f"Initial state '{initial_state}' not in ALL_STATES"])
 
-    if isinstance(all_states, (set, frozenset)):
-        all_states_set = set(all_states)
-    elif isinstance(all_states, (list, tuple)):
-        all_states_set = set(all_states)
-    else:
-        _fail(["FAIL: ALL_STATES must be set/list/tuple of strings"])
-
-    if not isinstance(transitions, Mapping):
-        _fail(["FAIL: TRANSITIONS must be dict-like mapping"])
-
-    transitions_dict: Dict[Tuple[str, str], str] = dict(transitions)
-
-    return all_states_set, transitions_dict, initial_state
+    return all_states, transitions, initial_state
 
 
-def _validate_structure(
-    all_states: Set[str],
-    transitions: Dict[Tuple[str, str], str],
-    initial_state: str,
-) -> Tuple[List[str], Dict[str, Set[str]], Set[str]]:
-
-    violations: List[str] = []
+def _build_graph(transitions):
     adjacency: Dict[str, Set[str]] = defaultdict(set)
-    event_set: Set[str] = set()
+    events: Set[str] = set()
 
-    for k, v in transitions.items():
+    for (src, event), dst in transitions.items():
+        adjacency[src].add(dst)
+        events.add(event)
 
-        if (
-            not isinstance(k, tuple)
-            or len(k) != 2
-            or not isinstance(k[0], str)
-            or not isinstance(k[1], str)
-        ):
-            violations.append(f"Invalid transition key: {repr(k)}")
-            continue
+    return dict(adjacency), events
 
-        if not isinstance(v, str):
-            violations.append(f"Invalid transition value for {repr(k)}: {repr(v)}")
-            continue
 
-        src, event = k
-        dst = v
-
+def _check_closure(transitions, all_states):
+    violations = []
+    for (src, _), dst in transitions.items():
         if src not in all_states:
             violations.append(f"Closure violation: {src} not in ALL_STATES")
         if dst not in all_states:
             violations.append(f"Closure violation: {dst} not in ALL_STATES")
-
-        adjacency[src].add(dst)
-        event_set.add(event)
-
-    if initial_state not in all_states:
-        violations.append(f"Initial state '{initial_state}' not in ALL_STATES")
-
-    return violations, dict(adjacency), event_set
+    return violations
 
 
-def _reachable_states(adjacency: Dict[str, Set[str]], initial_state: str) -> Set[str]:
+def _reachable_states(adjacency, initial_state):
     visited: Set[str] = set()
     q = deque([initial_state])
 
@@ -153,14 +92,14 @@ def _reachable_states(adjacency: Dict[str, Set[str]], initial_state: str) -> Set
         if s in visited:
             continue
         visited.add(s)
-        for nxt in sorted(adjacency.get(s, set())):
+        for nxt in adjacency.get(s, []):
             if nxt not in visited:
                 q.append(nxt)
 
     return visited
 
 
-def _detect_cycles(adjacency: Dict[str, Set[str]]) -> List[List[str]]:
+def _detect_cycles(adjacency):
     visited: Set[str] = set()
     stack: Set[str] = set()
     parent: Dict[str, str] = {}
@@ -171,7 +110,7 @@ def _detect_cycles(adjacency: Dict[str, Set[str]]) -> List[List[str]]:
         visited.add(node)
         stack.add(node)
 
-        for nxt in adjacency.get(node, set()):
+        for nxt in adjacency.get(node, []):
             if nxt not in visited:
                 parent[nxt] = node
                 dfs(nxt)
@@ -194,26 +133,34 @@ def _detect_cycles(adjacency: Dict[str, Set[str]]) -> List[List[str]]:
     return cycles
 
 
+# ------------------------------------------------------------
+# FIX: Rotation-safe cycle validation
+# Only allowed cycle is 2-node cycle between RUNNING and ERROR
+# ------------------------------------------------------------
+
 def _validate_cycles(cycles: List[List[str]]) -> List[str]:
     violations: List[str] = []
+    allowed_nodes = {"RUNNING", "ERROR"}
 
     for cycle in cycles:
-        if cycle == ALLOWED_RECOVERY_CYCLE:
-            continue
+        core = cycle[:-1]  # remove duplicate closing node
+
+        if len(core) == 2 and set(core) == allowed_nodes:
+            continue  # allowed recovery cycle
+
         violations.append(f"Disallowed cycle detected: {' -> '.join(cycle)}")
 
     return violations
 
 
-def main() -> None:
+def main():
     mod = _import_transitions_module()
     all_states, transitions, initial_state = _extract_required(mod)
 
-    violations, adjacency, event_set = _validate_structure(
-        all_states=all_states,
-        transitions=transitions,
-        initial_state=initial_state,
-    )
+    adjacency, events = _build_graph(transitions)
+
+    violations = []
+    violations += _check_closure(transitions, all_states)
 
     reachable = _reachable_states(adjacency, initial_state)
     unreachable = all_states - reachable
@@ -230,7 +177,7 @@ def main() -> None:
     print(f"MODULE: {TARGET_MODULE}")
     print(f"INITIAL_STATE: {initial_state}")
     print(f"ALL_STATES: {', '.join(sorted(all_states))}")
-    print(f"EVENTS: {', '.join(sorted(event_set))}")
+    print(f"EVENTS: {', '.join(sorted(events))}")
     print(f"DEAD_END_STATES: {', '.join(dead_ends) if dead_ends else '<none>'}")
 
     if violations:
