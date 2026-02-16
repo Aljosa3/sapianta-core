@@ -1,0 +1,28 @@
+layer: 0
+freeze_version: v1.2.7
+freeze_date: 2026-02-15
+execution_model: flat_state_machine
+allowed_cycle_policy: RUNNING<->ERROR only
+
+# Explicit locked file list (CI-enforced).
+# Keep this list minimal but sufficient to protect Layer 0 invariants.
+locked_files:
+  # Core Layer 0 governance specs (deterministic execution kernel)
+  - governance/specs/HOI_CANONICAL_STATE_OBJECT_SPEC_v0.1.md
+  - governance/specs/HOI_STATE_MACHINE_SPEC_v0.1.md
+  - governance/specs/HOI_EVENT_MODEL_SPEC_v0.1.md
+  - governance/specs/HOI_TRANSITION_VALIDATION_SPEC_v0.1.md
+  - governance/specs/HOI_EXECUTION_LOOP_CONTRACT_v0.1.md
+
+  # Kernel layer declarations (if present in your repo)
+  - governance/kernel/KERNEL_LAYER_MODEL_v1.0.md
+  - governance/kernel/KERNEL_STABILITY_DECLARATION_v1.0.md
+
+  # Governance gates / checks (protect discipline)
+  - scripts/kernel_boundary_check.py
+  - scripts/check_layer_freeze.py
+
+notes: >
+  Layer 0 is architecturally locked and execution-stable at v1.2.7.
+  Any change to locked files requires an explicit override and a separate governance decision/commit trail.
+  This freeze is governance-first and does not modify kernel logic or transition semantics.

@@ -76,12 +76,30 @@ fi
 # ------------------------------------------------
 
 echo ""
+echo "Running Kernel Runtime Repeatability Test..."
 python3 scripts/kernel_repeatability_test.py
 REP_STATUS=$?
 
 if [ $REP_STATUS -ne 0 ]; then
     echo ""
     echo "❌ Commit blocked: Kernel runtime is not repeatable."
+    exit 1
+fi
+
+
+# ------------------------------------------------
+# 6️⃣ LAYER 0 FREEZE CHECK
+# ------------------------------------------------
+
+echo ""
+echo "Running Layer 0 Freeze Check..."
+python3 scripts/check_layer_freeze.py
+FREEZE_STATUS=$?
+
+if [ $FREEZE_STATUS -ne 0 ]; then
+    echo ""
+    echo "❌ Commit blocked: Layer 0 freeze violation detected."
+    echo "Locked files cannot be modified without governance override."
     exit 1
 fi
 
