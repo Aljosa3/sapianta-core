@@ -1,6 +1,7 @@
 # SAPIANTA — AUTONOMY INTENT v1.0
 
 ## Status
+Status: Informational Governance Artifact (non-enforced)
 
 Current autonomy level: A0 (No self-commit)
 
