@@ -1,22 +1,24 @@
-from typing import Any, Callable, Dict
+from typing import Any, Dict
 
 from runtime.layer2.policy_evaluator import PolicyEvaluator
 from runtime.layer2.state_transition_executor import StateTransitionExecutor
 from runtime.layer2.audit_trace_collector import AuditTraceCollector
+from runtime.layer2.transition_contract import TransitionContract
+from runtime.layer2.invariant_guard import InvariantGuard
+from runtime.layer2.exceptions import PolicyDeniedError
 
 
 class ControlEngine:
     """
-    Deterministic Control Engine (Layer 2)
+    Deterministic Control Engine (Layer 2.2)
 
-    Orchestrates:
-    - Policy evaluation
-    - State transition
-    - Audit trace collection
-
-    Fail-closed:
-    - If policy denies → no transition
-    - If transition invalid → exception
+    Enforces:
+    - Policy
+    - TransitionContract validation
+    - Pre-invariants
+    - Transition execution
+    - Post-invariants
+    - Audit trace
     """
 
     def __init__(
@@ -25,43 +27,34 @@ class ControlEngine:
         transition_executor: StateTransitionExecutor,
         audit_collector: AuditTraceCollector,
     ):
-        if not policy_evaluator:
-            raise ValueError("PolicyEvaluator required.")
-        if not transition_executor:
-            raise ValueError("StateTransitionExecutor required.")
-        if not audit_collector:
-            raise ValueError("AuditTraceCollector required.")
 
         self._policy = policy_evaluator
         self._executor = transition_executor
         self._audit = audit_collector
+        self._invariant_guard = InvariantGuard()
 
     def process(
         self,
         event_id: str,
         state: Any,
-        transition_fn: Callable[[Any], Any],
+        contract: TransitionContract,
     ) -> Dict[str, Any]:
 
-        if not event_id:
-            raise ValueError("event_id must be provided.")
+        if not self._policy.evaluate(event_id, state):
+            raise PolicyDeniedError("Policy denied execution.")
 
-        allowed = self._policy.evaluate(event_id, state)
+        contract.validate_event(event_id)
+        contract.validate_state_type(state)
 
-        if not allowed:
-            # Fail-closed: state unchanged
-            return self._audit.collect(
-                event_id=event_id,
-                previous_state=state,
-                new_state=state,
-                allowed=False,
-            )
+        self._invariant_guard.validate_pre(state, contract.pre_invariants)
 
         new_state = self._executor.execute(
             event_id=event_id,
             state=state,
-            transition_fn=transition_fn,
+            transition_fn=contract.transition_fn,
         )
+
+        self._invariant_guard.validate_post(new_state, contract.post_invariants)
 
         return self._audit.collect(
             event_id=event_id,
