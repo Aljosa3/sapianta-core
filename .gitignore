@@ -53,12 +53,11 @@ Thumbs.db
 .cache/
 
 # ------------------------------------------------------------
-# Test artefacts
+# Test artefacts (generated only)
 # ------------------------------------------------------------
 .pytest_cache/
 .coverage
 htmlcov/
-tests/runtime/
 
 # ------------------------------------------------------------
 # Explicit NON-ignore (canonical domains — safety net)
@@ -68,4 +67,10 @@ tests/runtime/
 !sapianta_chat/**
 !srs/**
 !docs/**
-!tests/validation/**
+!tests/**
+
+# ------------------------------------------------------------
+# Enforce runtime cleanliness (override NON-ignore)
+# ------------------------------------------------------------
+runtime/**/__pycache__/
+runtime/**/*.pyc
