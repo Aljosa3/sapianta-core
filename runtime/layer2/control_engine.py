@@ -5,17 +5,19 @@ from runtime.layer2.state_transition_executor import StateTransitionExecutor
 from runtime.layer2.audit_trace_collector import AuditTraceCollector
 from runtime.layer2.transition_contract import TransitionContract
 from runtime.layer2.invariant_guard import InvariantGuard
+from runtime.layer2.state_guard import StateGuard
 from runtime.layer2.exceptions import PolicyDeniedError
 
 
 class ControlEngine:
     """
-    Deterministic Control Engine (Layer 2.2)
+    Deterministic Control Engine (Layer 2.3)
 
     Enforces:
     - Policy
     - TransitionContract validation
     - Pre-invariants
+    - No in-place mutation
     - Transition execution
     - Post-invariants
     - Audit trace
@@ -27,11 +29,11 @@ class ControlEngine:
         transition_executor: StateTransitionExecutor,
         audit_collector: AuditTraceCollector,
     ):
-
         self._policy = policy_evaluator
         self._executor = transition_executor
         self._audit = audit_collector
         self._invariant_guard = InvariantGuard()
+        self._state_guard = StateGuard()
 
     def process(
         self,
@@ -48,11 +50,15 @@ class ControlEngine:
 
         self._invariant_guard.validate_pre(state, contract.pre_invariants)
 
+        snapshot = self._state_guard.snapshot(state)
+
         new_state = self._executor.execute(
             event_id=event_id,
             state=state,
             transition_fn=contract.transition_fn,
         )
+
+        self._state_guard.validate_no_mutation(state, snapshot)
 
         self._invariant_guard.validate_post(new_state, contract.post_invariants)
 

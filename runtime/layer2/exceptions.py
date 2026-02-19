@@ -21,3 +21,7 @@ class PreInvariantViolationError(ControlLayerError):
 class PostInvariantViolationError(ControlLayerError):
     """Raised when post-transition invariant fails."""
     pass
+
+class StateMutationError(ControlLayerError):
+    """Raised when in-place state mutation is detected."""
+    pass
