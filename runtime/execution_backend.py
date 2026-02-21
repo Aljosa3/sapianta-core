@@ -1,22 +1,13 @@
-import os
-
-from sapianta_chat.execution.claude_adapter import ClaudeAdapter
+from typing import Protocol, Any
 
 
-def get_execution_backend():
+class ExecutionBackend(Protocol):
     """
-    Select execution backend.
+    Constitutional execution backend interface.
 
-    Defaults to 'claude'.
-    This module performs selection only.
-    Adapters remain configuration-agnostic.
+    Core defines only the contract.
+    Platform layer provides concrete implementation.
     """
 
-    backend = os.getenv("EXECUTION_BACKEND", "claude")
-
-    if backend == "claude":
-        from runtime.claude_client import ClaudeClient  # runtime wiring only
-        client = ClaudeClient.from_env()
-        return ClaudeAdapter(client)
-
-    raise RuntimeError(f"Unknown EXECUTION_BACKEND: {backend}")
+    def execute(self, payload: Any) -> Any:
+        ...
