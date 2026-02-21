@@ -1,0 +1,42 @@
+{
+  "registry_name": "TRADING_EVENT_REGISTRY",
+  "registry_version": "0.1",
+  "events": [
+    {
+      "event_name": "TRADING_SIGNAL_CANDIDATE",
+      "version": "0.1",
+      "required_fields": ["signal_id", "symbol", "timeframe"],
+      "optional_fields": ["source", "features_ref", "notes"]
+    },
+    {
+      "event_name": "TRADING_DECISION_PROPOSED",
+      "version": "0.1",
+      "required_fields": ["decision_id", "signal_id", "action"],
+      "optional_fields": ["rationale", "risk_ref", "notes"]
+    },
+    {
+      "event_name": "TRADING_INTENT_CREATED",
+      "version": "0.1",
+      "required_fields": ["intent_id", "decision_id", "action"],
+      "optional_fields": ["constraints_ref", "notes"]
+    },
+    {
+      "event_name": "TRADING_INTENT_REJECTED",
+      "version": "0.1",
+      "required_fields": ["intent_id", "decision_id", "reason"],
+      "optional_fields": ["notes"]
+    },
+    {
+      "event_name": "TRADING_EXECUTION_REQUESTED",
+      "version": "0.1",
+      "required_fields": ["execution_request_id", "intent_id"],
+      "optional_fields": ["broker", "account_ref", "notes"]
+    },
+    {
+      "event_name": "TRADING_EXECUTION_RESULT",
+      "version": "0.1",
+      "required_fields": ["execution_request_id", "status"],
+      "optional_fields": ["broker_order_id", "fills_ref", "notes"]
+    }
+  ]
+}
