@@ -1,0 +1,13 @@
+{
+  "contract_name": "TRADING_INTENT_CONTRACT",
+  "contract_version": "0.1",
+  "event_name": "TRADING_INTENT_CREATED",
+  "required_fields": ["intent_id", "decision_id", "action", "symbol", "timeframe"],
+  "optional_fields": ["constraints_ref", "notes"],
+  "constraints": {
+    "action_enum": ["BUY", "SELL", "HOLD"],
+    "timeframe_enum": ["1m", "5m", "15m", "1h", "4h", "1d"],
+    "symbol_pattern": "^[A-Z0-9._-]{1,20}$",
+    "max_notes_len": 1000
+  }
+}
