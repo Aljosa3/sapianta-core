@@ -12,10 +12,10 @@
 # - Integrated with existing validation test suite
 #
 # EXECUTION:
-#   python tests/validation/test_validator_v020_module_graph.py
+#   pytest
 #   ali preko obstoječega run_validation.sh
 #
-# EXIT CODES:
+# EXIT CODES (standalone mode):
 #   0 = all tests behaved as expected
 #   1 = unexpected PASS or FAIL
 
@@ -32,14 +32,17 @@ from sapianta_chat.validation.validator_pipeline_v020 import (
 
 def run_test(name: str, files: dict, should_pass: bool) -> bool:
     print(f"\n=== {name} ===")
+
     try:
         ValidatorPipelineV020(files).run()
+
         if should_pass:
             print("RESULT: PASS (as expected)")
             return True
         else:
             print("RESULT: UNEXPECTED PASS ❌")
             return False
+
     except ValidationHardFail as e:
         if should_pass:
             print(f"RESULT: UNEXPECTED FAIL ❌ → {e}")
@@ -53,7 +56,7 @@ def run_test(name: str, files: dict, should_pass: bool) -> bool:
 # Test cases (aligned with PHASE_v0.20_TEST_MATRIX.md)
 # ---------------------------------------------------------------------
 
-def test_v020_pass_valid_multifile() -> bool:
+def test_v020_pass_valid_multifile() -> None:
     files = {
         "proof_multifile_v020/core.py": (
             "import utils\n"
@@ -66,62 +69,106 @@ def test_v020_pass_valid_multifile() -> bool:
             "# no imports\n"
         ),
     }
-    return run_test(
+
+    result = run_test(
         "TC-PASS-01 — VALID MULTI-FILE MODULE",
         files,
         should_pass=True,
     )
 
+    assert result is True
 
-def test_v020_fail_circular_dependency() -> bool:
+
+def test_v020_fail_circular_dependency() -> None:
     files = {
         "proof_multifile_v020/core.py": "import utils\n",
         "proof_multifile_v020/utils.py": "import logic\n",
         "proof_multifile_v020/logic.py": "import core\n",
     }
-    return run_test(
+
+    result = run_test(
         "TC-FAIL-01 — CIRCULAR DEPENDENCY",
         files,
         should_pass=False,
     )
 
+    assert result is True
 
-def test_v020_fail_out_of_module_import() -> bool:
+
+def test_v020_fail_out_of_module_import() -> None:
     files = {
         "proof_multifile_v020/core.py": "import external_lib\n",
         "proof_multifile_v020/utils.py": "# no imports\n",
         "proof_multifile_v020/logic.py": "# no imports\n",
     }
-    return run_test(
+
+    result = run_test(
         "TC-FAIL-02 — OUT-OF-MODULE IMPORT",
         files,
         should_pass=False,
     )
 
+    assert result is True
 
-def test_v020_fail_phantom_file_import() -> bool:
+
+def test_v020_fail_phantom_file_import() -> None:
     files = {
         "proof_multifile_v020/core.py": "import missing\n",
         "proof_multifile_v020/utils.py": "# no imports\n",
         "proof_multifile_v020/logic.py": "# no imports\n",
     }
-    return run_test(
+
+    result = run_test(
         "TC-FAIL-03 — PHANTOM FILE IMPORT",
         files,
         should_pass=False,
     )
 
+    assert result is True
+
 
 # ---------------------------------------------------------------------
-# Optional standalone runner (kept for symmetry with existing tests)
+# Optional standalone runner (kept for symmetry)
 # ---------------------------------------------------------------------
 
 def main() -> None:
     results = [
-        test_v020_pass_valid_multifile(),
-        test_v020_fail_circular_dependency(),
-        test_v020_fail_out_of_module_import(),
-        test_v020_fail_phantom_file_import(),
+        run_test(
+            "TC-PASS-01 — VALID MULTI-FILE MODULE",
+            {
+                "proof_multifile_v020/core.py": "import utils\nimport logic\n",
+                "proof_multifile_v020/utils.py": "import logic\n",
+                "proof_multifile_v020/logic.py": "# no imports\n",
+            },
+            True,
+        ),
+        run_test(
+            "TC-FAIL-01 — CIRCULAR DEPENDENCY",
+            {
+                "proof_multifile_v020/core.py": "import utils\n",
+                "proof_multifile_v020/utils.py": "import logic\n",
+                "proof_multifile_v020/logic.py": "import core\n",
+            },
+            False,
+        ),
+        run_test(
+            "TC-FAIL-02 — OUT-OF-MODULE IMPORT",
+            {
+                "proof_multifile_v020/core.py": "import external_lib\n",
+                "proof_multifile_v020/utils.py": "# no imports\n",
+                "proof_multifile_v020/logic.py": "# no imports\n",
+            },
+            False,
+        ),
+        run_test(
+            "TC-FAIL-03 — PHANTOM FILE IMPORT",
+            {
+                "proof_multifile_v020/core.py": "import missing\n",
+                "proof_multifile_v020/utils.py": "# no imports\n",
+                "proof_multifile_v020/logic.py": "# no imports\n",
+            },
+            False,
+        ),
     ]
 
     if all(results):

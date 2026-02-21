@@ -1,0 +1,23 @@
+{
+  "registry_version": "v0.1",
+  "layer": "Layer1",
+  "domain_closed": true,
+  "policy": {
+    "unknown_event": "FAIL_CLOSED",
+    "implicit_creation": "FORBIDDEN",
+    "source_of_truth": "THIS_FILE_ONLY"
+  },
+  "events": [
+    {
+      "id": "EVT_NOOP",
+      "description": "Explicit no-op event (placeholder, used for baseline validation only).",
+      "status": "ALLOWED"
+    }
+  ],
+  "invariants": {
+    "ids_unique": true,
+    "ids_uppercase": true,
+    "ids_prefix": "EVT_",
+    "min_events": 1
+  }
+}

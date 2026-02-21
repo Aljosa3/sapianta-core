@@ -11,12 +11,16 @@ out.md
 response.json
 out/
 artifacts/
+dist/
+build/
+*.egg-info/
 
 # ------------------------------------------------------------
 # Python runtime artefacts
 # ------------------------------------------------------------
 __pycache__/
 *.py[cod]
+*$py.class
 
 # ------------------------------------------------------------
 # Virtual environments
@@ -24,6 +28,28 @@ __pycache__/
 .venv/
 venv/
 env/
+
+# ------------------------------------------------------------
+# Environment / Secrets (NEVER COMMIT)
+# ------------------------------------------------------------
+.env
+.env.*
+*.env
+.envrc
+secrets.json
+credentials.json
+ibkr_credentials.json
+api_keys.json
+
+# ------------------------------------------------------------
+# IBKR / Trading runtime artefacts
+# ------------------------------------------------------------
+ibkr_logs/
+ibkr_session/
+*.ibkr_state.json
+execution_cache/
+order_cache/
+replay_cache/
 
 # ------------------------------------------------------------
 # Sandbox / audits (non-canonical runtime data)
@@ -49,8 +75,17 @@ Thumbs.db
 # Logs / temp
 # ------------------------------------------------------------
 *.log
+*.out
+*.err
 .tmp/
 .cache/
+temp/
+tmp/
+
+# ------------------------------------------------------------
+# Jupyter (if ever used in domain experiments)
+# ------------------------------------------------------------
+.ipynb_checkpoints/
 
 # ------------------------------------------------------------
 # Test artefacts (generated only)
@@ -58,6 +93,7 @@ Thumbs.db
 .pytest_cache/
 .coverage
 htmlcov/
+coverage.xml
 
 # ------------------------------------------------------------
 # Explicit NON-ignore (canonical domains — safety net)
@@ -74,3 +110,12 @@ htmlcov/
 # ------------------------------------------------------------
 runtime/**/__pycache__/
 runtime/**/*.pyc
+
+# Enforce test cleanliness
+tests/**/__pycache__/
+tests/**/*.pyc
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/

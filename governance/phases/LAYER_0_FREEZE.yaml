@@ -15,7 +15,6 @@ locked_files:
   - governance/specs/HOI_EXECUTION_LOOP_CONTRACT_v0.1.md
 
   # Kernel layer declarations (if present in your repo)
-  - governance/kernel/KERNEL_LAYER_MODEL_v1.0.md
   - governance/kernel/KERNEL_STABILITY_DECLARATION_v1.0.md
 
   # Governance gates / checks (protect discipline)
