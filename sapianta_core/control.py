@@ -1,4 +1,4 @@
-from sapianta_runtime.validator.validate import validate_cdr, validate_all
+from sapianta_core._internal.runtime.validator.validate import validate_cdr, validate_all
 
 __all__ = [
     "validate_cdr",
