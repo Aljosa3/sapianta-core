@@ -16,6 +16,8 @@ The system has no authority to:
 
 All modifications require explicit human approval.
 
+Lifecycle: active
+
 ---
 
 ## Strategic Intent

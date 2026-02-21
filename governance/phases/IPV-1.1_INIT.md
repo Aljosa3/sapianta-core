@@ -2,6 +2,7 @@
 
 ## Status
 INIT
+Lifecycle: active
 
 ## Scope
 Initialize IPV-1.1 as the first governed semantic interpretation layer

@@ -2,6 +2,7 @@
 
 ## Status
 **LOCKED — READ ONLY**
+**Lifecycle: frozen**
 
 ---
 

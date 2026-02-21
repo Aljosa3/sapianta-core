@@ -7,6 +7,7 @@
 
 - **Status:** CANONICAL — LOCKED
 - **Version:** v0.1
+- **Lifecycle:** frozen
 - **Date of Canonization:** 2026-01-29
 - **Authority:** Sapianta Governance Layer
 - **Scope:** Reasoning, Interaction & Execution Layers (above Core)
