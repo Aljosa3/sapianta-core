@@ -13,6 +13,10 @@ Override mechanism:
 Optional soft tag check:
 - By default: warn only (never fail) if current tag doesn't match freeze_version.
 - Enforce by setting: SAPIANTA_FREEZE_STRICT_TAG=1
+
+Important:
+- Layer 0 freeze tag checks must NOT be affected by non-core tags (e.g., domain tags).
+- Therefore, git describe is constrained to core constitutional tags only.
 """
 
 from __future__ import annotations
@@ -25,6 +29,7 @@ from typing import List, Optional, Tuple
 
 
 MANIFEST_PATH = "governance/phases/LAYER_0_FREEZE.yaml"
+CORE_TAG_MATCH = "core_constitutional_*"
 
 
 @dataclass(frozen=True)
@@ -121,7 +126,7 @@ def _parse_minimal_yaml(path: str) -> FreezeManifest:
                 # notes: >  OR notes: "..."
                 _, val = s.split(":", 1)
                 val = val.strip()
-                if val in (">", "|", ">", "|-","|-",">-") or val.startswith(">") or val.startswith("|"):
+                if val in (">", "|", ">", "|-", "|-", ">-") or val.startswith(">") or val.startswith("|"):
                     in_notes_block = True
                     continue
                 notes_lines.append(_strip_quotes(val))
@@ -177,14 +182,20 @@ def _parse_minimal_yaml(path: str) -> FreezeManifest:
 
 
 def _git_current_tag_soft() -> Optional[str]:
-    # exact tag if HEAD is tagged
-    code, out = _run(["git", "describe", "--tags", "--exact-match"])
+    """
+    Layer 0 freeze must compare against core constitutional tags only.
+    Domain tags (e.g., trading_domain_v0.1) must not influence the result.
+    """
+    # exact tag if HEAD is tagged (core constitutional tags only)
+    code, out = _run(["git", "describe", "--tags", "--match", CORE_TAG_MATCH, "--exact-match"])
     if code == 0 and out:
         return out
-    # fallback: describe (may include distance/hash)
-    code, out = _run(["git", "describe", "--tags", "--always"])
+
+    # fallback: describe (may include distance/hash) but still core tags only
+    code, out = _run(["git", "describe", "--tags", "--match", CORE_TAG_MATCH, "--always"])
     if code == 0 and out:
         return out
+
     return None
 
 
@@ -234,12 +245,15 @@ def main() -> int:
     strict_tag = os.getenv("SAPIANTA_FREEZE_STRICT_TAG", "0") == "1"
 
     if current_tag is None:
-        print("[LAYER_FREEZE] WARN: Unable to determine git tag (git describe unavailable).")
+        print(
+            "[LAYER_FREEZE] WARN: Unable to determine core constitutional git tag "
+            "(git describe unavailable or no core_constitutional_* tags reachable)."
+        )
     else:
         if manifest.freeze_version not in current_tag:
             msg = (
                 f"[LAYER_FREEZE] WARN: freeze_version={manifest.freeze_version} "
-                f"does not match current git tag/describe='{current_tag}'."
+                f"does not match current core git tag/describe='{current_tag}'."
             )
             if strict_tag:
                 _die(msg.replace("WARN", "ERROR"))
