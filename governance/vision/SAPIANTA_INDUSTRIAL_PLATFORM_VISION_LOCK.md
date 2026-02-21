@@ -4,6 +4,7 @@
 Document ID: IPV-1-LOCK  
 Applies to: SAPIANTA_INDUSTRIAL_PLATFORM_VISION.md (IPV-1)  
 Status: LOCKED  
+Lifecycle: frozen  
 Effective date: 2026-01-27  
 Owner: SAPIANTA Governance  
 Change policy: Restricted  

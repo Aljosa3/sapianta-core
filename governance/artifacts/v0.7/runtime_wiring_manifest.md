@@ -1,4 +1,6 @@
 # SAPIANTA — Runtime Wiring Manifest (v0.7)
+
+Lifecycle: active  
 Artifact Type: Structural Wiring Declaration  
 Phase Scope: v0.7 ONLY  
 Execution Semantics: NONE  
@@ -17,15 +19,22 @@ without enabling execution, orchestration, or decision-making.
 
 This artifact defines **topology only**, not behavior.
 
+The formal freeze and normative authority of this artifact
+are defined in:
+
+`runtime_wiring_manifest_LOCK.md`
+
 ---
 
 ## 2. Canonical Constraints
 
 This manifest is strictly bound by:
+
 - `v0.7_INIT.md`
 - `v0.7_LOCK.md`
+- `runtime_wiring_manifest_LOCK.md`
 
-Any content exceeding the constraints of v0.7
+Any content exceeding the constraints of Phase v0.7
 is invalid and non-canonical.
 
 ---
@@ -47,9 +56,11 @@ The manifest MAY contain only:
 - grouping has no semantic meaning beyond classification
 
 All entries must be:
+
 - static
 - non-ordered
 - non-conditional
+- non-executable
 
 ---
 
@@ -67,18 +78,22 @@ The manifest MUST NOT contain:
 - Guard references (direct or indirect)
 - LLM references
 - time-based concepts
+- runtime configuration values
 
-Any forbidden content invalidates the artifact.
+Any forbidden content invalidates the artifact
+and voids its canonical standing.
 
 ---
 
 ## 5. Non-Authority Declaration
 
 The Runtime Wiring Manifest:
+
 - grants no authority
 - implies no capability
 - enables no access
 - triggers no behavior
+- defines no permissions
 
 Its existence does not imply readiness,
 availability, or permission to operate.
@@ -88,13 +103,18 @@ availability, or permission to operate.
 ## 6. Interpretation Limits
 
 This artifact:
+
 - must not be parsed for execution
 - must not be loaded by runtime systems
 - must not influence control flow
+- must not alter guard evaluation
+- must not be treated as configuration
 
 It exists solely for:
+
 - human inspection
 - structural audit
+- topology documentation
 - future phase reference (post v0.7)
 
 ---
@@ -102,18 +122,22 @@ It exists solely for:
 ## 7. Reversibility Guarantee
 
 Deletion of this manifest:
+
 - fully restores v0.6 canonical state
 - requires no compensating changes
 - leaves no residual linkage
+- introduces no runtime regression
 
 ---
 
 ## 8. Phase Boundary Assertion
 
 This artifact does NOT:
+
 - authorize v0.8 behavior
 - predefine orchestration
 - reserve execution semantics
+- introduce architectural commitments
 
 Any operational meaning is deferred
 to explicitly authorized future phases.

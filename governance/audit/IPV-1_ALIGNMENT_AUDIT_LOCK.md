@@ -4,6 +4,7 @@ Status: LOCKED
 Effective Date: 2026-01-27  
 Audit Reference: IPV-1_ALIGNMENT_AUDIT.md  
 Commit Reference: 594c71c  
+Lifecycle: frozen
 
 This document formally LOCKS the results of the IPV-1 Alignment Audit.
 

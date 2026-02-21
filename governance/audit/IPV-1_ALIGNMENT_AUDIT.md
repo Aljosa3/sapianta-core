@@ -1,11 +1,13 @@
 # IPV-1 ALIGNMENT AUDIT
 ## SAPIANTA Industrial Platform Vision — Compliance Assessment
 
-**Document ID:** IPV-1-AUDIT-2026-01-27
-**Audit Date:** 2026-01-27
-**Auditor:** SAPIANTA Governance Audit System
-**Scope:** Full repository alignment audit
-**Branch:** hds-json-output-v0.3
+Lifecycle: active
+
+**Document ID:** IPV-1-AUDIT-2026-01-27  
+**Audit Date:** 2026-01-27  
+**Auditor:** SAPIANTA Governance Audit System  
+**Scope:** Full repository alignment audit  
+**Branch:** hds-json-output-v0.3  
 **Commit:** 2147f05 (GOVERNANCE: lock SAPIANTA Industrial Platform Vision)
 
 ---
