@@ -207,6 +207,27 @@ For each lock pair, governance must define:
 - What is the lifecycle of the non-authoritative counterpart?
 - If both remain, their relationship must be explicitly documented (e.g., report + attestation model).
 
+### 5.3 Authoritative Chain Resolution (Draft, Evidence-Based)
+
+Evidence sources:
+- `/tmp/gov_authoritative_counts.txt` (governance reference counts by filename)
+- Header inspection of `_LOCK.md` documents (first ~60 lines)
+
+Resolution rule (v1):
+- If `_LOCK.md` explicitly states it applies to / locks / freezes a base document, treat as lock wrapper (attestation) unless it is the canonical lock record for a spec.
+- If counts strongly prefer one artifact AND lock text declares the other as reference target, treat as report+attestation pair.
+- If counts tie and structure is incomplete, mark as ambiguous (no lifecycle decision yet).
+
+| Base | Authoritative | Evidence | Lifecycle(non) | Lifecycle(lock) | Action | Notes |
+|------|---------------|----------|----------------|-----------------|--------|------|
+| governance/vision/SAPIANTA_INDUSTRIAL_PLATFORM_VISION | LOCK + base vision (paired) | refs: 3 vs 5; lock “Applies to: SAPIANTA_INDUSTRIAL_PLATFORM_VISION.md” | active | frozen | keep both | Vision doc is content; lock doc freezes it |
+| governance/audit/IPV-1_ALIGNMENT_AUDIT | non-lock report | refs: 5 vs 1; lock “Audit Reference: IPV-1_ALIGNMENT_AUDIT.md” and “LOCKS the results” | active | frozen | keep both | report + attestation model |
+| governance/artifacts/v0.7/runtime_wiring_manifest | non-lock manifest | refs: 2 vs 1; lock “constraints … defined by: runtime_wiring_manifest.md” | active | frozen | keep both | artifact + lock wrapper |
+| governance/contracts/LLM_ROLE_CONTRACT_v0.1 | non-lock contract (for now) | refs: 6 vs 2; lock freezes role scope but is shorter wrapper | active | frozen | keep both | later: consider norm to reference via lock path |
+| governance/MODULE_BUILDER_SPEC_v1.0 | LOCK | refs: 1 vs 2; lock is canonical phase lock record (“final and irreversible”) | deprecated-candidate | frozen | review pair | non-lock likely pre-lock spec |
+| governance/MODULE_BUILDER_IMPLEMENTATION_SPEC_v1.0 | LOCK | refs: 1 vs 2; lock is canonical phase lock record (“final and irreversible”) | deprecated-candidate | frozen | review pair | non-lock likely pre-lock spec |
+| governance/specs/USER_MODULE_TEMPLATE_SPEC_v0.1 | ambiguous | refs tie: 1 vs 1; lock header appears structurally incomplete (missing title/status block) | (no change) | (no change) | hold | requires canonical chain reference or header repair |
+
 ---
 
 ## 6. Next Governance Steps (Planned)
