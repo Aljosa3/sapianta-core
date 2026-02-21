@@ -93,7 +93,7 @@ def test_fail_bad_symbol_regex():
         "constraints": {
             "action_enum": ["BUY", "SELL", "HOLD"],
             "timeframe_enum": ["1m", "5m", "15m", "1h", "4h", "1d"],
-            "symbol_pattern": "([",  # invalid regex
+            "symbol_pattern": "([",
             "max_rationale_len": 1000
         }
     }
@@ -101,5 +101,4 @@ def test_fail_bad_symbol_regex():
         v.validate_contract_data(bad)
         assert False, "expected regex compile failure"
     except Exception as e:
-        # regex compile raises re.error, caught as Exception in validator usage
-        assert "unterminated" in str(e).lower() or "regex" in str(e).lower()
+        assert "regex" in str(e).lower() or "unterminated" in str(e).lower()
