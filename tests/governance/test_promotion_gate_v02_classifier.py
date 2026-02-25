@@ -197,3 +197,38 @@ def test_structural_beats_parametric_when_both_present():
     final, ev = classify(files, diff)
     assert final == PG.Severity.STRUCTURAL
     assert "S1" in evidence_ids(ev)
+
+    # -----------------------------
+# Fail-Closed Test (DiffCollector)
+# -----------------------------
+
+def test_fail_closed_on_git_diff_error(monkeypatch, capsys):
+    """
+    If git diff returns non-zero exit code,
+    classifier MUST fail closed and classify as STRUCTURAL.
+    """
+
+    class DummyResult:
+        def __init__(self):
+            self.returncode = 1
+            self.stdout = ""
+            self.stderr = "fatal error"
+
+    def fake_run(*args, **kwargs):
+        return DummyResult()
+
+    # Patch subprocess.run inside module
+    monkeypatch.setattr(PG.subprocess, "run", fake_run)
+
+    collector = PG.DiffCollector("HEAD~1..HEAD")
+
+    with pytest.raises(SystemExit) as exc:
+        collector.changed_files()
+
+    # Exit code must be 1
+    assert exc.value.code == 1
+
+    captured = capsys.readouterr()
+
+    assert "Change Classification: STRUCTURAL" in captured.out
+    assert "FAIL-CLOSED" in captured.out
