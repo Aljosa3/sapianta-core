@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-
 import subprocess
 import sys
 import re
 from enum import IntEnum
 from dataclasses import dataclass
-from typing import List
+from typing import Dict, List, Tuple, Optional
 
 
 # -----------------------------
@@ -18,7 +17,7 @@ class Severity(IntEnum):
     STRUCTURAL = 3
 
 
-@dataclass
+@dataclass(frozen=True)
 class Evidence:
     rule_id: str
     file: str
@@ -31,7 +30,6 @@ class Evidence:
 # -----------------------------
 
 class DiffCollector:
-
     def __init__(self, diff_range: str = "HEAD~1..HEAD"):
         self.diff_range = diff_range
 
@@ -56,7 +54,7 @@ class DiffCollector:
         return result.stdout
 
     @staticmethod
-    def fail_closed(message):
+    def fail_closed(message: str) -> None:
         print("Promotion Gate v0.2")
         print("Change Classification: STRUCTURAL")
         print(f"Reason: FAIL-CLOSED ({message})")
@@ -64,111 +62,213 @@ class DiffCollector:
 
 
 # -----------------------------
+# Minimal Diff Parser (per-file)
+# -----------------------------
+
+_DIFF_HEADER_RE = re.compile(r"^diff --git a/(.+?) b/(.+?)$")
+
+
+def split_diff_by_file(unified_diff: str) -> Dict[str, List[str]]:
+    buckets: Dict[str, List[str]] = {}
+    current_file: Optional[str] = None
+
+    for line in unified_diff.splitlines():
+        m = _DIFF_HEADER_RE.match(line)
+        if m:
+            current_file = m.group(2)
+            buckets.setdefault(current_file, [])
+            continue
+
+        if current_file is not None:
+            buckets[current_file].append(line)
+
+    return buckets
+
+
+def extract_changed_lines(file_lines: List[str]) -> Tuple[List[str], List[str]]:
+    removed: List[str] = []
+    added: List[str] = []
+
+    for l in file_lines:
+        if l.startswith("---") or l.startswith("+++"):
+            continue
+        if l.startswith("-"):
+            removed.append(l[1:])
+        elif l.startswith("+"):
+            added.append(l[1:])
+
+    return removed, added
+
+
+# -----------------------------
 # Rule Engine
 # -----------------------------
 
 class RuleEngine:
-
     CORE_TRIPWIRES = [
         "sapianta_core/",
         "runtime/layers/",
         "runtime/validation/",
         "governance/constitution/",
         "governance/phases/",
+        "tools/governance/",
         "scripts/check_layer_freeze.py",
     ]
 
     DOC_EXTENSIONS = (".md", ".rst")
-
     CONFIG_EXTENSIONS = (".yml", ".yaml", ".json", ".toml")
 
-    def __init__(self, files: List[str], diff: str):
+    def __init__(self, files: List[str], unified_diff: str):
         self.files = files
-        self.diff = diff
+        self.unified_diff = unified_diff
+        self.by_file = split_diff_by_file(unified_diff)
         self.evidence: List[Evidence] = []
 
-    def evaluate(self):
+    def evaluate(self) -> List[Evidence]:
         self.structural_rules()
         if not self.has_structural():
             self.parametric_rules()
         if not self.evidence:
             self.cosmetic_rules()
+        return self._dedupe_evidence(self.evidence)
 
-        return self.evidence
+    @staticmethod
+    def _dedupe_evidence(items: List[Evidence]) -> List[Evidence]:
+        seen = set()
+        out: List[Evidence] = []
+        for e in items:
+            key = (e.rule_id, e.file, e.severity, e.reason)
+            if key not in seen:
+                seen.add(key)
+                out.append(e)
+        return out
+
+    def has_structural(self) -> bool:
+        return any(e.severity == Severity.STRUCTURAL for e in self.evidence)
 
     # -----------------------------
-    # Structural Rules
+    # STRUCTURAL RULES
     # -----------------------------
 
-    def structural_rules(self):
+    def structural_rules(self) -> None:
+        # S1 – Core/Enforcement Tripwire
         for f in self.files:
             for trip in self.CORE_TRIPWIRES:
-                if f.startswith(trip):
+                if f == trip or f.startswith(trip):
                     self.evidence.append(Evidence(
                         "S1",
                         f,
                         Severity.STRUCTURAL,
-                        f"core/lifecycle surface modified ({f})"
+                        f"core/enforcement surface modified ({f})"
                     ))
+                    break
 
-        # Public API signature detection
-        for line in self.diff.splitlines():
-            if line.startswith(("+def ", "-def ", "+class ", "-class ")):
-                if any(f.startswith("sapianta_core/") for f in self.files):
-                    self.evidence.append(Evidence(
-                        "S2",
-                        "sapianta_core",
-                        Severity.STRUCTURAL,
-                        "public API modified"
-                    ))
+        # S2 – Public API signature changes (ONLY within sapianta_core/)
+        for f, lines in self.by_file.items():
+            if not f.startswith("sapianta_core/"):
+                continue
+            removed, added = extract_changed_lines(lines)
+            if any(s.lstrip().startswith(("def ", "class ")) for s in removed + added):
+                self.evidence.append(Evidence(
+                    "S2",
+                    f,
+                    Severity.STRUCTURAL,
+                    f"public API modified ({f})"
+                ))
 
-        # __all__ export detection
-        if "__all__" in self.diff:
-            self.evidence.append(Evidence(
-                "S3",
-                "export surface",
-                Severity.STRUCTURAL,
-                "export surface modified"
-            ))
+        # S3 – Export surface changes
+        for f, lines in self.by_file.items():
+            if not f.startswith("sapianta_core/"):
+                continue
 
-    def has_structural(self):
-        return any(e.severity == Severity.STRUCTURAL for e in self.evidence)
+            removed, added = extract_changed_lines(lines)
+
+            if f.endswith("__init__.py") and (removed or added):
+                self.evidence.append(Evidence(
+                    "S3",
+                    f,
+                    Severity.STRUCTURAL,
+                    f"export surface modified ({f})"
+                ))
+                continue
+
+            def is_all_assignment(s: str) -> bool:
+                s2 = s.strip()
+                return s2.startswith("__all__") and "=" in s2
+
+            if any(is_all_assignment(s) for s in removed + added):
+                self.evidence.append(Evidence(
+                    "S3",
+                    f,
+                    Severity.STRUCTURAL,
+                    f"export surface modified (__all__ in {f})"
+                ))
 
     # -----------------------------
-    # Parametric Rules
+    # PARAMETRIC RULES
     # -----------------------------
 
-    def parametric_rules(self):
+    def parametric_rules(self) -> None:
+        for f, lines in self.by_file.items():
+            if not f.endswith(self.CONFIG_EXTENSIONS):
+                continue
 
-        # Config file value change
-        for f in self.files:
-            if f.endswith(self.CONFIG_EXTENSIONS):
-                if re.search(r"-\s*.*:\s*[\d\.]+", self.diff) and re.search(r"\+\s*.*:\s*[\d\.]+", self.diff):
+            removed, added = extract_changed_lines(lines)
+            removed_kv = self._extract_simple_kv_pairs(removed)
+            added_kv = self._extract_simple_kv_pairs(added)
+
+            for key, old_val in removed_kv.items():
+                if key in added_kv and added_kv[key] != old_val:
                     self.evidence.append(Evidence(
                         "P1",
                         f,
                         Severity.PARAMETRIC,
-                        "configuration value modified"
+                        f"configuration value modified ({f}: {key} {old_val} -> {added_kv[key]})"
                     ))
+                    break
 
-        # Numeric literal change in non-core
-        if re.search(r"-.*\d+.*\n\+.*\d+.*", self.diff):
-            if not self.has_structural():
+        for f, lines in self.by_file.items():
+            if f.startswith("sapianta_core/"):
+                continue
+
+            removed, added = extract_changed_lines(lines)
+
+            if any(s.lstrip().startswith(("def ", "class ", "import ", "from ")) for s in removed + added):
+                continue
+
+            if self._has_numeric_value_only_change(removed, added):
                 self.evidence.append(Evidence(
                     "P2",
-                    "numeric_literal",
+                    f,
                     Severity.PARAMETRIC,
-                    "numeric literal modified"
+                    f"numeric literal modified ({f})"
                 ))
 
+    @staticmethod
+    def _extract_simple_kv_pairs(lines: List[str]) -> Dict[str, str]:
+        out: Dict[str, str] = {}
+        for s in lines:
+            m = re.match(r"^\s*([A-Za-z0-9_\-\.]+)\s*:\s*(.+?)\s*$", s)
+            if not m:
+                continue
+            out[m.group(1)] = m.group(2)
+        return out
+
+    @staticmethod
+    def _normalize_numbers(s: str) -> str:
+        return re.sub(r"\b\d+(\.\d+)?\b", "<NUM>", s)
+
+    def _has_numeric_value_only_change(self, removed: List[str], added: List[str]) -> bool:
+        removed_norm = {self._normalize_numbers(x) for x in removed if re.search(r"\b\d+(\.\d+)?\b", x)}
+        added_norm = {self._normalize_numbers(x) for x in added if re.search(r"\b\d+(\.\d+)?\b", x)}
+        return len(removed_norm.intersection(added_norm)) > 0
+
     # -----------------------------
-    # Cosmetic Rules
+    # COSMETIC RULES
     # -----------------------------
 
-    def cosmetic_rules(self):
-
-        # Docs only
-        if all(f.endswith(self.DOC_EXTENSIONS) or f.startswith("docs/") for f in self.files):
+    def cosmetic_rules(self) -> None:
+        if self.files and all(f.endswith(self.DOC_EXTENSIONS) or f.startswith("docs/") for f in self.files):
             self.evidence.append(Evidence(
                 "C1",
                 "documentation",
@@ -177,14 +277,7 @@ class RuleEngine:
             ))
             return
 
-        # Comment / whitespace only
-        lines = [l for l in self.diff.splitlines() if l.startswith(("+", "-"))]
-        meaningful = [
-            l for l in lines
-            if not re.match(r"[+-]\s*(#.*)?$", l)
-        ]
-
-        if not meaningful:
+        if self._is_comment_whitespace_only():
             self.evidence.append(Evidence(
                 "C2",
                 "whitespace/comment",
@@ -192,25 +285,46 @@ class RuleEngine:
                 "comment/whitespace only"
             ))
 
+    def _is_comment_whitespace_only(self) -> bool:
+        for f, lines in self.by_file.items():
+            removed, added = extract_changed_lines(lines)
+            for s in removed + added:
+                s_strip = s.strip()
+                if s_strip == "":
+                    continue
+                if s_strip.startswith("#"):
+                    continue
+                return False
+        return True
+
 
 # -----------------------------
-# Classification
+# Classification / Output
 # -----------------------------
 
-def classify(evidence: List[Evidence]):
-
+def classify(evidence: List[Evidence]) -> Severity:
     if not evidence:
         return Severity.COSMETIC
-
     return max(e.severity for e in evidence)
 
 
-# -----------------------------
-# CLI
-# -----------------------------
+def print_report(final: Severity, evidence: List[Evidence]) -> None:
+    print("Promotion Gate v0.2")
+    print(f"Change Classification: {final.name}")
+    print()
+    if evidence:
+        print("Evidence:")
+        def sort_key(e: Evidence):
+            return (-int(e.severity), e.rule_id, e.file, e.reason)
+        for e in sorted(evidence, key=sort_key):
+            print(f" - {e.rule_id}: {e.reason}")
+    else:
+        print("Evidence: none")
+    print()
+    print("Approval Required:", "YES" if final == Severity.STRUCTURAL else "NO")
 
-def main():
 
+def main() -> None:
     diff_range = sys.argv[1] if len(sys.argv) > 1 else "HEAD~1..HEAD"
 
     collector = DiffCollector(diff_range)
@@ -219,22 +333,9 @@ def main():
 
     engine = RuleEngine(files, diff)
     evidence = engine.evaluate()
-
     final = classify(evidence)
 
-    print("Promotion Gate v0.2")
-    print(f"Change Classification: {final.name}")
-    print()
-
-    if evidence:
-        print("Evidence:")
-        for e in evidence:
-            print(f" - {e.rule_id}: {e.reason}")
-    else:
-        print("Evidence: none")
-
-    print()
-    print("Approval Required:", "YES" if final == Severity.STRUCTURAL else "NO")
+    print_report(final, evidence)
 
 
 if __name__ == "__main__":
