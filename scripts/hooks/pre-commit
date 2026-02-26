@@ -1,5 +1,45 @@
 #!/bin/sh
 
+# ------------------------------------------------
+# 0️⃣ PROMOTION GATE CHECK
+# ------------------------------------------------
+
+echo ""
+echo "---------------------------------------------"
+echo "Running Promotion Gate v0.2..."
+echo "---------------------------------------------"
+
+OUTPUT=$(python3 tools/governance/promotion_gate_v02.py --staged)
+PG_STATUS=$?
+
+echo "$OUTPUT"
+
+# Fail-closed if Promotion Gate itself fails
+if [ $PG_STATUS -ne 0 ]; then
+    echo ""
+    echo "❌ Commit blocked: Promotion Gate execution failed."
+    exit 1
+fi
+
+# Detect STRUCTURAL classification
+echo "$OUTPUT" | grep -q "Change Classification: STRUCTURAL"
+if [ $? -eq 0 ]; then
+    echo ""
+    echo "❌ Commit blocked: STRUCTURAL change detected."
+    echo ""
+    echo "If intentional, run:"
+    echo "SAPIANTA_APPROVE_STRUCTURAL=1 git commit ..."
+    echo ""
+
+    if [ "${SAPIANTA_APPROVE_STRUCTURAL:-0}" != "1" ]; then
+        exit 1
+    fi
+
+    echo "⚠ STRUCTURAL override accepted."
+fi
+
+
+echo ""
 echo "---------------------------------------------"
 echo "SAPIANTA PRE-COMMIT VALIDATION"
 echo "---------------------------------------------"
