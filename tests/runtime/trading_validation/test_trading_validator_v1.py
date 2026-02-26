@@ -164,3 +164,29 @@ def test_policy_hash_order_independent_constraints():
     # Both should produce same validation result
     assert ra["decision_valid"] == rb["decision_valid"]
     assert ra["structural_valid"] == rb["structural_valid"]
+
+
+def test_structural_fail_missing_required_field():
+    """
+    Test that missing a required field causes structural validation failure.
+    Structural failures must block decision approval and skip policy evaluation.
+    """
+    envelope = valid_envelope()
+    # Remove one REQUIRED field to trigger structural validation failure
+    envelope.pop("asset", None)  # required field per spec
+
+    policy = base_policy()
+
+    result = validate_trading_decision(envelope, policy)
+
+    assert result["structural_valid"] is False
+
+    # Decision must not be approved when structure invalid
+    assert result["decision_valid"] is False
+
+    # Structural failures are not policy failures; failed_constraints should be empty
+    assert result["failed_constraints"] == []
+
+    # Verify structural_errors contains information about missing field
+    assert len(result["structural_errors"]) > 0
+    assert any("asset" in err.lower() for err in result["structural_errors"])
