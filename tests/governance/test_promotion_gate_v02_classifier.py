@@ -198,6 +198,123 @@ def test_structural_beats_parametric_when_both_present():
     assert final == PG.Severity.STRUCTURAL
     assert "S1" in evidence_ids(ev)
 
+
+# -----------------------------
+# S4 – Runtime Enforcement Module Tests
+# -----------------------------
+
+def test_structural_S4_trading_validation_policy():
+    """Changes to runtime/modules/trading_validation/policy.py must be STRUCTURAL."""
+    files = ["runtime/modules/trading_validation/policy.py"]
+    diff = make_unified_diff(
+        "runtime/modules/trading_validation/policy.py",
+        removed=["class OldPolicy:"],
+        added=["class NewPolicy:"],
+    )
+    final, ev = classify(files, diff)
+    assert final == PG.Severity.STRUCTURAL
+    assert "S4" in evidence_ids(ev)
+    # Verify reason includes the file path
+    s4_evidence = [e for e in ev if e.rule_id == "S4"]
+    assert len(s4_evidence) == 1
+    assert "runtime enforcement module modified" in s4_evidence[0].reason
+    assert "runtime/modules/trading_validation/policy.py" in s4_evidence[0].reason
+
+
+def test_structural_S4_trading_validation_validator():
+    """Changes to runtime/modules/trading_validation/validator.py must be STRUCTURAL."""
+    files = ["runtime/modules/trading_validation/validator.py"]
+    diff = make_unified_diff(
+        "runtime/modules/trading_validation/validator.py",
+        removed=["def old_validate():"],
+        added=["def new_validate():"],
+    )
+    final, ev = classify(files, diff)
+    assert final == PG.Severity.STRUCTURAL
+    assert "S4" in evidence_ids(ev)
+
+
+def test_structural_S4_credit_validation_policy():
+    """Changes to runtime/modules/credit_validation/policy.py must be STRUCTURAL."""
+    files = ["runtime/modules/credit_validation/policy.py"]
+    diff = make_unified_diff(
+        "runtime/modules/credit_validation/policy.py",
+        removed=["THRESHOLD = 0.35"],
+        added=["THRESHOLD = 0.40"],
+    )
+    final, ev = classify(files, diff)
+    assert final == PG.Severity.STRUCTURAL
+    assert "S4" in evidence_ids(ev)
+
+
+def test_structural_S4_credit_validation_validator():
+    """Changes to runtime/modules/credit_validation/validator.py must be STRUCTURAL."""
+    files = ["runtime/modules/credit_validation/validator.py"]
+    diff = make_unified_diff(
+        "runtime/modules/credit_validation/validator.py",
+        removed=["return True"],
+        added=["return False"],
+    )
+    final, ev = classify(files, diff)
+    assert final == PG.Severity.STRUCTURAL
+    assert "S4" in evidence_ids(ev)
+
+
+def test_no_S4_for_contracts_in_runtime_modules():
+    """Contract files (.md) in runtime/modules should NOT trigger S4."""
+    files = ["runtime/modules/trading_validation/contracts/TRADING_DECISION_ENVELOPE_CONTRACT_v1.0.md"]
+    diff = make_unified_diff(
+        "runtime/modules/trading_validation/contracts/TRADING_DECISION_ENVELOPE_CONTRACT_v1.0.md",
+        removed=["## Old Section"],
+        added=["## New Section"],
+    )
+    final, ev = classify(files, diff)
+    # Should be COSMETIC (docs), not STRUCTURAL
+    assert "S4" not in evidence_ids(ev)
+    # Should classify as C1 (documentation)
+    assert final == PG.Severity.COSMETIC
+    assert "C1" in evidence_ids(ev)
+
+
+def test_no_S4_for_similar_names_outside_runtime_modules():
+    """Files named policy.py or validator.py outside runtime/modules/ should NOT trigger S4."""
+    files = ["src/domain/policy.py"]
+    diff = make_unified_diff(
+        "src/domain/policy.py",
+        removed=["x = 1"],
+        added=["x = 2"],
+    )
+    final, ev = classify(files, diff)
+    # Should NOT trigger S4
+    assert "S4" not in evidence_ids(ev)
+
+
+def test_no_S4_for_runtime_domains():
+    """Files in runtime/domains/ (not runtime/modules/) should NOT trigger S4."""
+    files = ["runtime/domains/trading/policy.py"]
+    diff = make_unified_diff(
+        "runtime/domains/trading/policy.py",
+        removed=["x = 1"],
+        added=["x = 2"],
+    )
+    final, ev = classify(files, diff)
+    # Should NOT trigger S4 (different path pattern)
+    assert "S4" not in evidence_ids(ev)
+
+
+def test_S4_with_nested_module_paths():
+    """S4 should work with nested paths like runtime/modules/a/b/policy.py."""
+    files = ["runtime/modules/some_domain/subdir/policy.py"]
+    diff = make_unified_diff(
+        "runtime/modules/some_domain/subdir/policy.py",
+        removed=["old"],
+        added=["new"],
+    )
+    final, ev = classify(files, diff)
+    assert final == PG.Severity.STRUCTURAL
+    assert "S4" in evidence_ids(ev)
+
+
     # -----------------------------
 # Fail-Closed Test (DiffCollector)
 # -----------------------------

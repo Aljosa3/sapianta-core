@@ -204,6 +204,16 @@ class RuleEngine:
                     f"export surface modified (__all__ in {f})"
                 ))
 
+        # S4 – Runtime enforcement module changes (policy.py or validator.py)
+        for f in self.files:
+            if f.startswith("runtime/modules/") and (f.endswith("/policy.py") or f.endswith("/validator.py")):
+                self.evidence.append(Evidence(
+                    "S4",
+                    f,
+                    Severity.STRUCTURAL,
+                    f"runtime enforcement module modified ({f})"
+                ))
+
     # -----------------------------
     # PARAMETRIC RULES
     # -----------------------------
