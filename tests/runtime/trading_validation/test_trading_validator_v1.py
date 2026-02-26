@@ -190,3 +190,25 @@ def test_structural_fail_missing_required_field():
     # Verify structural_errors contains information about missing field
     assert len(result["structural_errors"]) > 0
     assert any("asset" in err.lower() for err in result["structural_errors"])
+
+
+def test_boundary_values_pass():
+    """
+    Test that values exactly at constraint boundaries pass validation.
+    Validates inclusive boundaries for all HARD constraints.
+    """
+    envelope = valid_envelope()
+
+    # Boundary values (exactly at limits should PASS)
+    envelope["leverage_ratio"] = 10.0       # <= 10
+    envelope["current_open_positions"] = 5  # <= 5
+    envelope["daily_pnl"] = -500.0          # >= -500
+    envelope["total_exposure"] = 50000.0    # <= 50000
+
+    policy = base_policy()
+
+    result = validate_trading_decision(envelope, policy)
+
+    assert result["structural_valid"] is True
+    assert result["decision_valid"] is True
+    assert result["failed_constraints"] == []
