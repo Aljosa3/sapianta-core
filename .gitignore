@@ -58,6 +58,26 @@ sandbox/
 audit_logs/
 
 # ------------------------------------------------------------
+# Experimental development areas (never canonical)
+# ------------------------------------------------------------
+experimental/
+prototype/
+research/
+playground/
+
+# ------------------------------------------------------------
+# Local artifacts discovered in repo
+# ------------------------------------------------------------
+artifact.json
+git_status_snapshot.txt
+
+# ------------------------------------------------------------
+# Local install scripts / bootstrap experiments
+# ------------------------------------------------------------
+block1_full_install.sh
+block2_authority_install.sh
+
+# ------------------------------------------------------------
 # IDE / Editor
 # ------------------------------------------------------------
 .vscode/
@@ -96,6 +116,14 @@ htmlcov/
 coverage.xml
 
 # ------------------------------------------------------------
+# Binary / compiled modules
+# ------------------------------------------------------------
+*.so
+*.dylib
+*.dll
+*.exe
+
+# ------------------------------------------------------------
 # Explicit NON-ignore (canonical domains — safety net)
 # ------------------------------------------------------------
 !governance/**
@@ -104,6 +132,7 @@ coverage.xml
 !srs/**
 !docs/**
 !tests/**
+!src/**
 
 # ------------------------------------------------------------
 # Enforce runtime cleanliness (override NON-ignore)
@@ -111,11 +140,15 @@ coverage.xml
 runtime/**/__pycache__/
 runtime/**/*.pyc
 
+# ------------------------------------------------------------
 # Enforce test cleanliness
+# ------------------------------------------------------------
 tests/**/__pycache__/
 tests/**/*.pyc
+
+# ------------------------------------------------------------
 # Python bytecode
-__pycache__/
+# ------------------------------------------------------------
 *.pyc
 *.pyo
-.pytest_cache/
+
