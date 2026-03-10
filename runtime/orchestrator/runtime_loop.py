@@ -15,6 +15,8 @@ from runtime.signals.runtime_signal_manager import (
     clear_reload_signal
 )
 
+from runtime.safety.runtime_risk_guard import evaluate_runtime_risk
+
 
 def run_runtime_loop(interval_seconds: int = 10):
     """
@@ -25,6 +27,12 @@ def run_runtime_loop(interval_seconds: int = 10):
 
     while True:
 
+        # --- Risk guard check ---
+        if not evaluate_runtime_risk():
+            print("Runtime stopped by risk guard")
+            break
+
+        # --- Runtime signal handling ---
         state = check_runtime_signals()
 
         if state == "STOP":
