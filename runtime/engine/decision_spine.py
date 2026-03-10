@@ -35,6 +35,7 @@ def run_decision_pipeline(proposal: dict) -> dict:
         producer="decision_spine",
         metadata={
             "proposal_id": proposal["proposal_id"],
+            "strategy_reference": proposal.get("strategy_reference"),
             "decision_result": envelope["decision_result"]
         }
     )
