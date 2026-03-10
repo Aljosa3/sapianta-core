@@ -9,9 +9,9 @@ Capabilities
 ------------
 1. Parametric search
 2. Genetic mutation
-3. Strategy ranking
-
-Uses experiment_engine to evaluate strategies deterministically.
+3. Multi-scenario evaluation
+4. Strategy ranking
+5. Strategy registry persistence
 """
 
 import random
@@ -19,6 +19,8 @@ import uuid
 import json
 
 from runtime.experiments.experiment_engine import run_strategy_experiment
+from runtime.evolution.strategy_registry import register_strategy
+from runtime.scenarios.scenario_engine import generate_scenario_suite
 
 
 # ---------------------------------------------------------
@@ -26,9 +28,6 @@ from runtime.experiments.experiment_engine import run_strategy_experiment
 # ---------------------------------------------------------
 
 def generate_parametric_strategies(base_strategy: dict, n: int = 10):
-    """
-    Generate strategy variants by modifying parameters.
-    """
 
     strategies = []
 
@@ -56,9 +55,6 @@ def generate_parametric_strategies(base_strategy: dict, n: int = 10):
 # ---------------------------------------------------------
 
 def mutate_strategy(strategy: dict):
-    """
-    Random mutation of strategy parameters.
-    """
 
     quantity = strategy["action"]["quantity"]
 
@@ -95,13 +91,10 @@ def genetic_mutation(strategies: list, n_mutations: int = 5):
 # ---------------------------------------------------------
 
 def rank_strategies(results: list):
-    """
-    Rank strategies based on experiment acceptance ratio.
-    """
 
     return sorted(
         results,
-        key=lambda x: x["evaluation"]["acceptance_ratio"],
+        key=lambda x: x["evaluation"]["avg_acceptance_ratio"],
         reverse=True
     )
 
@@ -110,7 +103,7 @@ def rank_strategies(results: list):
 # FULL EVOLUTION CYCLE
 # ---------------------------------------------------------
 
-def run_evolution_cycle(base_strategy: dict, scenario: dict):
+def run_evolution_cycle(base_strategy: dict, generation: int = 1):
 
     print("\n--- GENERATING STRATEGIES ---")
 
@@ -120,11 +113,50 @@ def run_evolution_cycle(base_strategy: dict, scenario: dict):
 
     for strategy in strategies:
 
-        print(f"Testing strategy: {strategy['strategy_id']}")
+        print(f"\nTesting strategy: {strategy['strategy_id']}")
 
-        record = run_strategy_experiment(strategy, scenario)
+        scenarios = generate_scenario_suite(strategy["strategy_id"])
 
-        results.append(record)
+        scenario_results = []
+
+        for scenario in scenarios:
+
+            print(f"  Scenario: {scenario['scenario_id']}")
+
+            record = run_strategy_experiment(strategy, scenario)
+
+            scenario_results.append(record)
+
+        # ----------------------------------
+        # aggregate scenario performance
+        # ----------------------------------
+
+        total_acceptance = sum(
+            r["evaluation"]["acceptance_ratio"]
+            for r in scenario_results
+        )
+
+        avg_acceptance = total_acceptance / len(scenario_results)
+
+        aggregated = {
+            "strategy_id": strategy["strategy_id"],
+            "scenario_results": scenario_results,
+            "evaluation": {
+                "avg_acceptance_ratio": avg_acceptance
+            }
+        }
+
+        # ----------------------------------
+        # register strategy in registry
+        # ----------------------------------
+
+        register_strategy(
+            strategy_id=strategy["strategy_id"],
+            generation=generation,
+            evaluation=aggregated["evaluation"]
+        )
+
+        results.append(aggregated)
 
     ranked = rank_strategies(results)
 
@@ -134,17 +166,15 @@ def run_evolution_cycle(base_strategy: dict, scenario: dict):
 
         print(
             r["strategy_id"],
-            r["evaluation"]["acceptance_ratio"]
+            r["evaluation"]["avg_acceptance_ratio"]
         )
 
     best = ranked[0]
 
     print("\nBest strategy:", best["strategy_id"])
 
-    # Genetic mutations of best strategies
-
     next_generation = genetic_mutation(
-        [s for s in strategies],
+        strategies,
         n_mutations=3
     )
 
@@ -170,14 +200,7 @@ if __name__ == "__main__":
         }
     }
 
-    scenario = {
-        "risk_context": {
-            "exposure_before": 0.1,
-            "exposure_after": 0.2
-        }
-    }
-
-    result = run_evolution_cycle(base_strategy, scenario)
+    result = run_evolution_cycle(base_strategy)
 
     print("\nEvolution Result")
 
