@@ -1,7 +1,12 @@
 """
 SAPIANTA Research Orchestrator
 
-Coordinates the autonomous research loop.
+Coordinates the autonomous research loop
+and registers artifacts in the Artifact Registry.
+
+Now supports:
+- Research Queue
+- Strategy Memory
 """
 
 import time
@@ -10,6 +15,11 @@ from runtime.research.idea_engine import IdeaEngine
 from runtime.research.experiment_engine import ExperimentEngine
 from runtime.research.evaluation_engine import EvaluationEngine
 from runtime.evolution.evolution_engine import EvolutionEngine
+
+from runtime.artifacts.artifact_registry import register_artifact
+from runtime.production.strategy_promotion_engine import promote_strategy
+
+from runtime.memory.strategy_memory import StrategyMemory
 
 from runtime.examples.simple_strategy import simple_strategy
 
@@ -23,46 +33,185 @@ class ResearchOrchestrator:
         self.evaluation_engine = EvaluationEngine()
         self.evolution_engine = EvolutionEngine()
 
-    def run_cycle(self):
+        # NEW
+        self.memory = StrategyMemory()
 
-        # IDEA
-        idea = self.idea_engine.generate_idea()
+    # ------------------------------------------------
+    # GENERATE IDEAS
+    # ------------------------------------------------
 
-        strategy = {
-            "type": "momentum",
-            "threshold": 100
-        }
+    def generate_ideas(self, count=20):
 
-        idea["strategy"] = strategy
+        ideas = []
+        attempts = 0
 
-        print("\nIDEA:")
-        print(idea)
+        while len(ideas) < count and attempts < count * 5:
 
-        # EXPERIMENT DATA
+            attempts += 1
+
+            idea = self.idea_engine.generate_idea()
+
+            strategy = {
+                "type": "momentum",
+                "threshold": 100
+            }
+
+            idea["strategy"] = strategy
+
+            # -----------------------------------------
+            # CHECK MEMORY
+            # -----------------------------------------
+
+            if self.memory.exists(strategy):
+                continue
+
+            artifact = register_artifact(
+                artifact_type="idea",
+                domain_id="research",
+                artifact_location="runtime/research",
+                producer="IdeaEngine",
+                metadata=idea
+            )
+
+            idea["artifact_id"] = artifact["artifact_id"]
+
+            ideas.append(idea)
+
+        return ideas
+
+    # ------------------------------------------------
+    # RUN EXPERIMENTS
+    # ------------------------------------------------
+
+    def run_experiments(self, ideas):
+
+        results = []
+
         dataset = [120, 130, 110, 140]
 
-        result = self.experiment_engine.run_experiment(dataset)
+        for idea in ideas:
 
-        print("\nEXPERIMENT:")
-        print(result)
+            strategy = idea["strategy"]
 
-        # EVALUATION
-        evaluation = self.evaluation_engine.evaluate(result)
+            result = self.experiment_engine.run_experiment(dataset)
 
-        evaluation["strategy"] = strategy
+            artifact = register_artifact(
+                artifact_type="experiment",
+                domain_id="research",
+                artifact_location="runtime/research",
+                producer="ExperimentEngine",
+                metadata={
+                    "idea_id": idea["artifact_id"],
+                    "dataset": dataset,
+                    "result": result
+                }
+            )
 
-        print("\nEVALUATION:")
-        print(evaluation)
+            results.append({
+                "idea": idea,
+                "experiment_result": result,
+                "artifact_id": artifact["artifact_id"]
+            })
 
-        # EVOLUTION
-        ranked = self.evolution_engine.rank([evaluation])
+        return results
+
+    # ------------------------------------------------
+    # EVALUATE STRATEGIES
+    # ------------------------------------------------
+
+    def evaluate_results(self, experiments):
+
+        evaluations = []
+
+        for exp in experiments:
+
+            evaluation = self.evaluation_engine.evaluate(exp["experiment_result"])
+
+            strategy = exp["idea"]["strategy"]
+
+            evaluation["strategy"] = strategy
+
+            artifact = register_artifact(
+                artifact_type="evaluation",
+                domain_id="research",
+                artifact_location="runtime/research",
+                producer="EvaluationEngine",
+                metadata={
+                    "experiment_id": exp["artifact_id"],
+                    "evaluation": evaluation,
+                    "strategy": strategy
+                }
+            )
+
+            evaluations.append(evaluation)
+
+        return evaluations
+
+    # ------------------------------------------------
+    # EVOLVE STRATEGIES
+    # ------------------------------------------------
+
+    def evolve_strategies(self, evaluations):
+
+        ranked = self.evolution_engine.rank(evaluations)
+
+        best = ranked[0]
 
         new_strategy = self.evolution_engine.generate_new(ranked)
 
-        print("\nNEW STRATEGY:")
+        artifact = register_artifact(
+            artifact_type="strategy",
+            domain_id="research",
+            artifact_location="runtime/research",
+            producer="EvolutionEngine",
+            metadata={
+                "source_strategy": best["strategy"],
+                "new_strategy": new_strategy
+            }
+        )
+
+        return new_strategy, best
+
+    # ------------------------------------------------
+    # RESEARCH CYCLE
+    # ------------------------------------------------
+
+    def run_cycle(self):
+
+        print("\nGenerating ideas...")
+
+        ideas = self.generate_ideas(20)
+
+        print(f"{len(ideas)} ideas generated")
+
+        print("\nRunning experiments...")
+
+        experiments = self.run_experiments(ideas)
+
+        print("\nEvaluating results...")
+
+        evaluations = self.evaluate_results(experiments)
+
+        print("\nRanking strategies...")
+
+        new_strategy, best_eval = self.evolve_strategies(evaluations)
+
+        # -----------------------------------------
+        # REGISTER IN MEMORY
+        # -----------------------------------------
+
+        self.memory.register(new_strategy, best_eval)
+
+        print("\nBEST STRATEGY FOUND:")
         print(new_strategy)
 
+        promote_strategy(new_strategy, best_eval)
+
         return new_strategy
+
+    # ------------------------------------------------
+    # LOOP
+    # ------------------------------------------------
 
     def run(self, cycles=10, delay=1):
 
@@ -79,6 +228,17 @@ class ResearchOrchestrator:
             time.sleep(delay)
 
         print("\nResearch completed.")
+
+
+# ------------------------------------------------
+# AUTO RESEARCH TRIGGER ENTRYPOINT
+# ------------------------------------------------
+
+def run_research_cycle():
+
+    orchestrator = ResearchOrchestrator()
+
+    orchestrator.run(cycles=1)
 
 
 if __name__ == "__main__":

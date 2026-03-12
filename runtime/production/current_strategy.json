@@ -1,0 +1,12 @@
+{
+  "timestamp": "2026-03-12T14:53:54.536795",
+  "strategy": {
+    "type": "momentum",
+    "threshold": 101
+  },
+  "evaluation": {
+    "profit": 4,
+    "trade_count": 4,
+    "score": 1.0
+  }
+}
