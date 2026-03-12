@@ -7,14 +7,17 @@ and registers artifacts in the Artifact Registry.
 Now supports:
 - Research Queue
 - Strategy Memory
+- Strategy Mutation Engine
 """
 
 import time
+import random
 
 from runtime.research.idea_engine import IdeaEngine
 from runtime.research.experiment_engine import ExperimentEngine
 from runtime.research.evaluation_engine import EvaluationEngine
 from runtime.evolution.evolution_engine import EvolutionEngine
+from runtime.evolution.strategy_mutation_engine import StrategyMutationEngine
 
 from runtime.artifacts.artifact_registry import register_artifact
 from runtime.production.strategy_promotion_engine import promote_strategy
@@ -33,8 +36,10 @@ class ResearchOrchestrator:
         self.evaluation_engine = EvaluationEngine()
         self.evolution_engine = EvolutionEngine()
 
-        # NEW
         self.memory = StrategyMemory()
+
+        # NEW
+        self.mutation_engine = StrategyMutationEngine()
 
     # ------------------------------------------------
     # GENERATE IDEAS
@@ -45,6 +50,52 @@ class ResearchOrchestrator:
         ideas = []
         attempts = 0
 
+        memory = self.memory.load()
+
+        # ------------------------------------------------
+        # IF MEMORY EXISTS → MUTATE BEST STRATEGY
+        # ------------------------------------------------
+
+        if memory:
+
+            best = sorted(
+                memory,
+                key=lambda x: x["evaluation"].get("fitness", 0),
+                reverse=True
+            )[0]
+
+            base_strategy = best["strategy"]
+
+            mutations = self.mutation_engine.mutate(base_strategy, count)
+
+            for strategy in mutations:
+
+                idea = self.idea_engine.generate_idea()
+
+                idea["strategy"] = strategy
+
+                if self.memory.exists(strategy):
+                    continue
+
+                artifact = register_artifact(
+                    artifact_type="idea",
+                    domain_id="research",
+                    artifact_location="runtime/research",
+                    producer="IdeaEngine",
+                    metadata=idea
+                )
+
+                idea["artifact_id"] = artifact["artifact_id"]
+
+                ideas.append(idea)
+
+                if len(ideas) >= count:
+                    break
+
+        # ------------------------------------------------
+        # FALLBACK → RANDOM SEARCH
+        # ------------------------------------------------
+
         while len(ideas) < count and attempts < count * 5:
 
             attempts += 1
@@ -53,14 +104,10 @@ class ResearchOrchestrator:
 
             strategy = {
                 "type": "momentum",
-                "threshold": 100
+                "threshold": random.randint(90, 110)
             }
 
             idea["strategy"] = strategy
-
-            # -----------------------------------------
-            # CHECK MEMORY
-            # -----------------------------------------
 
             if self.memory.exists(strategy):
                 continue
@@ -196,10 +243,7 @@ class ResearchOrchestrator:
 
         new_strategy, best_eval = self.evolve_strategies(evaluations)
 
-        # -----------------------------------------
         # REGISTER IN MEMORY
-        # -----------------------------------------
-
         self.memory.register(new_strategy, best_eval)
 
         print("\nBEST STRATEGY FOUND:")
