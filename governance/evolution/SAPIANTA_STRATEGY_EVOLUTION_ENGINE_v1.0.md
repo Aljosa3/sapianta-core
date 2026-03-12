@@ -1,9 +1,10 @@
 # SAPIANTA_STRATEGY_EVOLUTION_ENGINE_v1.0
 
 Status: ARCHITECTURAL SPECIFICATION  
-Layer: L3 Governance  
+Layer: L3 Governance / Evolution System  
 Scope: Autonomous Strategy Discovery  
 Version: 1.0
+
 
 ------------------------------------------------------------
 1. PURPOSE
@@ -17,9 +18,9 @@ The Strategy Evolution Engine is responsible for:
 • generating candidate strategies
 • exploring parameter spaces
 • evolving strategies through mutation
-• evaluating strategies through experiments
-• ranking strategies
-• promoting validated strategies into operational domains
+• generating new experiments
+• ranking strategies through evaluation results
+• producing promotion candidates
 
 The engine operates as part of the SAPIANTA Autonomous
 Research System.
@@ -33,40 +34,43 @@ It ensures that strategy discovery remains:
 
 
 ------------------------------------------------------------
-2. ARCHITECTURAL POSITION
+2. POSITION IN AUTONOMOUS RESEARCH ARCHITECTURE
 ------------------------------------------------------------
 
-The Strategy Evolution Engine operates within the
-Research System and integrates with the Experiment Pipeline.
+The Strategy Evolution Engine is part of the SAPIANTA
+Autonomous Research System.
 
-Architecture flow:
+Full research pipeline:
 
-Idea Artifact
+Idea Discovery Engine
 ↓
-ASF implementation
+Research Orchestrator
 ↓
-Strategy Candidate
+Research Runtime
 ↓
-Parameter Search
-↓
-Mutation Engine
-↓
-Experiment Pipeline
+Experiment Engine
 ↓
 Artifact Registry
 ↓
-Strategy Ranking
+Evaluation Engine
 ↓
-Promotion Candidate
+Strategy Evolution Engine
 ↓
-Domain Integration
+Promotion Engine
+↓
+Domain Modules
+↓
+Decision Spine
+
+The Evolution Engine generates new strategies
+based on experiment evaluation results.
 
 
 ------------------------------------------------------------
 3. STRATEGY ARTIFACT
 ------------------------------------------------------------
 
-The Strategy Artifact defines a candidate trading strategy.
+The Strategy Artifact defines a candidate strategy.
 
 Example structure:
 
@@ -114,11 +118,12 @@ strategy_artifact:
 
 The Parameter Search Engine explores parameter spaces.
 
-Search techniques:
+Search techniques include:
 
 • grid search
 • random search
 • adaptive search
+• evolutionary parameter search
 
 Example:
 
@@ -143,12 +148,12 @@ parameter_space:
 
 The Mutation Engine generates new strategy variants.
 
-Mutation operators:
+Mutation operators include:
 
-indicator mutation
-parameter mutation
-logic mutation
-risk parameter mutation
+• indicator mutation
+• parameter mutation
+• logic mutation
+• risk parameter mutation
 
 Examples:
 
@@ -163,32 +168,54 @@ mutation_3:
 
 
 ------------------------------------------------------------
-6. EXPERIMENT EXECUTION
+6. STRATEGY RECOMBINATION
 ------------------------------------------------------------
 
-Each strategy candidate is evaluated through the
-Experiment Pipeline.
+The recombination engine combines successful strategies
+to produce new candidate strategies.
+
+Recombination examples:
+
+• combine indicators from two strategies
+• merge entry logic
+• combine risk management rules
+
+
+------------------------------------------------------------
+7. EXPERIMENT GENERATION
+------------------------------------------------------------
+
+The Evolution Engine generates experiments for
+new candidate strategies.
 
 Process:
 
 strategy_candidate
 ↓
+experiment definition
+↓
 dataset selection
 ↓
-backtest execution
-↓
-metric evaluation
+Experiment Engine execution
 
-Metrics evaluated:
+
+------------------------------------------------------------
+8. EXPERIMENT EVALUATION
+------------------------------------------------------------
+
+Experiments are evaluated by the Evaluation Engine.
+
+Metrics evaluated may include:
 
 • Sharpe ratio
 • maximum drawdown
 • win rate
 • profit factor
+• stability across datasets
 
 
 ------------------------------------------------------------
-7. STRATEGY RANKING
+9. STRATEGY RANKING
 ------------------------------------------------------------
 
 Strategies are ranked according to performance.
@@ -202,12 +229,12 @@ score =
 + 0.2 * win_rate
 - 0.1 * max_drawdown
 
-
-Top ranked strategies are selected for promotion review.
+Top ranked strategies are selected for
+further evolution or promotion review.
 
 
 ------------------------------------------------------------
-8. PROMOTION CANDIDATE
+10. PROMOTION CANDIDATES
 ------------------------------------------------------------
 
 Strategies that pass ranking thresholds become
@@ -220,14 +247,13 @@ Promotion conditions:
 • governance compliance
 • deterministic execution
 
-
 Promotion produces:
 
 PROMOTION_ARTIFACT
 
 
 ------------------------------------------------------------
-9. DOMAIN INTEGRATION
+11. DOMAIN INTEGRATION
 ------------------------------------------------------------
 
 Promoted strategies are integrated into domain modules.
@@ -246,7 +272,29 @@ Decision Spine
 
 
 ------------------------------------------------------------
-10. GOVERNANCE CONSTRAINTS
+12. EVOLUTION LOOP
+------------------------------------------------------------
+
+The Strategy Evolution Engine executes
+the continuous research loop:
+
+evaluate
+↓
+select
+↓
+mutate
+↓
+recombine
+↓
+generate strategies
+↓
+generate experiments
+↓
+experiment execution
+
+
+------------------------------------------------------------
+13. GOVERNANCE CONSTRAINTS
 ------------------------------------------------------------
 
 The Strategy Evolution Engine must satisfy:
@@ -270,7 +318,7 @@ ledger
 
 
 ------------------------------------------------------------
-11. RELATIONSHIP TO OTHER ARTIFACTS
+14. RELATIONSHIP TO OTHER ARTIFACTS
 ------------------------------------------------------------
 
 Idea Artifact
@@ -283,7 +331,7 @@ Promotion Artifact
 → approves operational deployment
 
 Proposal Artifact
-→ used by domains for runtime decisions.
+→ used by domains for runtime decisions
 
 
 ------------------------------------------------------------
