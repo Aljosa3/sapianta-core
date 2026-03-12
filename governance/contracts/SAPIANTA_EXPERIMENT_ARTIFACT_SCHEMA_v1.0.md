@@ -1,8 +1,8 @@
 # SAPIANTA_EXPERIMENT_ARTIFACT_SCHEMA_v1.0
 
-Status: CANONICAL SPECIFICATION
-Layer: L3 Governance
-Scope: Research System
+Status: CANONICAL SPECIFICATION  
+Layer: L3 Governance  
+Scope: Research System  
 Version: 1.0
 
 
@@ -19,9 +19,16 @@ experimental evaluation performed by the AI Software Factory (ASF).
 The artifact ensures that experiments are:
 
 • reproducible
+• deterministic
 • traceable
 • comparable
 • governance-compliant
+
+Experiment artifacts form the bridge between:
+
+Idea Artifacts  
+and  
+Strategy Artifacts.
 
 
 ------------------------------------------------------------
@@ -44,6 +51,8 @@ experiment artifact
 knowledge extraction
 ↓
 promotion evaluation
+↓
+strategy artifact
 
 
 ------------------------------------------------------------
@@ -57,6 +66,7 @@ experiment_artifact:
   experiment_id: "uuid"
 
   source_idea:
+
     idea_id: "uuid"
 
   timestamp: "ISO-8601"
@@ -64,6 +74,11 @@ experiment_artifact:
   domain:
 
     primary_domain: "trading"
+
+  hypothesis:
+
+    description:
+      "Volatility regime detection improves trading performance."
 
   experiment_configuration:
 
@@ -74,10 +89,24 @@ experiment_artifact:
       lookback_window: 20
       volatility_threshold: 0.03
 
-    dataset:
+  dataset:
 
-      dataset_id: "market_dataset_001"
-      timeframe: "1h"
+    dataset_id: "market_dataset_001"
+
+    dataset_hash: "sha256_hash_of_dataset"
+
+    timeframe: "1h"
+
+    asset_universe:
+
+      - BTC
+      - ETH
+
+  execution_environment:
+
+    runtime_version: "sapianta_runtime_v0.4"
+
+    execution_node: "research_node_01"
 
   evaluation_metrics:
 
@@ -90,16 +119,29 @@ experiment_artifact:
   evaluation_summary:
 
     fitness_score: float
+
     ranking_position: int
+
+  deterministic_replay:
+
+    experiment_hash: "sha256_hash"
+
+    replay_seed: 42
+
+    replay_verified: true
 
   governance:
 
     deterministic: true
+
     reproducible: true
+
+    dataset_integrity_verified: true
 
   metadata:
 
     execution_environment: "ASF"
+
     evaluation_engine: "regime_strategy_evaluator"
 
 
@@ -109,56 +151,68 @@ experiment_artifact:
 
 The following fields are mandatory:
 
-experiment_id
-source_idea
-timestamp
-experiment_configuration
-evaluation_metrics
-evaluation_summary
+experiment_id  
+source_idea  
+timestamp  
+experiment_configuration  
+dataset  
+evaluation_metrics  
+evaluation_summary  
+deterministic_replay  
 
-These fields ensure experiment reproducibility.
+These fields ensure:
 
-
-------------------------------------------------------------
-5. EXPERIMENT SOURCE
-------------------------------------------------------------
-
-Experiments may originate from:
-
-ASF_GENERATED
-HUMAN_DEFINED
-DOMAIN_REQUESTED
+• experiment reproducibility
+• deterministic replay
+• dataset traceability
 
 
 ------------------------------------------------------------
-6. DATASET TRACEABILITY
+5. DATASET TRACEABILITY
 ------------------------------------------------------------
 
 Each experiment must reference the dataset used for evaluation.
 
-Example:
+The dataset must include:
 
-dataset_reference:
+dataset_id  
+dataset_hash  
+timeframe  
+asset_universe  
 
-  dataset_id: "market_data_2026"
-  timeframe: "1h"
-  asset_universe:
+dataset_hash ensures:
 
-    - BTC
-    - ETH
+• dataset immutability
+• reproducible experiment results
+• protection against data drift
 
 
 ------------------------------------------------------------
-7. REPRODUCIBILITY REQUIREMENT
+6. DETERMINISTIC REPLAY
 ------------------------------------------------------------
 
-All experiments must be reproducible.
+All experiments must support deterministic replay.
 
-Reproducibility requires:
+Replay requires:
 
-• deterministic dataset
-• deterministic configuration
-• deterministic evaluation
+• experiment hash
+• dataset hash
+• replay seed
+• configuration parameters
+
+This guarantees that experiment results can
+be reproduced exactly.
+
+
+------------------------------------------------------------
+7. EXPERIMENT SOURCE
+------------------------------------------------------------
+
+Experiments may originate from:
+
+ASF_GENERATED  
+HUMAN_DEFINED  
+DOMAIN_REQUESTED  
 
 
 ------------------------------------------------------------
@@ -210,6 +264,8 @@ experiment artifact
 knowledge artifact
 ↓
 promotion artifact
+↓
+strategy artifact
 ↓
 domain proposal
 ↓
