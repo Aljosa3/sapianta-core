@@ -1,4 +1,11 @@
-def simple_momentum(price):
+"""
+Simple Momentum Strategy Example
+Used by ExperimentEngine
+"""
+
+def simple_strategy(price):
+
+    price = float(price)   # <-- dodamo konverzijo
 
     threshold = 100
 
