@@ -10,6 +10,7 @@ This prevents overfitting to a single market scenario.
 
 from runtime.market.market_regime_engine import generate_regime_suite
 from runtime.market.market_simulator import generate_price_series, compute_returns
+from runtime.market.transaction_cost_engine import apply_transaction_costs
 
 from runtime.evolution.fitness_metrics import compute_performance_metrics
 from runtime.evolution.strategy_evaluator import compute_final_fitness
@@ -56,6 +57,16 @@ def evaluate_strategy_regime(strategy, regime):
     returns = compute_returns(prices)
 
     strategy_returns = simulate_strategy_on_returns(strategy, returns)
+
+    # ---------------------------------------------
+    # APPLY TRANSACTION COSTS
+    # ---------------------------------------------
+
+    strategy_returns = apply_transaction_costs(
+        strategy_returns,
+        position_size=strategy["action"]["quantity"],
+        price=100
+    )
 
     metrics = compute_performance_metrics(strategy_returns)
 
