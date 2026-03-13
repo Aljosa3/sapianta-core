@@ -10,8 +10,9 @@ Capabilities
 - price series generation
 - returns calculation
 - market regimes
+- strategy interaction
 
-Used by experiment_engine for strategy evaluation.
+Used by experiment_runner for strategy evaluation.
 """
 
 import random
@@ -24,14 +25,19 @@ import random
 def generate_price_series(
     start_price=100,
     steps=50,
-    volatility=0.01
+    volatility=0.01,
+    drift=0,
+    rng=None
 ):
+
+    if rng is None:
+        rng = random
 
     prices = [start_price]
 
     for _ in range(steps):
 
-        change = random.gauss(0, volatility)
+        change = drift + rng.gauss(0, volatility)
 
         next_price = prices[-1] * (1 + change)
 
@@ -58,70 +64,72 @@ def compute_returns(prices):
 
 
 # ---------------------------------------------------------
-# MARKET REGIME GENERATOR
+# MARKET SIMULATION WITH STRATEGY
 # ---------------------------------------------------------
 
-def generate_market_regime():
+def simulate_market(strategy, regime, seed=None, steps=50):
 
-    regimes = [
-        "bull",
-        "bear",
-        "sideways",
-        "volatile"
-    ]
-
-    regime = random.choice(regimes)
-
-    if regime == "bull":
-
-        volatility = 0.01
-        drift = 0.002
-
-    elif regime == "bear":
-
-        volatility = 0.015
-        drift = -0.002
-
-    elif regime == "sideways":
-
-        volatility = 0.005
-        drift = 0
-
-    else:
-
-        volatility = 0.03
-        drift = 0
-
-    return {
-
-        "regime": regime,
-        "volatility": volatility,
-        "drift": drift
-    }
-
-
-# ---------------------------------------------------------
-# MARKET SIMULATION
-# ---------------------------------------------------------
-
-def simulate_market():
-
-    regime = generate_market_regime()
+    rng = random.Random(seed)
 
     prices = generate_price_series(
         start_price=100,
-        steps=50,
-        volatility=regime["volatility"]
+        steps=steps,
+        volatility=regime["volatility"],
+        drift=regime["drift"],
+        rng=rng
     )
+
+    history = []
+
+    position = 0
+    entry_price = None
+    profit = 0
+
+    for price in prices:
+
+        history.append(price)
+
+        decision = strategy(history)
+
+        if decision == "BUY" and position == 0:
+
+            entry_price = price
+            position = 1
+
+        elif decision == "SELL" and position == 1:
+
+            profit += price - entry_price
+            position = 0
 
     returns = compute_returns(prices)
 
     return {
 
         "regime": regime["regime"],
+
+        "profit": profit,
+
+        "final_price": prices[-1],
+
         "prices": prices,
+
         "returns": returns
     }
+
+
+# ---------------------------------------------------------
+# TEST STRATEGY
+# ---------------------------------------------------------
+
+def test_strategy(history):
+
+    if len(history) < 2:
+        return "HOLD"
+
+    if history[-1] > history[-2]:
+        return "BUY"
+
+    return "HOLD"
 
 
 # ---------------------------------------------------------
@@ -130,12 +138,23 @@ def simulate_market():
 
 if __name__ == "__main__":
 
-    market = simulate_market()
+    regime = {
 
-    print("\nMarket regime:", market["regime"])
+        "regime": "bull",
+
+        "volatility": 0.01,
+
+        "drift": 0.002
+    }
+
+    result = simulate_market(test_strategy, regime)
+
+    print("\nMarket regime:", result["regime"])
+
+    print("\nProfit:", result["profit"])
 
     print("\nFirst prices:")
-    print(market["prices"][:5])
+    print(result["prices"][:5])
 
     print("\nFirst returns:")
-    print(market["returns"][:5])
+    print(result["returns"][:5])
