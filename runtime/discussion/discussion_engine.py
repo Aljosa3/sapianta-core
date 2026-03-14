@@ -1,4 +1,4 @@
-from sapianta_system.runtime.llm.llm_bridge import ask_llm
+from sapianta_factory.llm.llm_bridge import ask_llm
 
 
 class DiscussionEngine:
