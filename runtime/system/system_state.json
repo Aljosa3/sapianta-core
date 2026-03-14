@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-13T10:25:36.222971+00:00",
+  "generated_at": "2026-03-13T11:07:28.628404+00:00",
   "modules": [
     "runtime/__init__.py",
     "runtime/analytics/decision_metrics.py",
@@ -27,8 +27,10 @@
     "runtime/evolution/evolution_engine.py",
     "runtime/evolution/fitness_engine.py",
     "runtime/evolution/fitness_metrics.py",
+    "runtime/evolution/generation_manager.py",
     "runtime/evolution/genome_population.py",
     "runtime/evolution/regime_strategy_evaluator.py",
+    "runtime/evolution/research_supervisor.py",
     "runtime/evolution/strategy_evaluator.py",
     "runtime/evolution/strategy_genome.py",
     "runtime/evolution/strategy_mutation_engine.py",
@@ -110,6 +112,8 @@
     "runtime/strategies/strategy_selector.py",
     "runtime/system/architecture_graph.py",
     "runtime/system/auto_research_trigger.py",
+    "runtime/system/autonomous_cycle.py",
+    "runtime/system/autonomy_controller.py",
     "runtime/system/evolution_log.py",
     "runtime/system/system_knowledge.py",
     "runtime/system/system_map.py",
@@ -225,6 +229,15 @@
       "os",
       "hashlib",
       "datetime"
+    ],
+    "runtime.system.autonomous_cycle": [
+      "datetime",
+      "runtime.research.strategy_optimizer",
+      "runtime.system.evolution_log"
+    ],
+    "runtime.system.autonomy_controller": [
+      "time",
+      "runtime.evolution.research_supervisor"
     ],
     "runtime.system.system_map": [
       "pathlib",
@@ -466,6 +479,12 @@
     "runtime.evolution.fitness_engine": [
       "math"
     ],
+    "runtime.evolution.generation_manager": [
+      "random",
+      "runtime.research.strategy_optimizer",
+      "runtime.research.experiment_runner",
+      "runtime.research.strategy_registry"
+    ],
     "runtime.evolution.fitness_metrics": [
       "math"
     ],
@@ -498,6 +517,12 @@
       "json",
       "pathlib",
       "datetime"
+    ],
+    "runtime.evolution.research_supervisor": [
+      "datetime",
+      "runtime.evolution.generation_manager",
+      "runtime.system.evolution_log",
+      "runtime.system.system_knowledge"
     ],
     "runtime.development.capability_gap_detector": [
       "json",

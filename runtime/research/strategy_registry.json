@@ -158,5 +158,6617 @@
     {
         "strategy": "threshold_strategy_0.01854",
         "score": -40.474254281769696
+    },
+    {
+        "strategy": "threshold_strategy_0.01201",
+        "score": 33.10019408775413
+    },
+    {
+        "strategy": "threshold_strategy_0.01324",
+        "score": -23.77373121104
+    },
+    {
+        "strategy": "threshold_strategy_0.01222",
+        "score": -26.98775912092505
+    },
+    {
+        "strategy": "threshold_strategy_0.01135",
+        "score": -26.934155292187214
+    },
+    {
+        "strategy": "threshold_strategy_0.01268",
+        "score": -42.84654772112373
+    },
+    {
+        "strategy": "threshold_strategy_0.01131",
+        "score": -29.160501527663655
+    },
+    {
+        "strategy": "threshold_strategy_0.01236",
+        "score": -11.628099150538503
+    },
+    {
+        "strategy": "threshold_strategy_0.01408",
+        "score": -14.950263026909106
+    },
+    {
+        "strategy": "threshold_strategy_0.01277",
+        "score": 12.491202298549851
+    },
+    {
+        "strategy": "threshold_strategy_0.01094",
+        "score": -6.882120051402069
+    },
+    {
+        "strategy": "threshold_strategy_0.01035",
+        "score": -6.2846152818398195
+    },
+    {
+        "strategy": "threshold_strategy_0.01113",
+        "score": -12.154774146059331
+    },
+    {
+        "strategy": "threshold_strategy_0.01239",
+        "score": -13.22143824017786
+    },
+    {
+        "strategy": "threshold_strategy_0.01107",
+        "score": 23.5125176157943
+    },
+    {
+        "strategy": "threshold_strategy_0.00929",
+        "score": -15.500387964557348
+    },
+    {
+        "strategy": "threshold_strategy_0.00781",
+        "score": -26.194575250180918
+    },
+    {
+        "strategy": "threshold_strategy_0.00903",
+        "score": -26.437003306779914
+    },
+    {
+        "strategy": "threshold_strategy_0.00986",
+        "score": 14.198680035804728
+    },
+    {
+        "strategy": "threshold_strategy_0.01129",
+        "score": -34.83701040229772
+    },
+    {
+        "strategy": "threshold_strategy_0.01032",
+        "score": 55.34626095666759
+    },
+    {
+        "strategy": "threshold_strategy_0.01499",
+        "score": 18.001170270202266
+    },
+    {
+        "strategy": "threshold_strategy_0.01646",
+        "score": 8.18915821989846
+    },
+    {
+        "strategy": "threshold_strategy_0.01803",
+        "score": -19.62465858386733
+    },
+    {
+        "strategy": "threshold_strategy_0.01666",
+        "score": -23.215220750569884
+    },
+    {
+        "strategy": "threshold_strategy_0.01778",
+        "score": -18.33078645274412
+    },
+    {
+        "strategy": "threshold_strategy_0.01835",
+        "score": -66.43615019593005
+    },
+    {
+        "strategy": "threshold_strategy_0.01894",
+        "score": -9.679144671473246
+    },
+    {
+        "strategy": "threshold_strategy_0.01812",
+        "score": 17.97506116133539
+    },
+    {
+        "strategy": "threshold_strategy_0.01812",
+        "score": -43.739518864746586
+    },
+    {
+        "strategy": "threshold_strategy_0.01789",
+        "score": -48.5843205102041
+    },
+    {
+        "strategy": "threshold_strategy_0.01946",
+        "score": -29.751466162652818
+    },
+    {
+        "strategy": "threshold_strategy_0.01877",
+        "score": -66.65426158480916
+    },
+    {
+        "strategy": "threshold_strategy_0.02073",
+        "score": 8.741600444589395
+    },
+    {
+        "strategy": "threshold_strategy_0.0198",
+        "score": 19.803356921206287
+    },
+    {
+        "strategy": "threshold_strategy_0.01922",
+        "score": -29.75754271494978
+    },
+    {
+        "strategy": "threshold_strategy_0.01755",
+        "score": -19.974631935701353
+    },
+    {
+        "strategy": "threshold_strategy_0.01558",
+        "score": 1.7057042541764957
+    },
+    {
+        "strategy": "threshold_strategy_0.01753",
+        "score": -39.69797455944196
+    },
+    {
+        "strategy": "threshold_strategy_0.01944",
+        "score": -51.31646481147487
+    },
+    {
+        "strategy": "threshold_strategy_0.02077",
+        "score": -5.928624232418571
+    },
+    {
+        "strategy": "threshold_strategy_0.01324",
+        "score": 6.009677769350759
+    },
+    {
+        "strategy": "threshold_strategy_0.01864",
+        "score": -11.933780093240458
+    },
+    {
+        "strategy": "threshold_strategy_0.01815",
+        "score": -39.92760332321188
+    },
+    {
+        "strategy": "threshold_strategy_0.00689",
+        "score": -4.9228956643543995
+    },
+    {
+        "strategy": "threshold_strategy_0.01415",
+        "score": -40.98079331155794
+    },
+    {
+        "strategy": "threshold_strategy_0.00618",
+        "score": -5.468192763240324
+    },
+    {
+        "strategy": "threshold_strategy_0.01824",
+        "score": -42.376867677625626
+    },
+    {
+        "strategy": "threshold_strategy_0.01629",
+        "score": -12.154278780502821
+    },
+    {
+        "strategy": "threshold_strategy_0.00521",
+        "score": -2.466795837931116
+    },
+    {
+        "strategy": "threshold_strategy_0.00166",
+        "score": 4.455825239928146
+    },
+    {
+        "strategy": "threshold_strategy_0.01774",
+        "score": 0.9787416807508293
+    },
+    {
+        "strategy": "threshold_strategy_0.01054",
+        "score": -3.969723535204743
+    },
+    {
+        "strategy": "threshold_strategy_0.01369",
+        "score": -10.416227807027383
+    },
+    {
+        "strategy": "threshold_strategy_0.00345",
+        "score": -13.307366340119444
+    },
+    {
+        "strategy": "threshold_strategy_0.0006",
+        "score": 49.5137757938422
+    },
+    {
+        "strategy": "threshold_strategy_0.00168",
+        "score": 49.85371171881337
+    },
+    {
+        "strategy": "threshold_strategy_0.00526",
+        "score": -58.1284013310525
+    },
+    {
+        "strategy": "threshold_strategy_0.01868",
+        "score": 7.010626799297498
+    },
+    {
+        "strategy": "threshold_strategy_0.00786",
+        "score": -12.643442622678151
+    },
+    {
+        "strategy": "threshold_strategy_0.01634",
+        "score": 44.07533598572232
+    },
+    {
+        "strategy": "threshold_strategy_0.00168",
+        "score": -25.52083160034708
+    },
+    {
+        "strategy": "threshold_strategy_0.0006",
+        "score": -47.42323776905245
+    },
+    {
+        "strategy": "threshold_strategy_0.01634",
+        "score": -7.777958250181555
+    },
+    {
+        "strategy": "threshold_strategy_0.01868",
+        "score": -15.704148988663917
+    },
+    {
+        "strategy": "threshold_strategy_0.01324",
+        "score": -29.442976361750667
+    },
+    {
+        "strategy": "threshold_strategy_0.01629",
+        "score": -10.470682304373227
+    },
+    {
+        "strategy": "threshold_strategy_0.0118",
+        "score": 16.9320327376208
+    },
+    {
+        "strategy": "threshold_strategy_0.02059",
+        "score": -22.7674062069543
+    },
+    {
+        "strategy": "threshold_strategy_0.01251",
+        "score": 8.42975182897058
+    },
+    {
+        "strategy": "threshold_strategy_0.01719",
+        "score": 65.08328875268198
+    },
+    {
+        "strategy": "threshold_strategy_0.01563",
+        "score": -17.657678079279307
+    },
+    {
+        "strategy": "threshold_strategy_0.0003",
+        "score": 41.03206574621582
+    },
+    {
+        "strategy": "threshold_strategy_0.01522",
+        "score": 9.099119724385638
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": 9.970519217277072
+    },
+    {
+        "strategy": "threshold_strategy_0.00163",
+        "score": 0.6545521514662056
+    },
+    {
+        "strategy": "threshold_strategy_0.0199",
+        "score": -20.969852013653455
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -28.638823670339917
+    },
+    {
+        "strategy": "threshold_strategy_0.01288",
+        "score": 24.299286140758994
+    },
+    {
+        "strategy": "threshold_strategy_0.00011",
+        "score": -45.012005105054186
+    },
+    {
+        "strategy": "threshold_strategy_0.01494",
+        "score": -13.154911415927458
+    },
+    {
+        "strategy": "threshold_strategy_0.01719",
+        "score": -42.541393878381115
+    },
+    {
+        "strategy": "threshold_strategy_0.0003",
+        "score": -10.534979601700883
+    },
+    {
+        "strategy": "threshold_strategy_0.01288",
+        "score": 16.565504868655438
+    },
+    {
+        "strategy": "threshold_strategy_0.0118",
+        "score": -9.172830830593078
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -6.13701642158005
+    },
+    {
+        "strategy": "threshold_strategy_0.0173",
+        "score": 5.615196042419484
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": 21.588890056220336
+    },
+    {
+        "strategy": "threshold_strategy_0.01882",
+        "score": -1.5326152136077908
+    },
+    {
+        "strategy": "threshold_strategy_0.01677",
+        "score": -35.513240149875195
+    },
+    {
+        "strategy": "threshold_strategy_0.0142",
+        "score": -15.692314872415004
+    },
+    {
+        "strategy": "threshold_strategy_0.01211",
+        "score": -11.881273993099754
+    },
+    {
+        "strategy": "threshold_strategy_0.01252",
+        "score": 19.234902326748397
+    },
+    {
+        "strategy": "threshold_strategy_0.01609",
+        "score": 4.744389492580652
+    },
+    {
+        "strategy": "threshold_strategy_0.01196",
+        "score": -2.3630435769049427
+    },
+    {
+        "strategy": "threshold_strategy_0.016",
+        "score": -51.441262573596305
+    },
+    {
+        "strategy": "threshold_strategy_0.01604",
+        "score": -25.374332716108825
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -42.2295290930617
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -35.04827951527265
+    },
+    {
+        "strategy": "threshold_strategy_0.01712",
+        "score": -4.212182132783667
+    },
+    {
+        "strategy": "threshold_strategy_0.01579",
+        "score": -52.14822744408631
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": 20.67699556752548
+    },
+    {
+        "strategy": "threshold_strategy_0.01252",
+        "score": -25.969287808261214
+    },
+    {
+        "strategy": "threshold_strategy_0.01288",
+        "score": -37.63695585215784
+    },
+    {
+        "strategy": "threshold_strategy_0.0173",
+        "score": -43.53570369482078
+    },
+    {
+        "strategy": "threshold_strategy_0.01609",
+        "score": -23.532530512488847
+    },
+    {
+        "strategy": "threshold_strategy_0.01605",
+        "score": -31.44299333854518
+    },
+    {
+        "strategy": "threshold_strategy_0.01859",
+        "score": 15.583521464292161
+    },
+    {
+        "strategy": "threshold_strategy_0.01132",
+        "score": -36.16605569918913
+    },
+    {
+        "strategy": "threshold_strategy_0.0159",
+        "score": -54.948107496504115
+    },
+    {
+        "strategy": "threshold_strategy_0.01145",
+        "score": 8.475080930999326
+    },
+    {
+        "strategy": "threshold_strategy_0.01152",
+        "score": -29.23310034121969
+    },
+    {
+        "strategy": "threshold_strategy_0.01148",
+        "score": -7.345546448262525
+    },
+    {
+        "strategy": "threshold_strategy_0.01231",
+        "score": -13.19113571118342
+    },
+    {
+        "strategy": "threshold_strategy_0.01412",
+        "score": -29.28092064055373
+    },
+    {
+        "strategy": "threshold_strategy_0.01234",
+        "score": -0.8436426152300527
+    },
+    {
+        "strategy": "threshold_strategy_0.0185",
+        "score": -1.8370038533894189
+    },
+    {
+        "strategy": "threshold_strategy_0.01364",
+        "score": -6.0709629958564335
+    },
+    {
+        "strategy": "threshold_strategy_0.01538",
+        "score": -16.86939768213128
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -16.912355702427575
+    },
+    {
+        "strategy": "threshold_strategy_0.01199",
+        "score": -27.147885041479746
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -24.883022306570098
+    },
+    {
+        "strategy": "threshold_strategy_0.01859",
+        "score": -34.48337837137219
+    },
+    {
+        "strategy": "threshold_strategy_0.01145",
+        "score": -28.784481674002677
+    },
+    {
+        "strategy": "threshold_strategy_0.01234",
+        "score": -34.70619281241849
+    },
+    {
+        "strategy": "threshold_strategy_0.0185",
+        "score": -19.955904278532998
+    },
+    {
+        "strategy": "threshold_strategy_0.01137",
+        "score": -25.206201291898026
+    },
+    {
+        "strategy": "threshold_strategy_0.00091",
+        "score": 19.34516516239023
+    },
+    {
+        "strategy": "threshold_strategy_0.01814",
+        "score": -13.926913193478796
+    },
+    {
+        "strategy": "threshold_strategy_0.00137",
+        "score": -15.401755122453807
+    },
+    {
+        "strategy": "threshold_strategy_0.01344",
+        "score": -1.3282572007656626
+    },
+    {
+        "strategy": "threshold_strategy_0.01079",
+        "score": -43.85792543320758
+    },
+    {
+        "strategy": "threshold_strategy_0.00086",
+        "score": -31.782291356177907
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -17.08911756104105
+    },
+    {
+        "strategy": "threshold_strategy_0.02049",
+        "score": -6.282549902939806
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": 10.526207941928746
+    },
+    {
+        "strategy": "threshold_strategy_0.00156",
+        "score": 5.942384170082619
+    },
+    {
+        "strategy": "threshold_strategy_0.00154",
+        "score": -33.56425923736044
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -25.85358264557359
+    },
+    {
+        "strategy": "threshold_strategy_0.00987",
+        "score": -17.992858294343705
+    },
+    {
+        "strategy": "threshold_strategy_0.01776",
+        "score": -22.602528046122288
+    },
+    {
+        "strategy": "threshold_strategy_0.00091",
+        "score": 1.7511827546625156
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -14.591363091618994
+    },
+    {
+        "strategy": "threshold_strategy_0.00156",
+        "score": -39.06225106656244
+    },
+    {
+        "strategy": "threshold_strategy_0.01344",
+        "score": -10.163670740601248
+    },
+    {
+        "strategy": "threshold_strategy_0.02049",
+        "score": -36.63861802180581
+    },
+    {
+        "strategy": "threshold_strategy_0.01162",
+        "score": -9.222955667637741
+    },
+    {
+        "strategy": "threshold_strategy_0.01498",
+        "score": -36.563795186590525
+    },
+    {
+        "strategy": "threshold_strategy_0.00107",
+        "score": 11.962165456825026
+    },
+    {
+        "strategy": "threshold_strategy_0.01491",
+        "score": -17.33042013400445
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -55.105629124113364
+    },
+    {
+        "strategy": "threshold_strategy_0.00124",
+        "score": 15.477190611165454
+    },
+    {
+        "strategy": "threshold_strategy_0.00045",
+        "score": 7.343483822662662
+    },
+    {
+        "strategy": "threshold_strategy_0.00168",
+        "score": -79.96560570270191
+    },
+    {
+        "strategy": "threshold_strategy_0.00241",
+        "score": -17.043025216845543
+    },
+    {
+        "strategy": "threshold_strategy_0.02089",
+        "score": -23.04117831226708
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -23.26196898446178
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -23.99017056128737
+    },
+    {
+        "strategy": "threshold_strategy_0.00049",
+        "score": -38.14870400270149
+    },
+    {
+        "strategy": "threshold_strategy_0.02205",
+        "score": 1.5720290915734694
+    },
+    {
+        "strategy": "threshold_strategy_0.01978",
+        "score": -25.549033809679827
+    },
+    {
+        "strategy": "threshold_strategy_0.00124",
+        "score": 1.78949001965686
+    },
+    {
+        "strategy": "threshold_strategy_0.00107",
+        "score": 35.03094240793942
+    },
+    {
+        "strategy": "threshold_strategy_0.00045",
+        "score": -14.941764908423863
+    },
+    {
+        "strategy": "threshold_strategy_0.00091",
+        "score": -5.596224585401842
+    },
+    {
+        "strategy": "threshold_strategy_0.02205",
+        "score": -0.39145632121920926
+    },
+    {
+        "strategy": "threshold_strategy_0.00147",
+        "score": -34.5461300878403
+    },
+    {
+        "strategy": "threshold_strategy_0.00025",
+        "score": -14.769248133832242
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": 21.7376952999996
+    },
+    {
+        "strategy": "threshold_strategy_0.02017",
+        "score": -0.10179488411978355
+    },
+    {
+        "strategy": "threshold_strategy_0.00094",
+        "score": -1.7818557001160116
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -41.923193470834725
+    },
+    {
+        "strategy": "threshold_strategy_0.00239",
+        "score": 12.783188292840947
+    },
+    {
+        "strategy": "threshold_strategy_0.00131",
+        "score": -5.365433304221952
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -29.448598800438788
+    },
+    {
+        "strategy": "threshold_strategy_0.00239",
+        "score": -11.397233365377787
+    },
+    {
+        "strategy": "threshold_strategy_0.00115",
+        "score": -26.174321628117156
+    },
+    {
+        "strategy": "threshold_strategy_0.0009",
+        "score": -19.308445910041584
+    },
+    {
+        "strategy": "threshold_strategy_0.00138",
+        "score": -33.331904652323516
+    },
+    {
+        "strategy": "threshold_strategy_0.00305",
+        "score": -41.16627393125068
+    },
+    {
+        "strategy": "threshold_strategy_0.00124",
+        "score": 9.299082060648303
+    },
+    {
+        "strategy": "threshold_strategy_0.00107",
+        "score": -16.51710375512171
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": 57.441669933409415
+    },
+    {
+        "strategy": "threshold_strategy_0.00239",
+        "score": -23.631061655757676
+    },
+    {
+        "strategy": "threshold_strategy_0.00124",
+        "score": 23.99904113561052
+    },
+    {
+        "strategy": "threshold_strategy_0.00124",
+        "score": -63.24527893040774
+    },
+    {
+        "strategy": "threshold_strategy_0.00123",
+        "score": 24.725450370530154
+    },
+    {
+        "strategy": "threshold_strategy_0.00248",
+        "score": -46.937275158270666
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": 64.09893699234792
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": 1.1555037840748525
+    },
+    {
+        "strategy": "threshold_strategy_0.00132",
+        "score": -29.176820238818358
+    },
+    {
+        "strategy": "threshold_strategy_0.00034",
+        "score": -14.262383575562602
+    },
+    {
+        "strategy": "threshold_strategy_0.0006",
+        "score": -28.271750667521616
+    },
+    {
+        "strategy": "threshold_strategy_0.00154",
+        "score": -3.7127000710550817
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": 45.99091570042103
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -44.96034494504898
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -18.335061843511838
+    },
+    {
+        "strategy": "threshold_strategy_0.00209",
+        "score": -16.099895381810967
+    },
+    {
+        "strategy": "threshold_strategy_0.0025",
+        "score": 8.949045036878104
+    },
+    {
+        "strategy": "threshold_strategy_0.00318",
+        "score": -4.008536734554056
+    },
+    {
+        "strategy": "threshold_strategy_0.00012",
+        "score": -63.77598628259213
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -7.04112153233433
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -9.771574754991477
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -16.255606621064373
+    },
+    {
+        "strategy": "threshold_strategy_0.00123",
+        "score": -42.80994645370644
+    },
+    {
+        "strategy": "threshold_strategy_0.00124",
+        "score": 18.213625775290268
+    },
+    {
+        "strategy": "threshold_strategy_0.0025",
+        "score": -24.062241304950177
+    },
+    {
+        "strategy": "threshold_strategy_0.00041",
+        "score": -17.790342814709433
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": 28.067089476075495
+    },
+    {
+        "strategy": "threshold_strategy_0.00037",
+        "score": -60.76975942184805
+    },
+    {
+        "strategy": "threshold_strategy_0.00094",
+        "score": -34.50875015382816
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -12.329945938563988
+    },
+    {
+        "strategy": "threshold_strategy_0.00146",
+        "score": -1.7440063583773622
+    },
+    {
+        "strategy": "threshold_strategy_0.00251",
+        "score": 3.821818585927332
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": 0.7006391311333005
+    },
+    {
+        "strategy": "threshold_strategy_0.00087",
+        "score": 17.80389468655615
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -24.94595284616436
+    },
+    {
+        "strategy": "threshold_strategy_0.00148",
+        "score": 15.80533058593025
+    },
+    {
+        "strategy": "threshold_strategy_0.00034",
+        "score": 4.323892777104376
+    },
+    {
+        "strategy": "threshold_strategy_0.00281",
+        "score": -39.46182906517167
+    },
+    {
+        "strategy": "threshold_strategy_0.00301",
+        "score": -40.44942321122629
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": 2.7457408423504432
+    },
+    {
+        "strategy": "threshold_strategy_0.00124",
+        "score": -27.646528237663503
+    },
+    {
+        "strategy": "threshold_strategy_0.00087",
+        "score": -17.41920570041836
+    },
+    {
+        "strategy": "threshold_strategy_0.00148",
+        "score": -9.003851781830406
+    },
+    {
+        "strategy": "threshold_strategy_0.00034",
+        "score": -31.8646881443317
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -59.467462266375165
+    },
+    {
+        "strategy": "threshold_strategy_0.00179",
+        "score": -31.217268724214705
+    },
+    {
+        "strategy": "threshold_strategy_0.00193",
+        "score": -8.434558825547654
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -13.13191992270368
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -41.27528545258252
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -18.541932579708615
+    },
+    {
+        "strategy": "threshold_strategy_0.00334",
+        "score": -42.944229867747296
+    },
+    {
+        "strategy": "threshold_strategy_0.00093",
+        "score": 3.0414192349068827
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -42.0978661314786
+    },
+    {
+        "strategy": "threshold_strategy_0.00048",
+        "score": -7.491928150552752
+    },
+    {
+        "strategy": "threshold_strategy_0.001",
+        "score": -16.97803506725839
+    },
+    {
+        "strategy": "threshold_strategy_0.00119",
+        "score": -23.305729213782442
+    },
+    {
+        "strategy": "threshold_strategy_0.0011",
+        "score": -52.78111532840025
+    },
+    {
+        "strategy": "threshold_strategy_0.00106",
+        "score": -14.40635286268379
+    },
+    {
+        "strategy": "threshold_strategy_0.00014",
+        "score": -29.450919234639116
+    },
+    {
+        "strategy": "threshold_strategy_0.01282",
+        "score": 0.2863974560660765
+    },
+    {
+        "strategy": "threshold_strategy_0.01965",
+        "score": 4.410958717075886
+    },
+    {
+        "strategy": "threshold_strategy_0.00607",
+        "score": -2.2502437345545445
+    },
+    {
+        "strategy": "threshold_strategy_0.01221",
+        "score": -52.469308567072744
+    },
+    {
+        "strategy": "threshold_strategy_0.00449",
+        "score": -44.19130911833679
+    },
+    {
+        "strategy": "threshold_strategy_0.0025",
+        "score": -13.950439430030002
+    },
+    {
+        "strategy": "threshold_strategy_0.00255",
+        "score": -69.13839857852058
+    },
+    {
+        "strategy": "threshold_strategy_0.01946",
+        "score": 5.185172675331479
+    },
+    {
+        "strategy": "threshold_strategy_0.00112",
+        "score": -23.92475687907975
+    },
+    {
+        "strategy": "threshold_strategy_0.01069",
+        "score": 6.381557824419772
+    },
+    {
+        "strategy": "threshold_strategy_0.0154",
+        "score": -17.473733816865632
+    },
+    {
+        "strategy": "threshold_strategy_0.01866",
+        "score": -60.66270961498257
+    },
+    {
+        "strategy": "threshold_strategy_0.00965",
+        "score": -23.89904385407428
+    },
+    {
+        "strategy": "threshold_strategy_0.00164",
+        "score": 30.865756294598285
+    },
+    {
+        "strategy": "threshold_strategy_0.00692",
+        "score": -7.472199465355416
+    },
+    {
+        "strategy": "threshold_strategy_0.00674",
+        "score": 18.390753376501678
+    },
+    {
+        "strategy": "threshold_strategy_0.00898",
+        "score": -22.487483460370086
+    },
+    {
+        "strategy": "threshold_strategy_0.00935",
+        "score": -33.708845641570576
+    },
+    {
+        "strategy": "threshold_strategy_0.01068",
+        "score": -23.864236286698542
+    },
+    {
+        "strategy": "threshold_strategy_0.00947",
+        "score": -48.02922701078738
+    },
+    {
+        "strategy": "threshold_strategy_0.00164",
+        "score": -50.632750143548954
+    },
+    {
+        "strategy": "threshold_strategy_0.00674",
+        "score": 4.010531219177437
+    },
+    {
+        "strategy": "threshold_strategy_0.01069",
+        "score": -42.820532823844516
+    },
+    {
+        "strategy": "threshold_strategy_0.01946",
+        "score": -66.35744385641495
+    },
+    {
+        "strategy": "threshold_strategy_0.01965",
+        "score": -7.978639288345903
+    },
+    {
+        "strategy": "threshold_strategy_0.02074",
+        "score": -67.5763233359798
+    },
+    {
+        "strategy": "threshold_strategy_0.0119",
+        "score": 39.785464730918534
+    },
+    {
+        "strategy": "threshold_strategy_0.0012",
+        "score": 5.145514251248528
+    },
+    {
+        "strategy": "threshold_strategy_0.00967",
+        "score": -12.642930850468247
+    },
+    {
+        "strategy": "threshold_strategy_0.00758",
+        "score": -17.76106435646193
+    },
+    {
+        "strategy": "threshold_strategy_0.00903",
+        "score": 1.685384463766205
+    },
+    {
+        "strategy": "threshold_strategy_0.02002",
+        "score": -0.5109727412756371
+    },
+    {
+        "strategy": "threshold_strategy_0.00498",
+        "score": 35.594834140915054
+    },
+    {
+        "strategy": "threshold_strategy_0.00511",
+        "score": 52.326737804524896
+    },
+    {
+        "strategy": "threshold_strategy_0.019",
+        "score": -27.53649913720119
+    },
+    {
+        "strategy": "threshold_strategy_0.02116",
+        "score": -33.201391330931315
+    },
+    {
+        "strategy": "threshold_strategy_0.00749",
+        "score": -45.95978407895934
+    },
+    {
+        "strategy": "threshold_strategy_0.0206",
+        "score": 1.455893945489251
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": 13.689905031224129
+    },
+    {
+        "strategy": "threshold_strategy_0.007",
+        "score": -21.63967284037122
+    },
+    {
+        "strategy": "threshold_strategy_0.00511",
+        "score": -11.467032871366094
+    },
+    {
+        "strategy": "threshold_strategy_0.0119",
+        "score": -23.610369906096253
+    },
+    {
+        "strategy": "threshold_strategy_0.00498",
+        "score": -15.204492913107515
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -11.86885115211821
+    },
+    {
+        "strategy": "threshold_strategy_0.0012",
+        "score": 26.626974768073026
+    },
+    {
+        "strategy": "threshold_strategy_0.01045",
+        "score": -7.957549231373228
+    },
+    {
+        "strategy": "threshold_strategy_0.01311",
+        "score": 26.401348443056875
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": 1.7179949830480723
+    },
+    {
+        "strategy": "threshold_strategy_0.01195",
+        "score": -57.091133754323494
+    },
+    {
+        "strategy": "threshold_strategy_0.00232",
+        "score": -10.25189107045557
+    },
+    {
+        "strategy": "threshold_strategy_0.0138",
+        "score": -30.81101507505462
+    },
+    {
+        "strategy": "threshold_strategy_0.00674",
+        "score": -64.444282324879
+    },
+    {
+        "strategy": "threshold_strategy_0.00454",
+        "score": 2.8825998117095395
+    },
+    {
+        "strategy": "threshold_strategy_0.00563",
+        "score": -15.594267951628964
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": 0.8247308526695889
+    },
+    {
+        "strategy": "threshold_strategy_0.00503",
+        "score": -2.012108683571782
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -21.97056024054457
+    },
+    {
+        "strategy": "threshold_strategy_0.00602",
+        "score": -10.099330926054982
+    },
+    {
+        "strategy": "threshold_strategy_0.01074",
+        "score": -34.48789393880469
+    },
+    {
+        "strategy": "threshold_strategy_0.01322",
+        "score": -8.60448642882293
+    },
+    {
+        "strategy": "threshold_strategy_0.0012",
+        "score": -25.76666532281547
+    },
+    {
+        "strategy": "threshold_strategy_0.01311",
+        "score": -24.19445222118722
+    },
+    {
+        "strategy": "threshold_strategy_0.00454",
+        "score": -4.880996588981191
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -40.33836496487626
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -22.572517067178907
+    },
+    {
+        "strategy": "threshold_strategy_0.013",
+        "score": 32.357771060646115
+    },
+    {
+        "strategy": "threshold_strategy_0.00268",
+        "score": -41.06259802046782
+    },
+    {
+        "strategy": "threshold_strategy_0.0017",
+        "score": 9.466715246968818
+    },
+    {
+        "strategy": "threshold_strategy_0.00098",
+        "score": 35.53869517543295
+    },
+    {
+        "strategy": "threshold_strategy_0.00478",
+        "score": 15.24368273042208
+    },
+    {
+        "strategy": "threshold_strategy_0.01433",
+        "score": 38.512527530911555
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -35.04016070736054
+    },
+    {
+        "strategy": "threshold_strategy_0.00398",
+        "score": -28.18597292514083
+    },
+    {
+        "strategy": "threshold_strategy_0.00478",
+        "score": -26.227962969203546
+    },
+    {
+        "strategy": "threshold_strategy_0.00127",
+        "score": 3.5778746646386708
+    },
+    {
+        "strategy": "threshold_strategy_0.00175",
+        "score": 29.28796466054591
+    },
+    {
+        "strategy": "threshold_strategy_0.01346",
+        "score": 47.80018292499352
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -36.1212233931745
+    },
+    {
+        "strategy": "threshold_strategy_0.01269",
+        "score": 14.636707599565156
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -34.25508835182548
+    },
+    {
+        "strategy": "threshold_strategy_0.01346",
+        "score": -36.23848087960112
+    },
+    {
+        "strategy": "threshold_strategy_0.01433",
+        "score": -34.33387029381062
+    },
+    {
+        "strategy": "threshold_strategy_0.00098",
+        "score": -16.3393500857446
+    },
+    {
+        "strategy": "threshold_strategy_0.013",
+        "score": -16.18493807932181
+    },
+    {
+        "strategy": "threshold_strategy_0.00175",
+        "score": 64.34437278007903
+    },
+    {
+        "strategy": "threshold_strategy_0.0143",
+        "score": -34.75200355938463
+    },
+    {
+        "strategy": "threshold_strategy_0.01528",
+        "score": -51.31456101173914
+    },
+    {
+        "strategy": "threshold_strategy_0.0022",
+        "score": -0.9679320908361007
+    },
+    {
+        "strategy": "threshold_strategy_0.01514",
+        "score": -31.014185539735266
+    },
+    {
+        "strategy": "threshold_strategy_0.00252",
+        "score": 22.426933942514083
+    },
+    {
+        "strategy": "threshold_strategy_0.01326",
+        "score": -0.8809622590174513
+    },
+    {
+        "strategy": "threshold_strategy_0.00056",
+        "score": -13.84144268123643
+    },
+    {
+        "strategy": "threshold_strategy_0.01355",
+        "score": -24.562841168201977
+    },
+    {
+        "strategy": "threshold_strategy_0.00324",
+        "score": -45.52994007548203
+    },
+    {
+        "strategy": "threshold_strategy_0.01463",
+        "score": -15.216625726117911
+    },
+    {
+        "strategy": "threshold_strategy_0.0016",
+        "score": 30.6518711204523
+    },
+    {
+        "strategy": "threshold_strategy_0.00196",
+        "score": -43.42614144460893
+    },
+    {
+        "strategy": "threshold_strategy_0.00153",
+        "score": 6.8083098575500145
+    },
+    {
+        "strategy": "threshold_strategy_0.0009",
+        "score": 18.819717400986562
+    },
+    {
+        "strategy": "threshold_strategy_0.00187",
+        "score": -9.589272066410786
+    },
+    {
+        "strategy": "threshold_strategy_0.00175",
+        "score": -1.3830285761973116
+    },
+    {
+        "strategy": "threshold_strategy_0.0016",
+        "score": -31.627490563650113
+    },
+    {
+        "strategy": "threshold_strategy_0.00252",
+        "score": 1.5416749766946367
+    },
+    {
+        "strategy": "threshold_strategy_0.0009",
+        "score": 50.099677680360045
+    },
+    {
+        "strategy": "threshold_strategy_0.00153",
+        "score": -8.699273987839177
+    },
+    {
+        "strategy": "threshold_strategy_0.00238",
+        "score": -27.543200102501224
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": 51.97607346996202
+    },
+    {
+        "strategy": "threshold_strategy_0.00175",
+        "score": 12.493484364087507
+    },
+    {
+        "strategy": "threshold_strategy_0.00389",
+        "score": 6.283466885997143
+    },
+    {
+        "strategy": "threshold_strategy_0.00049",
+        "score": -57.19701290727767
+    },
+    {
+        "strategy": "threshold_strategy_0.00072",
+        "score": -52.02209864031194
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -11.839272667112823
+    },
+    {
+        "strategy": "threshold_strategy_0.00403",
+        "score": -36.490904987123386
+    },
+    {
+        "strategy": "threshold_strategy_0.00277",
+        "score": -26.04467816587578
+    },
+    {
+        "strategy": "threshold_strategy_0.0036",
+        "score": -16.76980443055583
+    },
+    {
+        "strategy": "threshold_strategy_0.00078",
+        "score": -26.43365422611747
+    },
+    {
+        "strategy": "threshold_strategy_0.00325",
+        "score": -16.0602965387515
+    },
+    {
+        "strategy": "threshold_strategy_0.00252",
+        "score": 40.119192514473355
+    },
+    {
+        "strategy": "threshold_strategy_0.00304",
+        "score": -47.32902572112627
+    },
+    {
+        "strategy": "threshold_strategy_0.00126",
+        "score": 6.41371071058191
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -44.57231888511602
+    },
+    {
+        "strategy": "threshold_strategy_0.0009",
+        "score": 9.241203222334882
+    },
+    {
+        "strategy": "threshold_strategy_0.00252",
+        "score": -18.59756005291719
+    },
+    {
+        "strategy": "threshold_strategy_0.00175",
+        "score": -16.94847011306412
+    },
+    {
+        "strategy": "threshold_strategy_0.00126",
+        "score": -29.612809918873793
+    },
+    {
+        "strategy": "threshold_strategy_0.0014",
+        "score": -15.716170279224556
+    },
+    {
+        "strategy": "threshold_strategy_0.00139",
+        "score": -54.554793162632755
+    },
+    {
+        "strategy": "threshold_strategy_0.00168",
+        "score": -68.70397041854999
+    },
+    {
+        "strategy": "threshold_strategy_0.00344",
+        "score": -17.7374008576965
+    },
+    {
+        "strategy": "threshold_strategy_0.00028",
+        "score": -26.870543374687543
+    },
+    {
+        "strategy": "threshold_strategy_0.0009",
+        "score": -35.51844610505562
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -49.122935847919756
+    },
+    {
+        "strategy": "threshold_strategy_0.00069",
+        "score": -14.82868536917627
+    },
+    {
+        "strategy": "threshold_strategy_0.00278",
+        "score": 10.223614232770657
+    },
+    {
+        "strategy": "threshold_strategy_0.0013",
+        "score": -12.64563153439056
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -18.17877000239723
+    },
+    {
+        "strategy": "threshold_strategy_0.00089",
+        "score": -57.55953759787336
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -16.41067568781881
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -7.771540924411099
+    },
+    {
+        "strategy": "threshold_strategy_0.00132",
+        "score": -23.011893519540152
+    },
+    {
+        "strategy": "threshold_strategy_0.00278",
+        "score": -53.32596177064825
+    },
+    {
+        "strategy": "threshold_strategy_0.0009",
+        "score": 10.639222395978614
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -24.04468327652924
+    },
+    {
+        "strategy": "threshold_strategy_0.0013",
+        "score": -15.773783820059336
+    },
+    {
+        "strategy": "threshold_strategy_0.00069",
+        "score": -1.1884009109281521
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -41.87478073027919
+    },
+    {
+        "strategy": "threshold_strategy_0.00058",
+        "score": -41.374815252625815
+    },
+    {
+        "strategy": "threshold_strategy_0.00185",
+        "score": -27.63238190282226
+    },
+    {
+        "strategy": "threshold_strategy_0.00066",
+        "score": -3.8324411869621002
+    },
+    {
+        "strategy": "threshold_strategy_0.00449",
+        "score": 0.6962999648611969
+    },
+    {
+        "strategy": "threshold_strategy_0.00275",
+        "score": 23.61186104001132
+    },
+    {
+        "strategy": "threshold_strategy_0.00365",
+        "score": -31.342685044634422
+    },
+    {
+        "strategy": "threshold_strategy_0.00106",
+        "score": -21.82236102711984
+    },
+    {
+        "strategy": "threshold_strategy_0.00299",
+        "score": -42.72157918366186
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -19.12989516527915
+    },
+    {
+        "strategy": "threshold_strategy_0.0038",
+        "score": 12.135487049077824
+    },
+    {
+        "strategy": "threshold_strategy_0.00117",
+        "score": -73.8619335181508
+    },
+    {
+        "strategy": "threshold_strategy_0.00196",
+        "score": 30.50217588779391
+    },
+    {
+        "strategy": "threshold_strategy_0.00083",
+        "score": 8.480965797603972
+    },
+    {
+        "strategy": "threshold_strategy_0.00193",
+        "score": -14.123216495625698
+    },
+    {
+        "strategy": "threshold_strategy_0.00196",
+        "score": 21.003601192499772
+    },
+    {
+        "strategy": "threshold_strategy_0.00275",
+        "score": -62.56694905571614
+    },
+    {
+        "strategy": "threshold_strategy_0.0038",
+        "score": -46.32030814224899
+    },
+    {
+        "strategy": "threshold_strategy_0.0009",
+        "score": -14.670421001283088
+    },
+    {
+        "strategy": "threshold_strategy_0.00083",
+        "score": -46.44135764557916
+    },
+    {
+        "strategy": "threshold_strategy_0.00412",
+        "score": -30.921762144178373
+    },
+    {
+        "strategy": "threshold_strategy_0.001",
+        "score": 18.192107344999613
+    },
+    {
+        "strategy": "threshold_strategy_0.00032",
+        "score": -54.27875543674173
+    },
+    {
+        "strategy": "threshold_strategy_0.00085",
+        "score": -1.3921717444961814
+    },
+    {
+        "strategy": "threshold_strategy_0.00194",
+        "score": -46.5141606143831
+    },
+    {
+        "strategy": "threshold_strategy_0.00298",
+        "score": 14.111695502167038
+    },
+    {
+        "strategy": "threshold_strategy_0.00157",
+        "score": 33.02619624758522
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": 39.24479813884733
+    },
+    {
+        "strategy": "threshold_strategy_0.00199",
+        "score": -2.10659184624123
+    },
+    {
+        "strategy": "threshold_strategy_0.00225",
+        "score": 13.590433230441718
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": 25.78928664486949
+    },
+    {
+        "strategy": "threshold_strategy_0.00149",
+        "score": -13.531017308919047
+    },
+    {
+        "strategy": "threshold_strategy_0.00177",
+        "score": 27.115830750666504
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": 4.901662918509004
+    },
+    {
+        "strategy": "threshold_strategy_0.00291",
+        "score": 1.462907035353183
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -46.32352941508674
+    },
+    {
+        "strategy": "threshold_strategy_0.00157",
+        "score": -9.782315022474151
+    },
+    {
+        "strategy": "threshold_strategy_0.00177",
+        "score": 24.735753574909488
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": 24.80546968640941
+    },
+    {
+        "strategy": "threshold_strategy_0.00196",
+        "score": -38.33666548260979
+    },
+    {
+        "strategy": "threshold_strategy_0.00109",
+        "score": 47.72475629360294
+    },
+    {
+        "strategy": "threshold_strategy_0.00113",
+        "score": -21.018898339496403
+    },
+    {
+        "strategy": "threshold_strategy_0.00125",
+        "score": -12.343031264404978
+    },
+    {
+        "strategy": "threshold_strategy_0.00112",
+        "score": -48.27122320937103
+    },
+    {
+        "strategy": "threshold_strategy_0.00011",
+        "score": -29.843397677916634
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -18.661941522904513
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -36.64293909282286
+    },
+    {
+        "strategy": "threshold_strategy_0.00178",
+        "score": 12.486149451915566
+    },
+    {
+        "strategy": "threshold_strategy_0.00305",
+        "score": -33.34232575372273
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -18.415204479747985
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": 4.186337441707451
+    },
+    {
+        "strategy": "threshold_strategy_0.0001",
+        "score": -25.79368179874635
+    },
+    {
+        "strategy": "threshold_strategy_0.00205",
+        "score": -39.48124759716286
+    },
+    {
+        "strategy": "threshold_strategy_0.00063",
+        "score": -12.429910601509025
+    },
+    {
+        "strategy": "threshold_strategy_0.00375",
+        "score": -6.743970990155788
+    },
+    {
+        "strategy": "threshold_strategy_0.00228",
+        "score": -20.535533730062994
+    },
+    {
+        "strategy": "threshold_strategy_0.01963",
+        "score": -36.90539283874843
+    },
+    {
+        "strategy": "threshold_strategy_0.00551",
+        "score": -28.736504051743438
+    },
+    {
+        "strategy": "threshold_strategy_0.00651",
+        "score": -52.12020808654153
+    },
+    {
+        "strategy": "threshold_strategy_0.01229",
+        "score": -23.64290778414967
+    },
+    {
+        "strategy": "threshold_strategy_0.01002",
+        "score": 1.0443910151549574
+    },
+    {
+        "strategy": "threshold_strategy_0.01758",
+        "score": 8.503721890951368
+    },
+    {
+        "strategy": "threshold_strategy_0.01387",
+        "score": -58.313362510402
+    },
+    {
+        "strategy": "threshold_strategy_0.0038",
+        "score": -19.64534383792362
+    },
+    {
+        "strategy": "threshold_strategy_0.01683",
+        "score": -15.117531888056156
+    },
+    {
+        "strategy": "threshold_strategy_0.00547",
+        "score": -20.270763218653613
+    },
+    {
+        "strategy": "threshold_strategy_0.00633",
+        "score": -5.852709643970897
+    },
+    {
+        "strategy": "threshold_strategy_0.00488",
+        "score": 14.25512300081823
+    },
+    {
+        "strategy": "threshold_strategy_0.00618",
+        "score": -78.86185480883641
+    },
+    {
+        "strategy": "threshold_strategy_0.01536",
+        "score": 38.7926728031875
+    },
+    {
+        "strategy": "threshold_strategy_0.01001",
+        "score": 22.018054024113013
+    },
+    {
+        "strategy": "threshold_strategy_0.01569",
+        "score": -15.195405550767362
+    },
+    {
+        "strategy": "threshold_strategy_0.00801",
+        "score": -6.607276942655517
+    },
+    {
+        "strategy": "threshold_strategy_0.01716",
+        "score": -37.8973463633795
+    },
+    {
+        "strategy": "threshold_strategy_0.01079",
+        "score": -9.723208329571442
+    },
+    {
+        "strategy": "threshold_strategy_0.01536",
+        "score": 19.41250110981636
+    },
+    {
+        "strategy": "threshold_strategy_0.01001",
+        "score": -12.766702710749037
+    },
+    {
+        "strategy": "threshold_strategy_0.00488",
+        "score": -10.845180422444436
+    },
+    {
+        "strategy": "threshold_strategy_0.01758",
+        "score": 2.6273271366054303
+    },
+    {
+        "strategy": "threshold_strategy_0.01002",
+        "score": 23.11958267231705
+    },
+    {
+        "strategy": "threshold_strategy_0.00934",
+        "score": 9.25131897148215
+    },
+    {
+        "strategy": "threshold_strategy_0.01771",
+        "score": -15.966463138328947
+    },
+    {
+        "strategy": "threshold_strategy_0.00841",
+        "score": -53.949732049541026
+    },
+    {
+        "strategy": "threshold_strategy_0.00642",
+        "score": -13.081156713502438
+    },
+    {
+        "strategy": "threshold_strategy_0.01796",
+        "score": -23.09939185355752
+    },
+    {
+        "strategy": "threshold_strategy_0.01677",
+        "score": -26.98725146306512
+    },
+    {
+        "strategy": "threshold_strategy_0.00858",
+        "score": -31.956972852372658
+    },
+    {
+        "strategy": "threshold_strategy_0.00931",
+        "score": 52.694097966442385
+    },
+    {
+        "strategy": "threshold_strategy_0.01484",
+        "score": -23.051050349226642
+    },
+    {
+        "strategy": "threshold_strategy_0.00605",
+        "score": -33.709991853281885
+    },
+    {
+        "strategy": "threshold_strategy_0.01459",
+        "score": -55.15176525910895
+    },
+    {
+        "strategy": "threshold_strategy_0.00594",
+        "score": -17.598278049070505
+    },
+    {
+        "strategy": "threshold_strategy_0.01776",
+        "score": 36.292432989333776
+    },
+    {
+        "strategy": "threshold_strategy_0.00999",
+        "score": 21.158088476300918
+    },
+    {
+        "strategy": "threshold_strategy_0.00521",
+        "score": 4.817629670399818
+    },
+    {
+        "strategy": "threshold_strategy_0.00931",
+        "score": 35.29531327723906
+    },
+    {
+        "strategy": "threshold_strategy_0.01776",
+        "score": 35.471499518630864
+    },
+    {
+        "strategy": "threshold_strategy_0.01002",
+        "score": 10.022693902381292
+    },
+    {
+        "strategy": "threshold_strategy_0.00999",
+        "score": -7.948259971195057
+    },
+    {
+        "strategy": "threshold_strategy_0.01536",
+        "score": 16.054717959344202
+    },
+    {
+        "strategy": "threshold_strategy_0.00896",
+        "score": -50.09739560353336
+    },
+    {
+        "strategy": "threshold_strategy_0.00795",
+        "score": -10.301445577097411
+    },
+    {
+        "strategy": "threshold_strategy_0.00834",
+        "score": 16.22032883553372
+    },
+    {
+        "strategy": "threshold_strategy_0.01176",
+        "score": -17.74793784190431
+    },
+    {
+        "strategy": "threshold_strategy_0.00937",
+        "score": 5.658237525097377
+    },
+    {
+        "strategy": "threshold_strategy_0.01847",
+        "score": 3.7485313809429144
+    },
+    {
+        "strategy": "threshold_strategy_0.00821",
+        "score": -41.42861648546574
+    },
+    {
+        "strategy": "threshold_strategy_0.00853",
+        "score": 64.62508748302932
+    },
+    {
+        "strategy": "threshold_strategy_0.01659",
+        "score": -59.17588092904373
+    },
+    {
+        "strategy": "threshold_strategy_0.0171",
+        "score": -22.850075102657854
+    },
+    {
+        "strategy": "threshold_strategy_0.01047",
+        "score": 17.736310459577652
+    },
+    {
+        "strategy": "threshold_strategy_0.01007",
+        "score": 15.552522302495163
+    },
+    {
+        "strategy": "threshold_strategy_0.01541",
+        "score": -40.16617721542377
+    },
+    {
+        "strategy": "threshold_strategy_0.00899",
+        "score": -4.45726965392825
+    },
+    {
+        "strategy": "threshold_strategy_0.01046",
+        "score": -0.7343295140370003
+    },
+    {
+        "strategy": "threshold_strategy_0.00853",
+        "score": -15.462541965774626
+    },
+    {
+        "strategy": "threshold_strategy_0.01776",
+        "score": -40.47278118288367
+    },
+    {
+        "strategy": "threshold_strategy_0.00931",
+        "score": -8.067211923218863
+    },
+    {
+        "strategy": "threshold_strategy_0.01047",
+        "score": 90.94985094201742
+    },
+    {
+        "strategy": "threshold_strategy_0.00834",
+        "score": -38.950942436708445
+    },
+    {
+        "strategy": "threshold_strategy_0.01727",
+        "score": -24.288165189898102
+    },
+    {
+        "strategy": "threshold_strategy_0.01578",
+        "score": -49.79498635064448
+    },
+    {
+        "strategy": "threshold_strategy_0.01232",
+        "score": -54.86768760773761
+    },
+    {
+        "strategy": "threshold_strategy_0.00842",
+        "score": -36.23384607990607
+    },
+    {
+        "strategy": "threshold_strategy_0.01615",
+        "score": -3.716963072405619
+    },
+    {
+        "strategy": "threshold_strategy_0.00904",
+        "score": -11.743393936340837
+    },
+    {
+        "strategy": "threshold_strategy_0.01125",
+        "score": -39.89238757528772
+    },
+    {
+        "strategy": "threshold_strategy_0.0113",
+        "score": -42.24983912721507
+    },
+    {
+        "strategy": "threshold_strategy_0.01732",
+        "score": -10.33287364874029
+    },
+    {
+        "strategy": "threshold_strategy_0.0094",
+        "score": -44.03258600944895
+    },
+    {
+        "strategy": "threshold_strategy_0.01015",
+        "score": -48.943064214798234
+    },
+    {
+        "strategy": "threshold_strategy_0.00656",
+        "score": 4.030516888829553
+    },
+    {
+        "strategy": "threshold_strategy_0.00828",
+        "score": -1.1348283695512578
+    },
+    {
+        "strategy": "threshold_strategy_0.00982",
+        "score": -50.99615724667344
+    },
+    {
+        "strategy": "threshold_strategy_0.00887",
+        "score": -25.08278516296504
+    },
+    {
+        "strategy": "threshold_strategy_0.01047",
+        "score": -49.493857978419456
+    },
+    {
+        "strategy": "threshold_strategy_0.00656",
+        "score": -8.845724133418862
+    },
+    {
+        "strategy": "threshold_strategy_0.00828",
+        "score": -17.74525047826492
+    },
+    {
+        "strategy": "threshold_strategy_0.01615",
+        "score": -43.084205382524814
+    },
+    {
+        "strategy": "threshold_strategy_0.00931",
+        "score": -38.299899253097635
+    },
+    {
+        "strategy": "threshold_strategy_0.01793",
+        "score": -44.1738586920288
+    },
+    {
+        "strategy": "threshold_strategy_0.00903",
+        "score": -64.58165792787348
+    },
+    {
+        "strategy": "threshold_strategy_0.00913",
+        "score": -25.64955391663088
+    },
+    {
+        "strategy": "threshold_strategy_0.00749",
+        "score": -6.221473499817137
+    },
+    {
+        "strategy": "threshold_strategy_0.00876",
+        "score": -23.172085793636683
+    },
+    {
+        "strategy": "threshold_strategy_0.01031",
+        "score": 26.494613486584967
+    },
+    {
+        "strategy": "threshold_strategy_0.00693",
+        "score": -26.264135229336212
+    },
+    {
+        "strategy": "threshold_strategy_0.01006",
+        "score": 5.581397186270294
+    },
+    {
+        "strategy": "threshold_strategy_0.00991",
+        "score": -5.6965278880723105
+    },
+    {
+        "strategy": "threshold_strategy_0.01048",
+        "score": -36.195728628465204
+    },
+    {
+        "strategy": "threshold_strategy_0.01",
+        "score": -18.583216111173456
+    },
+    {
+        "strategy": "threshold_strategy_0.00668",
+        "score": 32.25573558736029
+    },
+    {
+        "strategy": "threshold_strategy_0.00746",
+        "score": -48.64387109474521
+    },
+    {
+        "strategy": "threshold_strategy_0.00675",
+        "score": -35.527532714864705
+    },
+    {
+        "strategy": "threshold_strategy_0.01537",
+        "score": 24.74408911749478
+    },
+    {
+        "strategy": "threshold_strategy_0.00668",
+        "score": -29.441467529537803
+    },
+    {
+        "strategy": "threshold_strategy_0.01031",
+        "score": -24.869052029222033
+    },
+    {
+        "strategy": "threshold_strategy_0.01537",
+        "score": 5.151998242853935
+    },
+    {
+        "strategy": "threshold_strategy_0.01006",
+        "score": -18.139698633490312
+    },
+    {
+        "strategy": "threshold_strategy_0.00991",
+        "score": -43.40478429631973
+    },
+    {
+        "strategy": "threshold_strategy_0.01649",
+        "score": -13.252439740360373
+    },
+    {
+        "strategy": "threshold_strategy_0.00879",
+        "score": -31.468240003449893
+    },
+    {
+        "strategy": "threshold_strategy_0.01085",
+        "score": -51.441997334322
+    },
+    {
+        "strategy": "threshold_strategy_0.00741",
+        "score": 20.07179823640992
+    },
+    {
+        "strategy": "threshold_strategy_0.0148",
+        "score": -59.43643623699896
+    },
+    {
+        "strategy": "threshold_strategy_0.01039",
+        "score": -24.66459979529553
+    },
+    {
+        "strategy": "threshold_strategy_0.01094",
+        "score": -25.373280189398983
+    },
+    {
+        "strategy": "threshold_strategy_0.00795",
+        "score": 27.12804408336003
+    },
+    {
+        "strategy": "threshold_strategy_0.01175",
+        "score": -35.16901606220107
+    },
+    {
+        "strategy": "threshold_strategy_0.01129",
+        "score": -16.844406876799162
+    },
+    {
+        "strategy": "threshold_strategy_0.00841",
+        "score": -10.632045769738752
+    },
+    {
+        "strategy": "threshold_strategy_0.00729",
+        "score": -9.231652934843694
+    },
+    {
+        "strategy": "threshold_strategy_0.00576",
+        "score": -10.911834673230587
+    },
+    {
+        "strategy": "threshold_strategy_0.01161",
+        "score": 15.160505902722264
+    },
+    {
+        "strategy": "threshold_strategy_0.00841",
+        "score": -1.312852031354538
+    },
+    {
+        "strategy": "threshold_strategy_0.00795",
+        "score": -35.81130131466658
+    },
+    {
+        "strategy": "threshold_strategy_0.00741",
+        "score": 38.008414899174184
+    },
+    {
+        "strategy": "threshold_strategy_0.01161",
+        "score": 74.36764243754142
+    },
+    {
+        "strategy": "threshold_strategy_0.01537",
+        "score": -0.9511866419744024
+    },
+    {
+        "strategy": "threshold_strategy_0.00841",
+        "score": 0.6242874306401944
+    },
+    {
+        "strategy": "threshold_strategy_0.00724",
+        "score": -6.6140068563002
+    },
+    {
+        "strategy": "threshold_strategy_0.01131",
+        "score": 19.737878234455096
+    },
+    {
+        "strategy": "threshold_strategy_0.00892",
+        "score": -40.6446276791377
+    },
+    {
+        "strategy": "threshold_strategy_0.01325",
+        "score": -1.2453286516277515
+    },
+    {
+        "strategy": "threshold_strategy_0.00946",
+        "score": 34.68379666328643
+    },
+    {
+        "strategy": "threshold_strategy_0.00732",
+        "score": -20.37876526638236
+    },
+    {
+        "strategy": "threshold_strategy_0.00562",
+        "score": -26.056006721665113
+    },
+    {
+        "strategy": "threshold_strategy_0.01036",
+        "score": -14.52456911475862
+    },
+    {
+        "strategy": "threshold_strategy_0.01682",
+        "score": -51.9360495735165
+    },
+    {
+        "strategy": "threshold_strategy_0.01084",
+        "score": -12.439644678864
+    },
+    {
+        "strategy": "threshold_strategy_0.0097",
+        "score": -1.9239472228607042
+    },
+    {
+        "strategy": "threshold_strategy_0.00835",
+        "score": -31.6966626764506
+    },
+    {
+        "strategy": "threshold_strategy_0.01339",
+        "score": -30.641758330838343
+    },
+    {
+        "strategy": "threshold_strategy_0.01362",
+        "score": -50.833473324492516
+    },
+    {
+        "strategy": "threshold_strategy_0.00715",
+        "score": -22.19893831089248
+    },
+    {
+        "strategy": "threshold_strategy_0.01161",
+        "score": 7.55027267798156
+    },
+    {
+        "strategy": "threshold_strategy_0.00741",
+        "score": 1.3391968997274404
+    },
+    {
+        "strategy": "threshold_strategy_0.00946",
+        "score": -17.81284934300561
+    },
+    {
+        "strategy": "threshold_strategy_0.01131",
+        "score": -28.98756854311064
+    },
+    {
+        "strategy": "threshold_strategy_0.00841",
+        "score": 41.44357444106319
+    },
+    {
+        "strategy": "threshold_strategy_0.00849",
+        "score": 19.59094300795769
+    },
+    {
+        "strategy": "threshold_strategy_0.00785",
+        "score": -0.019053887800971836
+    },
+    {
+        "strategy": "threshold_strategy_0.00936",
+        "score": 23.98056919020334
+    },
+    {
+        "strategy": "threshold_strategy_0.01334",
+        "score": -20.07113942000045
+    },
+    {
+        "strategy": "threshold_strategy_0.01298",
+        "score": -17.835583460143354
+    },
+    {
+        "strategy": "threshold_strategy_0.01103",
+        "score": 10.573120618883948
+    },
+    {
+        "strategy": "threshold_strategy_0.01312",
+        "score": 4.115580492798387
+    },
+    {
+        "strategy": "threshold_strategy_0.00844",
+        "score": -18.21211069126406
+    },
+    {
+        "strategy": "threshold_strategy_0.00543",
+        "score": 74.30712000583334
+    },
+    {
+        "strategy": "threshold_strategy_0.01292",
+        "score": -35.32696188705819
+    },
+    {
+        "strategy": "threshold_strategy_0.01125",
+        "score": -15.883162432637548
+    },
+    {
+        "strategy": "threshold_strategy_0.01034",
+        "score": -51.18126440360926
+    },
+    {
+        "strategy": "threshold_strategy_0.00676",
+        "score": -2.381504118392172
+    },
+    {
+        "strategy": "threshold_strategy_0.01168",
+        "score": -48.35366934291708
+    },
+    {
+        "strategy": "threshold_strategy_0.01344",
+        "score": 7.22504187612563
+    },
+    {
+        "strategy": "threshold_strategy_0.00543",
+        "score": 2.8091215171852895
+    },
+    {
+        "strategy": "threshold_strategy_0.00841",
+        "score": -21.773450567311507
+    },
+    {
+        "strategy": "threshold_strategy_0.00936",
+        "score": 0.8502949170225804
+    },
+    {
+        "strategy": "threshold_strategy_0.00849",
+        "score": -35.07978786142865
+    },
+    {
+        "strategy": "threshold_strategy_0.01103",
+        "score": 7.256057576688576
+    },
+    {
+        "strategy": "threshold_strategy_0.00413",
+        "score": -32.27107998434895
+    },
+    {
+        "strategy": "threshold_strategy_0.0065",
+        "score": -29.6951192417879
+    },
+    {
+        "strategy": "threshold_strategy_0.00934",
+        "score": -31.601802178824045
+    },
+    {
+        "strategy": "threshold_strategy_0.00862",
+        "score": -16.866160479220042
+    },
+    {
+        "strategy": "threshold_strategy_0.01044",
+        "score": -51.94924625125243
+    },
+    {
+        "strategy": "threshold_strategy_0.00452",
+        "score": 0.3120057659881752
+    },
+    {
+        "strategy": "threshold_strategy_0.01",
+        "score": -40.194712602916404
+    },
+    {
+        "strategy": "threshold_strategy_0.01051",
+        "score": -10.341368809449321
+    },
+    {
+        "strategy": "threshold_strategy_0.00772",
+        "score": -28.65120398199298
+    },
+    {
+        "strategy": "threshold_strategy_0.01272",
+        "score": -21.11971614088793
+    },
+    {
+        "strategy": "threshold_strategy_0.00602",
+        "score": -41.90552714996558
+    },
+    {
+        "strategy": "threshold_strategy_0.00789",
+        "score": -4.618218290758456
+    },
+    {
+        "strategy": "threshold_strategy_0.01136",
+        "score": -40.15923457999733
+    },
+    {
+        "strategy": "threshold_strategy_0.00759",
+        "score": 17.139993593577408
+    },
+    {
+        "strategy": "threshold_strategy_0.00421",
+        "score": -68.19925937402999
+    },
+    {
+        "strategy": "threshold_strategy_0.00759",
+        "score": -13.921101085799954
+    },
+    {
+        "strategy": "threshold_strategy_0.01103",
+        "score": -21.156395549997505
+    },
+    {
+        "strategy": "threshold_strategy_0.00543",
+        "score": -35.51759539939131
+    },
+    {
+        "strategy": "threshold_strategy_0.00936",
+        "score": -5.406236942416129
+    },
+    {
+        "strategy": "threshold_strategy_0.00452",
+        "score": -20.03164388450122
+    },
+    {
+        "strategy": "threshold_strategy_0.01085",
+        "score": -35.221602673679115
+    },
+    {
+        "strategy": "threshold_strategy_0.00357",
+        "score": 3.4493292246536527
+    },
+    {
+        "strategy": "threshold_strategy_0.00939",
+        "score": -10.6353664244308
+    },
+    {
+        "strategy": "threshold_strategy_0.00304",
+        "score": -41.771702943328634
+    },
+    {
+        "strategy": "threshold_strategy_0.00714",
+        "score": -16.74036117104677
+    },
+    {
+        "strategy": "threshold_strategy_0.01045",
+        "score": -23.535692497843286
+    },
+    {
+        "strategy": "threshold_strategy_0.00869",
+        "score": -27.212621021344773
+    },
+    {
+        "strategy": "threshold_strategy_0.00579",
+        "score": -37.228609099887265
+    },
+    {
+        "strategy": "threshold_strategy_0.01235",
+        "score": -15.53387087224565
+    },
+    {
+        "strategy": "threshold_strategy_0.00955",
+        "score": -8.821454186283631
+    },
+    {
+        "strategy": "threshold_strategy_0.0062",
+        "score": -67.76127852537121
+    },
+    {
+        "strategy": "threshold_strategy_0.00863",
+        "score": -19.848911769327145
+    },
+    {
+        "strategy": "threshold_strategy_0.00799",
+        "score": -36.41875014556365
+    },
+    {
+        "strategy": "threshold_strategy_0.00567",
+        "score": -36.3970643818712
+    },
+    {
+        "strategy": "threshold_strategy_0.00938",
+        "score": -74.4482216100123
+    },
+    {
+        "strategy": "threshold_strategy_0.01365",
+        "score": 0.8250886753762074
+    },
+    {
+        "strategy": "threshold_strategy_0.01057",
+        "score": 28.70113404377743
+    },
+    {
+        "strategy": "threshold_strategy_0.01721",
+        "score": -24.537997344591084
+    },
+    {
+        "strategy": "threshold_strategy_0.01676",
+        "score": -30.233873212675846
+    },
+    {
+        "strategy": "threshold_strategy_0.00494",
+        "score": 48.982087675840276
+    },
+    {
+        "strategy": "threshold_strategy_0.01569",
+        "score": 7.463013734456652
+    },
+    {
+        "strategy": "threshold_strategy_0.00084",
+        "score": -43.79432470306989
+    },
+    {
+        "strategy": "threshold_strategy_0.00371",
+        "score": -28.67540172325046
+    },
+    {
+        "strategy": "threshold_strategy_0.00315",
+        "score": 31.28097958368693
+    },
+    {
+        "strategy": "threshold_strategy_0.00128",
+        "score": -4.411674695219631
+    },
+    {
+        "strategy": "threshold_strategy_0.01068",
+        "score": -22.365265525828832
+    },
+    {
+        "strategy": "threshold_strategy_0.0065",
+        "score": -5.839606592597576
+    },
+    {
+        "strategy": "threshold_strategy_0.01983",
+        "score": 3.264330405561523
+    },
+    {
+        "strategy": "threshold_strategy_0.01943",
+        "score": 0.41026550583777066
+    },
+    {
+        "strategy": "threshold_strategy_0.00785",
+        "score": -49.56948067994504
+    },
+    {
+        "strategy": "threshold_strategy_0.00091",
+        "score": -26.89599059967523
+    },
+    {
+        "strategy": "threshold_strategy_0.00807",
+        "score": -23.985556547975122
+    },
+    {
+        "strategy": "threshold_strategy_0.00197",
+        "score": -0.20409413866106263
+    },
+    {
+        "strategy": "threshold_strategy_0.00331",
+        "score": -19.679618128652805
+    },
+    {
+        "strategy": "threshold_strategy_0.00664",
+        "score": -0.4499258611770074
+    },
+    {
+        "strategy": "threshold_strategy_0.00494",
+        "score": -5.854632067369209
+    },
+    {
+        "strategy": "threshold_strategy_0.00315",
+        "score": -31.884650835781486
+    },
+    {
+        "strategy": "threshold_strategy_0.01057",
+        "score": -42.38992013118264
+    },
+    {
+        "strategy": "threshold_strategy_0.01569",
+        "score": 29.9625645897828
+    },
+    {
+        "strategy": "threshold_strategy_0.01983",
+        "score": -34.83986918202332
+    },
+    {
+        "strategy": "threshold_strategy_0.0021",
+        "score": 16.286669622887416
+    },
+    {
+        "strategy": "threshold_strategy_0.00296",
+        "score": -15.261555685118438
+    },
+    {
+        "strategy": "threshold_strategy_0.01159",
+        "score": 24.99179060059035
+    },
+    {
+        "strategy": "threshold_strategy_0.01512",
+        "score": 64.18545039448081
+    },
+    {
+        "strategy": "threshold_strategy_0.00941",
+        "score": -23.356969986110713
+    },
+    {
+        "strategy": "threshold_strategy_0.01642",
+        "score": -53.94909368553839
+    },
+    {
+        "strategy": "threshold_strategy_0.00663",
+        "score": -39.44896102910698
+    },
+    {
+        "strategy": "threshold_strategy_0.02105",
+        "score": -41.84212152595134
+    },
+    {
+        "strategy": "threshold_strategy_0.00497",
+        "score": -17.1915851890666
+    },
+    {
+        "strategy": "threshold_strategy_0.00371",
+        "score": -37.92423657359876
+    },
+    {
+        "strategy": "threshold_strategy_0.00314",
+        "score": 27.61902518592194
+    },
+    {
+        "strategy": "threshold_strategy_0.01518",
+        "score": 18.596066434666852
+    },
+    {
+        "strategy": "threshold_strategy_0.0068",
+        "score": -4.742322740498977
+    },
+    {
+        "strategy": "threshold_strategy_0.01177",
+        "score": -55.117880964316335
+    },
+    {
+        "strategy": "threshold_strategy_0.00369",
+        "score": -49.85406312611792
+    },
+    {
+        "strategy": "threshold_strategy_0.01512",
+        "score": -15.142198019832321
+    },
+    {
+        "strategy": "threshold_strategy_0.01569",
+        "score": 1.406663462781097
+    },
+    {
+        "strategy": "threshold_strategy_0.00314",
+        "score": -0.0604569381386284
+    },
+    {
+        "strategy": "threshold_strategy_0.01159",
+        "score": -40.710391406658246
+    },
+    {
+        "strategy": "threshold_strategy_0.01518",
+        "score": -20.073783121617765
+    },
+    {
+        "strategy": "threshold_strategy_0.01076",
+        "score": 15.034231538700993
+    },
+    {
+        "strategy": "threshold_strategy_0.0152",
+        "score": -42.5518789448892
+    },
+    {
+        "strategy": "threshold_strategy_0.01584",
+        "score": -27.19444853275761
+    },
+    {
+        "strategy": "threshold_strategy_0.0133",
+        "score": 19.653106227418533
+    },
+    {
+        "strategy": "threshold_strategy_0.01689",
+        "score": -50.999795670176496
+    },
+    {
+        "strategy": "threshold_strategy_0.0174",
+        "score": -34.27619496911701
+    },
+    {
+        "strategy": "threshold_strategy_0.01154",
+        "score": 10.982062964005578
+    },
+    {
+        "strategy": "threshold_strategy_0.01475",
+        "score": -7.41584212251842
+    },
+    {
+        "strategy": "threshold_strategy_0.01385",
+        "score": -28.23408336596897
+    },
+    {
+        "strategy": "threshold_strategy_0.01296",
+        "score": -21.910390216528583
+    },
+    {
+        "strategy": "threshold_strategy_0.00157",
+        "score": 0.2097619512205
+    },
+    {
+        "strategy": "threshold_strategy_0.0122",
+        "score": 17.584586369885187
+    },
+    {
+        "strategy": "threshold_strategy_0.01618",
+        "score": 27.686641620824076
+    },
+    {
+        "strategy": "threshold_strategy_0.01209",
+        "score": -40.863341067582724
+    },
+    {
+        "strategy": "threshold_strategy_0.01419",
+        "score": -21.367629926480753
+    },
+    {
+        "strategy": "threshold_strategy_0.01618",
+        "score": -21.514701161626917
+    },
+    {
+        "strategy": "threshold_strategy_0.0133",
+        "score": -31.76318142696786
+    },
+    {
+        "strategy": "threshold_strategy_0.0122",
+        "score": -36.72599799476884
+    },
+    {
+        "strategy": "threshold_strategy_0.01076",
+        "score": -1.3970048927470629
+    },
+    {
+        "strategy": "threshold_strategy_0.01154",
+        "score": 68.49677898522368
+    },
+    {
+        "strategy": "threshold_strategy_0.00876",
+        "score": -68.39053067880455
+    },
+    {
+        "strategy": "threshold_strategy_0.01626",
+        "score": 90.77142612903599
+    },
+    {
+        "strategy": "threshold_strategy_0.01295",
+        "score": -45.887779401057145
+    },
+    {
+        "strategy": "threshold_strategy_0.01496",
+        "score": -4.202302902302421
+    },
+    {
+        "strategy": "threshold_strategy_0.01208",
+        "score": 32.15022979818687
+    },
+    {
+        "strategy": "threshold_strategy_0.01431",
+        "score": -4.620336370159464
+    },
+    {
+        "strategy": "threshold_strategy_0.01103",
+        "score": 6.928416924164509
+    },
+    {
+        "strategy": "threshold_strategy_0.01474",
+        "score": -32.25373268798347
+    },
+    {
+        "strategy": "threshold_strategy_0.0118",
+        "score": 10.255781364258809
+    },
+    {
+        "strategy": "threshold_strategy_0.01222",
+        "score": 14.718767834302959
+    },
+    {
+        "strategy": "threshold_strategy_0.01787",
+        "score": -29.87113290029953
+    },
+    {
+        "strategy": "threshold_strategy_0.01078",
+        "score": -33.7448980074345
+    },
+    {
+        "strategy": "threshold_strategy_0.01186",
+        "score": 1.6131574328266112
+    },
+    {
+        "strategy": "threshold_strategy_0.01158",
+        "score": -24.225309588089715
+    },
+    {
+        "strategy": "threshold_strategy_0.01358",
+        "score": -31.526546396455757
+    },
+    {
+        "strategy": "threshold_strategy_0.01626",
+        "score": -31.012817521031792
+    },
+    {
+        "strategy": "threshold_strategy_0.01154",
+        "score": -26.99768782338976
+    },
+    {
+        "strategy": "threshold_strategy_0.01208",
+        "score": 34.84210997994013
+    },
+    {
+        "strategy": "threshold_strategy_0.01222",
+        "score": -57.74892042464765
+    },
+    {
+        "strategy": "threshold_strategy_0.0118",
+        "score": 32.024656245879726
+    },
+    {
+        "strategy": "threshold_strategy_0.01347",
+        "score": -29.315351480142738
+    },
+    {
+        "strategy": "threshold_strategy_0.01307",
+        "score": 18.0771718082094
+    },
+    {
+        "strategy": "threshold_strategy_0.01256",
+        "score": -33.605410365387094
+    },
+    {
+        "strategy": "threshold_strategy_0.01371",
+        "score": 18.039200651869862
+    },
+    {
+        "strategy": "threshold_strategy_0.01167",
+        "score": 9.224874806370394
+    },
+    {
+        "strategy": "threshold_strategy_0.01142",
+        "score": -49.06150394271675
+    },
+    {
+        "strategy": "threshold_strategy_0.01266",
+        "score": 6.746587649211357
+    },
+    {
+        "strategy": "threshold_strategy_0.01644",
+        "score": -16.673525627698368
+    },
+    {
+        "strategy": "threshold_strategy_0.0175",
+        "score": -23.606246818398752
+    },
+    {
+        "strategy": "threshold_strategy_0.0152",
+        "score": -28.307223357983048
+    },
+    {
+        "strategy": "threshold_strategy_0.01336",
+        "score": -16.004631507151018
+    },
+    {
+        "strategy": "threshold_strategy_0.01118",
+        "score": 9.215780299493844
+    },
+    {
+        "strategy": "threshold_strategy_0.01248",
+        "score": 2.914072794136615
+    },
+    {
+        "strategy": "threshold_strategy_0.01121",
+        "score": 15.60166857291442
+    },
+    {
+        "strategy": "threshold_strategy_0.01014",
+        "score": -34.60455459648112
+    },
+    {
+        "strategy": "threshold_strategy_0.01208",
+        "score": -23.647351751288895
+    },
+    {
+        "strategy": "threshold_strategy_0.0118",
+        "score": -8.868382285356525
+    },
+    {
+        "strategy": "threshold_strategy_0.01307",
+        "score": -52.916887923532215
+    },
+    {
+        "strategy": "threshold_strategy_0.01371",
+        "score": -27.23077983197261
+    },
+    {
+        "strategy": "threshold_strategy_0.01121",
+        "score": -1.5935770162732865
+    },
+    {
+        "strategy": "threshold_strategy_0.01124",
+        "score": -36.70286000601501
+    },
+    {
+        "strategy": "threshold_strategy_0.01336",
+        "score": -17.052434339603337
+    },
+    {
+        "strategy": "threshold_strategy_0.01113",
+        "score": 10.718435444563916
+    },
+    {
+        "strategy": "threshold_strategy_0.01133",
+        "score": -0.7742898220484022
+    },
+    {
+        "strategy": "threshold_strategy_0.01261",
+        "score": -45.285056803201826
+    },
+    {
+        "strategy": "threshold_strategy_0.01224",
+        "score": -38.71838654172308
+    },
+    {
+        "strategy": "threshold_strategy_0.01395",
+        "score": 22.145824528931158
+    },
+    {
+        "strategy": "threshold_strategy_0.0127",
+        "score": -25.878946030943098
+    },
+    {
+        "strategy": "threshold_strategy_0.01189",
+        "score": 48.20349432997496
+    },
+    {
+        "strategy": "threshold_strategy_0.01514",
+        "score": -5.618573311367925
+    },
+    {
+        "strategy": "threshold_strategy_0.01188",
+        "score": -28.425633272891105
+    },
+    {
+        "strategy": "threshold_strategy_0.0105",
+        "score": -22.461888695284557
+    },
+    {
+        "strategy": "threshold_strategy_0.01037",
+        "score": -36.86655184222039
+    },
+    {
+        "strategy": "threshold_strategy_0.01087",
+        "score": 13.852739588095517
+    },
+    {
+        "strategy": "threshold_strategy_0.01241",
+        "score": -1.8244481306119695
+    },
+    {
+        "strategy": "threshold_strategy_0.01189",
+        "score": 12.02146150343129
+    },
+    {
+        "strategy": "threshold_strategy_0.01395",
+        "score": -38.83439043089878
+    },
+    {
+        "strategy": "threshold_strategy_0.01087",
+        "score": -7.997630069125691
+    },
+    {
+        "strategy": "threshold_strategy_0.01113",
+        "score": -19.581621482692697
+    },
+    {
+        "strategy": "threshold_strategy_0.01133",
+        "score": 3.3492600268850126
+    },
+    {
+        "strategy": "threshold_strategy_0.01401",
+        "score": -37.27013232709993
+    },
+    {
+        "strategy": "threshold_strategy_0.01091",
+        "score": -6.421131597185777
+    },
+    {
+        "strategy": "threshold_strategy_0.01192",
+        "score": -43.369925087352314
+    },
+    {
+        "strategy": "threshold_strategy_0.01134",
+        "score": -56.73449115128085
+    },
+    {
+        "strategy": "threshold_strategy_0.01189",
+        "score": -10.2723962973782
+    },
+    {
+        "strategy": "threshold_strategy_0.01316",
+        "score": -31.198564290756167
+    },
+    {
+        "strategy": "threshold_strategy_0.00925",
+        "score": 90.08482900140626
+    },
+    {
+        "strategy": "threshold_strategy_0.01016",
+        "score": -37.604083515783174
+    },
+    {
+        "strategy": "threshold_strategy_0.01169",
+        "score": -51.052441943191624
+    },
+    {
+        "strategy": "threshold_strategy_0.01101",
+        "score": -25.641358055450382
+    },
+    {
+        "strategy": "threshold_strategy_0.00959",
+        "score": -23.72448950548717
+    },
+    {
+        "strategy": "threshold_strategy_0.01284",
+        "score": -48.39711492142496
+    },
+    {
+        "strategy": "threshold_strategy_0.01176",
+        "score": 2.0494957219862187
+    },
+    {
+        "strategy": "threshold_strategy_0.01436",
+        "score": 2.0644398008846565
+    },
+    {
+        "strategy": "threshold_strategy_0.00943",
+        "score": -46.8119290514644
+    },
+    {
+        "strategy": "threshold_strategy_0.00925",
+        "score": -49.966242611802755
+    },
+    {
+        "strategy": "threshold_strategy_0.01189",
+        "score": -29.3143727247201
+    },
+    {
+        "strategy": "threshold_strategy_0.01133",
+        "score": -42.99659373364938
+    },
+    {
+        "strategy": "threshold_strategy_0.01436",
+        "score": -35.947222073213176
+    },
+    {
+        "strategy": "threshold_strategy_0.01176",
+        "score": 13.902151956136535
+    },
+    {
+        "strategy": "threshold_strategy_0.00979",
+        "score": 8.446680515830039
+    },
+    {
+        "strategy": "threshold_strategy_0.01063",
+        "score": -17.639174529925654
+    },
+    {
+        "strategy": "threshold_strategy_0.01379",
+        "score": -4.84142944336088
+    },
+    {
+        "strategy": "threshold_strategy_0.00996",
+        "score": 23.52669225819075
+    },
+    {
+        "strategy": "threshold_strategy_0.01088",
+        "score": -32.201371869707636
+    },
+    {
+        "strategy": "threshold_strategy_0.01415",
+        "score": -66.33454741905558
+    },
+    {
+        "strategy": "threshold_strategy_0.01075",
+        "score": -3.814045227156896
+    },
+    {
+        "strategy": "threshold_strategy_0.00832",
+        "score": 6.9838812567481625
+    },
+    {
+        "strategy": "threshold_strategy_0.00805",
+        "score": -12.867321962189244
+    },
+    {
+        "strategy": "threshold_strategy_0.01238",
+        "score": -10.749583516592779
+    },
+    {
+        "strategy": "threshold_strategy_0.01357",
+        "score": -3.1277115279411447
+    },
+    {
+        "strategy": "threshold_strategy_0.00985",
+        "score": -27.416766294462747
+    },
+    {
+        "strategy": "threshold_strategy_0.01037",
+        "score": -51.575578205807375
+    },
+    {
+        "strategy": "threshold_strategy_0.01175",
+        "score": 43.22638683303952
+    },
+    {
+        "strategy": "threshold_strategy_0.01376",
+        "score": -3.375802214647763
+    },
+    {
+        "strategy": "threshold_strategy_0.01175",
+        "score": 19.678669795195013
+    },
+    {
+        "strategy": "threshold_strategy_0.00996",
+        "score": 14.45729792031463
+    },
+    {
+        "strategy": "threshold_strategy_0.01176",
+        "score": -12.257640319672376
+    },
+    {
+        "strategy": "threshold_strategy_0.00979",
+        "score": -10.28122688913831
+    },
+    {
+        "strategy": "threshold_strategy_0.00832",
+        "score": -56.974552153224714
+    },
+    {
+        "strategy": "threshold_strategy_0.01367",
+        "score": -23.117078382112467
+    },
+    {
+        "strategy": "threshold_strategy_0.01073",
+        "score": -34.29400785919343
+    },
+    {
+        "strategy": "threshold_strategy_0.00816",
+        "score": -45.50553486082348
+    },
+    {
+        "strategy": "threshold_strategy_0.00903",
+        "score": 7.61970962494172
+    },
+    {
+        "strategy": "threshold_strategy_0.00738",
+        "score": 45.147565580375904
+    },
+    {
+        "strategy": "threshold_strategy_0.0099",
+        "score": 10.334998187475477
+    },
+    {
+        "strategy": "threshold_strategy_0.01218",
+        "score": -18.056377558519827
+    },
+    {
+        "strategy": "threshold_strategy_0.0115",
+        "score": -28.256450457251155
+    },
+    {
+        "strategy": "threshold_strategy_0.00966",
+        "score": 0.7999974552588185
+    },
+    {
+        "strategy": "threshold_strategy_0.01323",
+        "score": -28.16102236328365
+    },
+    {
+        "strategy": "threshold_strategy_0.01129",
+        "score": 12.865736944093896
+    },
+    {
+        "strategy": "threshold_strategy_0.00981",
+        "score": 20.24889942072585
+    },
+    {
+        "strategy": "threshold_strategy_0.00962",
+        "score": -40.85528732626314
+    },
+    {
+        "strategy": "threshold_strategy_0.01044",
+        "score": 16.135887053058624
+    },
+    {
+        "strategy": "threshold_strategy_0.01238",
+        "score": -30.94449276719014
+    },
+    {
+        "strategy": "threshold_strategy_0.00738",
+        "score": -12.480704942869565
+    },
+    {
+        "strategy": "threshold_strategy_0.00981",
+        "score": -27.26487510109139
+    },
+    {
+        "strategy": "threshold_strategy_0.01175",
+        "score": -15.708713100795165
+    },
+    {
+        "strategy": "threshold_strategy_0.01044",
+        "score": -3.208948463031952
+    },
+    {
+        "strategy": "threshold_strategy_0.00996",
+        "score": -32.80470781612496
+    },
+    {
+        "strategy": "threshold_strategy_0.01214",
+        "score": -6.137558820309081
+    },
+    {
+        "strategy": "threshold_strategy_0.00995",
+        "score": 35.44178944756016
+    },
+    {
+        "strategy": "threshold_strategy_0.00796",
+        "score": 61.70332454740641
+    },
+    {
+        "strategy": "threshold_strategy_0.00823",
+        "score": 56.46755718905426
+    },
+    {
+        "strategy": "threshold_strategy_0.01157",
+        "score": -29.411878622555818
+    },
+    {
+        "strategy": "threshold_strategy_0.00961",
+        "score": -29.88916183199438
+    },
+    {
+        "strategy": "threshold_strategy_0.00808",
+        "score": -5.8021902487768955
+    },
+    {
+        "strategy": "threshold_strategy_0.00829",
+        "score": 22.451769605838876
+    },
+    {
+        "strategy": "threshold_strategy_0.01002",
+        "score": 18.829777494533687
+    },
+    {
+        "strategy": "threshold_strategy_0.01044",
+        "score": -22.83086984484865
+    },
+    {
+        "strategy": "threshold_strategy_0.01147",
+        "score": -1.388133030828044
+    },
+    {
+        "strategy": "threshold_strategy_0.00856",
+        "score": -16.904837993547922
+    },
+    {
+        "strategy": "threshold_strategy_0.00803",
+        "score": -1.38464507094902
+    },
+    {
+        "strategy": "threshold_strategy_0.00981",
+        "score": 10.845481688272173
+    },
+    {
+        "strategy": "threshold_strategy_0.00847",
+        "score": 25.895115010181044
+    },
+    {
+        "strategy": "threshold_strategy_0.01337",
+        "score": 5.3163330577831545
+    },
+    {
+        "strategy": "threshold_strategy_0.00375",
+        "score": -31.406436694493806
+    },
+    {
+        "strategy": "threshold_strategy_0.01001",
+        "score": -28.44737748520754
+    },
+    {
+        "strategy": "threshold_strategy_0.00518",
+        "score": 0.3667572928094529
+    },
+    {
+        "strategy": "threshold_strategy_0.01829",
+        "score": -11.101992384253421
+    },
+    {
+        "strategy": "threshold_strategy_0.00115",
+        "score": -13.7511619546176
+    },
+    {
+        "strategy": "threshold_strategy_0.0139",
+        "score": -10.556178252561821
+    },
+    {
+        "strategy": "threshold_strategy_0.00155",
+        "score": 0.5692883190762359
+    },
+    {
+        "strategy": "threshold_strategy_0.00175",
+        "score": -18.999399598970015
+    },
+    {
+        "strategy": "threshold_strategy_0.00977",
+        "score": -31.418321609804536
+    },
+    {
+        "strategy": "threshold_strategy_0.0043",
+        "score": -12.793222307745161
+    },
+    {
+        "strategy": "threshold_strategy_0.01525",
+        "score": -24.234413752597106
+    },
+    {
+        "strategy": "threshold_strategy_0.01442",
+        "score": 23.061101917898874
+    },
+    {
+        "strategy": "threshold_strategy_0.00201",
+        "score": 19.8826355718913
+    },
+    {
+        "strategy": "threshold_strategy_0.00737",
+        "score": -31.748527278053302
+    },
+    {
+        "strategy": "threshold_strategy_0.0049",
+        "score": -21.511856558469574
+    },
+    {
+        "strategy": "threshold_strategy_0.01391",
+        "score": -31.495238867070803
+    },
+    {
+        "strategy": "threshold_strategy_0.01898",
+        "score": -19.785870007563993
+    },
+    {
+        "strategy": "threshold_strategy_0.01366",
+        "score": -19.002557685437388
+    },
+    {
+        "strategy": "threshold_strategy_0.00483",
+        "score": 4.073941336240722
+    },
+    {
+        "strategy": "threshold_strategy_0.01442",
+        "score": -29.389604132629948
+    },
+    {
+        "strategy": "threshold_strategy_0.00201",
+        "score": 29.807168831869603
+    },
+    {
+        "strategy": "threshold_strategy_0.01337",
+        "score": -51.896076750368664
+    },
+    {
+        "strategy": "threshold_strategy_0.00483",
+        "score": -20.412630016670704
+    },
+    {
+        "strategy": "threshold_strategy_0.00155",
+        "score": 15.543960534948347
+    },
+    {
+        "strategy": "threshold_strategy_0.00353",
+        "score": 13.858377412105384
+    },
+    {
+        "strategy": "threshold_strategy_0.00165",
+        "score": -42.62915665861655
+    },
+    {
+        "strategy": "threshold_strategy_0.00212",
+        "score": -7.7787445918797005
+    },
+    {
+        "strategy": "threshold_strategy_0.00413",
+        "score": 5.879562477422851
+    },
+    {
+        "strategy": "threshold_strategy_0.00431",
+        "score": 7.56209842397314
+    },
+    {
+        "strategy": "threshold_strategy_0.00072",
+        "score": 3.1465238382810696
+    },
+    {
+        "strategy": "threshold_strategy_0.00367",
+        "score": -37.710207417108634
+    },
+    {
+        "strategy": "threshold_strategy_0.00298",
+        "score": -21.034221530723187
+    },
+    {
+        "strategy": "threshold_strategy_0.00029",
+        "score": 2.479021162550353
+    },
+    {
+        "strategy": "threshold_strategy_0.00107",
+        "score": -24.31092953302472
+    },
+    {
+        "strategy": "threshold_strategy_0.01499",
+        "score": -26.766089116950425
+    },
+    {
+        "strategy": "threshold_strategy_0.01528",
+        "score": 26.61085980208368
+    },
+    {
+        "strategy": "threshold_strategy_0.01243",
+        "score": -34.21176228564895
+    },
+    {
+        "strategy": "threshold_strategy_0.00209",
+        "score": -50.781519761870385
+    },
+    {
+        "strategy": "threshold_strategy_0.00296",
+        "score": -1.9604816505008387
+    },
+    {
+        "strategy": "threshold_strategy_0.00201",
+        "score": -21.74253313252204
+    },
+    {
+        "strategy": "threshold_strategy_0.01528",
+        "score": 18.474228438990764
+    },
+    {
+        "strategy": "threshold_strategy_0.00155",
+        "score": -1.1290991194374698
+    },
+    {
+        "strategy": "threshold_strategy_0.00353",
+        "score": 30.615960370234006
+    },
+    {
+        "strategy": "threshold_strategy_0.00431",
+        "score": -22.576018997411097
+    },
+    {
+        "strategy": "threshold_strategy_0.0034",
+        "score": 10.580646933166477
+    },
+    {
+        "strategy": "threshold_strategy_0.01512",
+        "score": -23.607470589193767
+    },
+    {
+        "strategy": "threshold_strategy_0.01664",
+        "score": 1.6414921616834874
+    },
+    {
+        "strategy": "threshold_strategy_0.00207",
+        "score": -29.333431463905654
+    },
+    {
+        "strategy": "threshold_strategy_0.00177",
+        "score": -30.635531787463606
+    },
+    {
+        "strategy": "threshold_strategy_0.00394",
+        "score": 7.816311209200158
+    },
+    {
+        "strategy": "threshold_strategy_0.00187",
+        "score": 15.672509778456359
+    },
+    {
+        "strategy": "threshold_strategy_0.00268",
+        "score": -40.09429977508947
+    },
+    {
+        "strategy": "threshold_strategy_0.00356",
+        "score": -22.558414690070123
+    },
+    {
+        "strategy": "threshold_strategy_0.00181",
+        "score": 1.8412891318249152
+    },
+    {
+        "strategy": "threshold_strategy_0.00115",
+        "score": -43.380388010048364
+    },
+    {
+        "strategy": "threshold_strategy_0.01536",
+        "score": -34.05450265608157
+    },
+    {
+        "strategy": "threshold_strategy_0.00341",
+        "score": -17.99188553836028
+    },
+    {
+        "strategy": "threshold_strategy_0.00532",
+        "score": -20.976946599304544
+    },
+    {
+        "strategy": "threshold_strategy_0.00194",
+        "score": -3.292424927074535
+    },
+    {
+        "strategy": "threshold_strategy_0.00353",
+        "score": -12.870771331069925
+    },
+    {
+        "strategy": "threshold_strategy_0.01528",
+        "score": -35.609729339753585
+    },
+    {
+        "strategy": "threshold_strategy_0.00187",
+        "score": -43.41414715936902
+    },
+    {
+        "strategy": "threshold_strategy_0.0034",
+        "score": -37.314734931417306
+    },
+    {
+        "strategy": "threshold_strategy_0.00394",
+        "score": -4.5388591431536796
+    },
+    {
+        "strategy": "threshold_strategy_0.00323",
+        "score": -18.62508842707814
+    },
+    {
+        "strategy": "threshold_strategy_0.00366",
+        "score": -18.327371006018623
+    },
+    {
+        "strategy": "threshold_strategy_0.00446",
+        "score": 6.572788438165162
+    },
+    {
+        "strategy": "threshold_strategy_0.00221",
+        "score": -26.516489738939754
+    },
+    {
+        "strategy": "threshold_strategy_0.00175",
+        "score": -9.298120124829381
+    },
+    {
+        "strategy": "threshold_strategy_0.00517",
+        "score": -0.4160130336595387
+    },
+    {
+        "strategy": "threshold_strategy_0.00447",
+        "score": -0.552809426013738
+    },
+    {
+        "strategy": "threshold_strategy_0.00488",
+        "score": -8.706072937062672
+    },
+    {
+        "strategy": "threshold_strategy_0.01519",
+        "score": -19.06603771706491
+    },
+    {
+        "strategy": "threshold_strategy_0.01691",
+        "score": -44.046406565528024
+    },
+    {
+        "strategy": "threshold_strategy_0.00434",
+        "score": -27.680889720982762
+    },
+    {
+        "strategy": "threshold_strategy_0.00492",
+        "score": 3.3411196386592934
+    },
+    {
+        "strategy": "threshold_strategy_0.00428",
+        "score": 2.788980221875562
+    },
+    {
+        "strategy": "threshold_strategy_0.01383",
+        "score": -21.618236037266357
+    },
+    {
+        "strategy": "threshold_strategy_0.00361",
+        "score": -9.660904594655435
+    },
+    {
+        "strategy": "threshold_strategy_0.00446",
+        "score": 6.140706117405145
+    },
+    {
+        "strategy": "threshold_strategy_0.00492",
+        "score": -45.708391359436014
+    },
+    {
+        "strategy": "threshold_strategy_0.00428",
+        "score": -17.5964548814594
+    },
+    {
+        "strategy": "threshold_strategy_0.00517",
+        "score": -25.9637596128495
+    },
+    {
+        "strategy": "threshold_strategy_0.00447",
+        "score": 29.63920464022661
+    },
+    {
+        "strategy": "threshold_strategy_0.00528",
+        "score": -28.065080163385275
+    },
+    {
+        "strategy": "threshold_strategy_0.00249",
+        "score": -35.773374442257385
+    },
+    {
+        "strategy": "threshold_strategy_0.00526",
+        "score": -21.426859987107704
+    },
+    {
+        "strategy": "threshold_strategy_0.00627",
+        "score": -34.35905851312971
+    },
+    {
+        "strategy": "threshold_strategy_0.0044",
+        "score": -9.996664496235432
+    },
+    {
+        "strategy": "threshold_strategy_0.00457",
+        "score": -79.18041647996753
+    },
+    {
+        "strategy": "threshold_strategy_0.00667",
+        "score": 49.26002621374505
+    },
+    {
+        "strategy": "threshold_strategy_0.00593",
+        "score": -21.526657695165333
+    },
+    {
+        "strategy": "threshold_strategy_0.00473",
+        "score": -2.3499416582806347
+    },
+    {
+        "strategy": "threshold_strategy_0.00367",
+        "score": 21.011681891347678
+    },
+    {
+        "strategy": "threshold_strategy_0.00333",
+        "score": 35.678822355916495
+    },
+    {
+        "strategy": "threshold_strategy_0.00397",
+        "score": 5.3769795763947315
+    },
+    {
+        "strategy": "threshold_strategy_0.00511",
+        "score": -30.174943783476976
+    },
+    {
+        "strategy": "threshold_strategy_0.00291",
+        "score": 2.9642482836407993
+    },
+    {
+        "strategy": "threshold_strategy_0.00545",
+        "score": -59.829825198018355
+    },
+    {
+        "strategy": "threshold_strategy_0.00667",
+        "score": 1.4677157376117123
+    },
+    {
+        "strategy": "threshold_strategy_0.00333",
+        "score": 10.043215707284162
+    },
+    {
+        "strategy": "threshold_strategy_0.00447",
+        "score": -48.89321861990237
+    },
+    {
+        "strategy": "threshold_strategy_0.00367",
+        "score": -37.50531024197349
+    },
+    {
+        "strategy": "threshold_strategy_0.00446",
+        "score": -25.690052990949255
+    },
+    {
+        "strategy": "threshold_strategy_0.00286",
+        "score": -10.01738491373635
+    },
+    {
+        "strategy": "threshold_strategy_0.00478",
+        "score": 12.66577863618906
+    },
+    {
+        "strategy": "threshold_strategy_0.00229",
+        "score": -36.35634602092218
+    },
+    {
+        "strategy": "threshold_strategy_0.00271",
+        "score": 23.776574827939065
+    },
+    {
+        "strategy": "threshold_strategy_0.00638",
+        "score": -5.235579182287083
+    },
+    {
+        "strategy": "threshold_strategy_0.00467",
+        "score": -26.7934121116008
+    },
+    {
+        "strategy": "threshold_strategy_0.00346",
+        "score": -3.6634057245277774
+    },
+    {
+        "strategy": "threshold_strategy_0.00414",
+        "score": -3.72155177258459
+    },
+    {
+        "strategy": "threshold_strategy_0.00581",
+        "score": -4.21721630759923
+    },
+    {
+        "strategy": "threshold_strategy_0.00426",
+        "score": -30.686633584224296
+    },
+    {
+        "strategy": "threshold_strategy_0.00453",
+        "score": -27.471264669321428
+    },
+    {
+        "strategy": "threshold_strategy_0.00293",
+        "score": -1.425716674440956
+    },
+    {
+        "strategy": "threshold_strategy_0.00841",
+        "score": 5.633152746578332
+    },
+    {
+        "strategy": "threshold_strategy_0.00569",
+        "score": -51.18251956029232
+    },
+    {
+        "strategy": "threshold_strategy_0.00494",
+        "score": -57.54383456829502
+    },
+    {
+        "strategy": "threshold_strategy_0.00271",
+        "score": 21.850037142229837
+    },
+    {
+        "strategy": "threshold_strategy_0.00478",
+        "score": -21.11798771145824
+    },
+    {
+        "strategy": "threshold_strategy_0.00333",
+        "score": 4.210579709801877
+    },
+    {
+        "strategy": "threshold_strategy_0.00841",
+        "score": 3.2708934639107667
+    },
+    {
+        "strategy": "threshold_strategy_0.00667",
+        "score": -31.664092918303155
+    },
+    {
+        "strategy": "threshold_strategy_0.00279",
+        "score": 9.683544541481425
+    },
+    {
+        "strategy": "threshold_strategy_0.00309",
+        "score": -15.217112869710895
+    },
+    {
+        "strategy": "threshold_strategy_0.00422",
+        "score": -11.845243102783385
+    },
+    {
+        "strategy": "threshold_strategy_0.00335",
+        "score": -30.635593238126475
+    },
+    {
+        "strategy": "threshold_strategy_0.00564",
+        "score": -5.551846830054586
+    },
+    {
+        "strategy": "threshold_strategy_0.00463",
+        "score": -1.0903643087187191
+    },
+    {
+        "strategy": "threshold_strategy_0.00687",
+        "score": -24.998870656492173
+    },
+    {
+        "strategy": "threshold_strategy_0.00782",
+        "score": -60.814993506397656
+    },
+    {
+        "strategy": "threshold_strategy_0.00671",
+        "score": -22.524589433058175
+    },
+    {
+        "strategy": "threshold_strategy_0.00734",
+        "score": 7.491171583084679
+    },
+    {
+        "strategy": "threshold_strategy_0.00519",
+        "score": -10.867447982326489
+    },
+    {
+        "strategy": "threshold_strategy_0.00335",
+        "score": -18.669923725908944
+    },
+    {
+        "strategy": "threshold_strategy_0.00351",
+        "score": 1.8329731865876795
+    },
+    {
+        "strategy": "threshold_strategy_0.00704",
+        "score": -23.10229255653819
+    },
+    {
+        "strategy": "threshold_strategy_0.00753",
+        "score": -67.39655948882533
+    },
+    {
+        "strategy": "threshold_strategy_0.00271",
+        "score": 39.877769560178166
+    },
+    {
+        "strategy": "threshold_strategy_0.00279",
+        "score": -48.9849350291539
+    },
+    {
+        "strategy": "threshold_strategy_0.00734",
+        "score": -3.2596820662614974
+    },
+    {
+        "strategy": "threshold_strategy_0.00333",
+        "score": -4.091829102470044
+    },
+    {
+        "strategy": "threshold_strategy_0.00841",
+        "score": -10.918195259769973
+    },
+    {
+        "strategy": "threshold_strategy_0.00262",
+        "score": -25.288166973916503
+    },
+    {
+        "strategy": "threshold_strategy_0.00801",
+        "score": 3.528298393269438
+    },
+    {
+        "strategy": "threshold_strategy_0.00208",
+        "score": -48.061172304206984
+    },
+    {
+        "strategy": "threshold_strategy_0.00742",
+        "score": -50.6536317850275
+    },
+    {
+        "strategy": "threshold_strategy_0.00174",
+        "score": -57.74886536772861
+    },
+    {
+        "strategy": "threshold_strategy_0.00317",
+        "score": -49.121319578217026
+    },
+    {
+        "strategy": "threshold_strategy_0.00409",
+        "score": 21.232710818544405
+    },
+    {
+        "strategy": "threshold_strategy_0.00459",
+        "score": -31.33682362787127
+    },
+    {
+        "strategy": "threshold_strategy_0.00229",
+        "score": -35.05843910095054
+    },
+    {
+        "strategy": "threshold_strategy_0.00178",
+        "score": -31.152582495378482
+    },
+    {
+        "strategy": "threshold_strategy_0.00308",
+        "score": -20.22384337139654
+    },
+    {
+        "strategy": "threshold_strategy_0.00828",
+        "score": -28.98008284762639
+    },
+    {
+        "strategy": "threshold_strategy_0.00333",
+        "score": 1.6723183000161157
+    },
+    {
+        "strategy": "threshold_strategy_0.00435",
+        "score": -48.83639266841196
+    },
+    {
+        "strategy": "threshold_strategy_0.00175",
+        "score": -27.49499116515058
+    },
+    {
+        "strategy": "threshold_strategy_0.00271",
+        "score": -35.05896332129077
+    },
+    {
+        "strategy": "threshold_strategy_0.00409",
+        "score": -3.9367914593948825
+    },
+    {
+        "strategy": "threshold_strategy_0.00801",
+        "score": -17.608490755783812
+    },
+    {
+        "strategy": "threshold_strategy_0.00333",
+        "score": -52.71230407148049
+    },
+    {
+        "strategy": "threshold_strategy_0.00734",
+        "score": -60.39970136944606
+    },
+    {
+        "strategy": "threshold_strategy_0.00769",
+        "score": -28.93922403099363
+    },
+    {
+        "strategy": "threshold_strategy_0.00783",
+        "score": -33.54111118210647
+    },
+    {
+        "strategy": "threshold_strategy_0.00685",
+        "score": 7.978013298274192
+    },
+    {
+        "strategy": "threshold_strategy_0.00206",
+        "score": 33.86016353747695
+    },
+    {
+        "strategy": "threshold_strategy_0.00397",
+        "score": -39.11024323293063
+    },
+    {
+        "strategy": "threshold_strategy_0.00543",
+        "score": -44.34574070123905
+    },
+    {
+        "strategy": "threshold_strategy_0.00193",
+        "score": -0.10984513241812977
+    },
+    {
+        "strategy": "threshold_strategy_0.00215",
+        "score": -8.468639047008551
+    },
+    {
+        "strategy": "threshold_strategy_0.00236",
+        "score": -43.982517812660134
+    },
+    {
+        "strategy": "threshold_strategy_0.0024",
+        "score": -57.206240638752035
+    },
+    {
+        "strategy": "threshold_strategy_0.00409",
+        "score": -36.300915870052606
+    },
+    {
+        "strategy": "threshold_strategy_0.00164",
+        "score": -25.055476530470145
+    },
+    {
+        "strategy": "threshold_strategy_0.00532",
+        "score": -2.3938157181938493
+    },
+    {
+        "strategy": "threshold_strategy_0.00175",
+        "score": -4.779543743199568
+    },
+    {
+        "strategy": "threshold_strategy_0.00699",
+        "score": 17.305378824340394
+    },
+    {
+        "strategy": "threshold_strategy_0.00206",
+        "score": -2.436572373342031
+    },
+    {
+        "strategy": "threshold_strategy_0.00699",
+        "score": -4.835964040815391
+    },
+    {
+        "strategy": "threshold_strategy_0.00685",
+        "score": -68.7929429439252
+    },
+    {
+        "strategy": "threshold_strategy_0.00193",
+        "score": -2.239715460630677
+    },
+    {
+        "strategy": "threshold_strategy_0.00532",
+        "score": -21.460729365815475
+    },
+    {
+        "strategy": "threshold_strategy_0.00091",
+        "score": -14.136662739236058
+    },
+    {
+        "strategy": "threshold_strategy_0.00612",
+        "score": -10.663881933778505
+    },
+    {
+        "strategy": "threshold_strategy_0.0061",
+        "score": -40.93711591018179
+    },
+    {
+        "strategy": "threshold_strategy_0.0088",
+        "score": -13.409091126724121
+    },
+    {
+        "strategy": "threshold_strategy_0.00671",
+        "score": -28.417153485077165
+    },
+    {
+        "strategy": "threshold_strategy_0.00663",
+        "score": 9.037876126383836
+    },
+    {
+        "strategy": "threshold_strategy_0.00055",
+        "score": -1.5418558179012223
+    },
+    {
+        "strategy": "threshold_strategy_0.00747",
+        "score": -29.582631418575232
+    },
+    {
+        "strategy": "threshold_strategy_0.0059",
+        "score": 7.322290717745872
+    },
+    {
+        "strategy": "threshold_strategy_0.00312",
+        "score": -49.81206296616641
+    },
+    {
+        "strategy": "threshold_strategy_0.0054",
+        "score": -44.036116486575324
+    },
+    {
+        "strategy": "threshold_strategy_0.00719",
+        "score": 16.671487946748982
+    },
+    {
+        "strategy": "threshold_strategy_0.00059",
+        "score": -59.34661355890662
+    },
+    {
+        "strategy": "threshold_strategy_0.00622",
+        "score": -44.486247445637076
+    },
+    {
+        "strategy": "threshold_strategy_0.00223",
+        "score": 8.301868811743134
+    },
+    {
+        "strategy": "threshold_strategy_0.01588",
+        "score": 33.86235153905824
+    },
+    {
+        "strategy": "threshold_strategy_0.01286",
+        "score": -36.69678188109954
+    },
+    {
+        "strategy": "threshold_strategy_0.01645",
+        "score": -20.225686945397612
+    },
+    {
+        "strategy": "threshold_strategy_0.01008",
+        "score": 8.963781324739898
+    },
+    {
+        "strategy": "threshold_strategy_0.01929",
+        "score": -24.71469830501708
+    },
+    {
+        "strategy": "threshold_strategy_0.00195",
+        "score": 7.0643895126414264
+    },
+    {
+        "strategy": "threshold_strategy_0.00234",
+        "score": -11.2417857749479
+    },
+    {
+        "strategy": "threshold_strategy_0.01502",
+        "score": 15.47663376722521
+    },
+    {
+        "strategy": "threshold_strategy_0.00316",
+        "score": 64.11124780788441
+    },
+    {
+        "strategy": "threshold_strategy_0.01879",
+        "score": -23.217971003547504
+    },
+    {
+        "strategy": "threshold_strategy_0.01462",
+        "score": -14.389530535335041
+    },
+    {
+        "strategy": "threshold_strategy_0.01971",
+        "score": 10.282651138795288
+    },
+    {
+        "strategy": "threshold_strategy_0.01916",
+        "score": 3.8112723733386957
+    },
+    {
+        "strategy": "threshold_strategy_0.00056",
+        "score": -44.24165092621111
+    },
+    {
+        "strategy": "threshold_strategy_0.01542",
+        "score": -55.6302116602789
+    },
+    {
+        "strategy": "threshold_strategy_0.00933",
+        "score": -58.88606733609922
+    },
+    {
+        "strategy": "threshold_strategy_0.01861",
+        "score": -0.9227658452003453
+    },
+    {
+        "strategy": "threshold_strategy_0.00742",
+        "score": 16.117917178253663
+    },
+    {
+        "strategy": "threshold_strategy_0.00093",
+        "score": -38.632079755754745
+    },
+    {
+        "strategy": "threshold_strategy_0.00937",
+        "score": -39.21142889152714
+    },
+    {
+        "strategy": "threshold_strategy_0.00316",
+        "score": 58.2177109975421
+    },
+    {
+        "strategy": "threshold_strategy_0.01588",
+        "score": 1.7590652884486246
+    },
+    {
+        "strategy": "threshold_strategy_0.00742",
+        "score": 11.140247576305129
+    },
+    {
+        "strategy": "threshold_strategy_0.01502",
+        "score": -18.241462302011236
+    },
+    {
+        "strategy": "threshold_strategy_0.01971",
+        "score": 11.047058519011685
+    },
+    {
+        "strategy": "threshold_strategy_0.00267",
+        "score": 7.613009813396502
+    },
+    {
+        "strategy": "threshold_strategy_0.00418",
+        "score": -3.876814475158028
+    },
+    {
+        "strategy": "threshold_strategy_0.0085",
+        "score": 7.793934073597029
+    },
+    {
+        "strategy": "threshold_strategy_0.00214",
+        "score": -41.14340245662807
+    },
+    {
+        "strategy": "threshold_strategy_0.00577",
+        "score": 17.903305669746572
+    },
+    {
+        "strategy": "threshold_strategy_0.00368",
+        "score": -27.53421696976936
+    },
+    {
+        "strategy": "threshold_strategy_0.01652",
+        "score": -25.503365388340512
+    },
+    {
+        "strategy": "threshold_strategy_0.00271",
+        "score": -32.13317316629786
+    },
+    {
+        "strategy": "threshold_strategy_0.00156",
+        "score": -26.481439138114283
+    },
+    {
+        "strategy": "threshold_strategy_0.00793",
+        "score": -18.252425105460297
+    },
+    {
+        "strategy": "threshold_strategy_0.0139",
+        "score": -7.794186981854622
+    },
+    {
+        "strategy": "threshold_strategy_0.01616",
+        "score": -18.587963734997786
+    },
+    {
+        "strategy": "threshold_strategy_0.02136",
+        "score": -24.352055189609075
+    },
+    {
+        "strategy": "threshold_strategy_0.01707",
+        "score": 52.707480435573444
+    },
+    {
+        "strategy": "threshold_strategy_0.01625",
+        "score": -26.562577517879276
+    },
+    {
+        "strategy": "threshold_strategy_0.00316",
+        "score": -6.853954092323505
+    },
+    {
+        "strategy": "threshold_strategy_0.01707",
+        "score": 0.9250976564986644
+    },
+    {
+        "strategy": "threshold_strategy_0.00577",
+        "score": 7.9962807617823515
+    },
+    {
+        "strategy": "threshold_strategy_0.00742",
+        "score": -53.03044276373985
+    },
+    {
+        "strategy": "threshold_strategy_0.01971",
+        "score": -20.858104898660756
+    },
+    {
+        "strategy": "threshold_strategy_0.00898",
+        "score": -29.525406144240975
+    },
+    {
+        "strategy": "threshold_strategy_0.01529",
+        "score": 101.61822210161714
+    },
+    {
+        "strategy": "threshold_strategy_0.0189",
+        "score": -4.745441050502613
+    },
+    {
+        "strategy": "threshold_strategy_0.02125",
+        "score": -43.76630462128455
+    },
+    {
+        "strategy": "threshold_strategy_0.00798",
+        "score": -0.6908987597122831
+    },
+    {
+        "strategy": "threshold_strategy_0.00812",
+        "score": -38.83917949484353
+    },
+    {
+        "strategy": "threshold_strategy_0.00768",
+        "score": 3.2508281211832966
+    },
+    {
+        "strategy": "threshold_strategy_0.01979",
+        "score": -40.89639077153417
+    },
+    {
+        "strategy": "threshold_strategy_0.00437",
+        "score": -60.87339942086837
+    },
+    {
+        "strategy": "threshold_strategy_0.00619",
+        "score": -30.868066610139905
+    },
+    {
+        "strategy": "threshold_strategy_0.01568",
+        "score": 13.606891012534248
+    },
+    {
+        "strategy": "threshold_strategy_0.01741",
+        "score": -21.502673559068853
+    },
+    {
+        "strategy": "threshold_strategy_0.01641",
+        "score": -21.34683041568475
+    },
+    {
+        "strategy": "threshold_strategy_0.00517",
+        "score": -26.602229663952087
+    },
+    {
+        "strategy": "threshold_strategy_0.019",
+        "score": -26.59453950088531
+    },
+    {
+        "strategy": "threshold_strategy_0.01529",
+        "score": 12.889211059065133
+    },
+    {
+        "strategy": "threshold_strategy_0.01568",
+        "score": -25.777007832431956
+    },
+    {
+        "strategy": "threshold_strategy_0.00577",
+        "score": -53.68390276547809
+    },
+    {
+        "strategy": "threshold_strategy_0.00768",
+        "score": 33.410143271475064
+    },
+    {
+        "strategy": "threshold_strategy_0.01707",
+        "score": -24.970647770746936
+    },
+    {
+        "strategy": "threshold_strategy_0.00946",
+        "score": -0.1716157145285564
+    },
+    {
+        "strategy": "threshold_strategy_0.00587",
+        "score": 3.3788994722476815
+    },
+    {
+        "strategy": "threshold_strategy_0.00792",
+        "score": -42.975405369006026
+    },
+    {
+        "strategy": "threshold_strategy_0.01685",
+        "score": -34.30234589061119
+    },
+    {
+        "strategy": "threshold_strategy_0.01513",
+        "score": -5.53816466546526
+    },
+    {
+        "strategy": "threshold_strategy_0.01559",
+        "score": 20.685731049786867
+    },
+    {
+        "strategy": "threshold_strategy_0.00659",
+        "score": -32.20796249546922
+    },
+    {
+        "strategy": "threshold_strategy_0.01587",
+        "score": -0.05321474982756058
+    },
+    {
+        "strategy": "threshold_strategy_0.01562",
+        "score": -14.138434051474363
+    },
+    {
+        "strategy": "threshold_strategy_0.00528",
+        "score": -14.854320926803865
+    },
+    {
+        "strategy": "threshold_strategy_0.01713",
+        "score": -27.464431672546922
+    },
+    {
+        "strategy": "threshold_strategy_0.0067",
+        "score": -42.571618666233405
+    },
+    {
+        "strategy": "threshold_strategy_0.01674",
+        "score": 4.550276830097701
+    },
+    {
+        "strategy": "threshold_strategy_0.00703",
+        "score": -4.715513741925882
+    },
+    {
+        "strategy": "threshold_strategy_0.00961",
+        "score": -20.130088982242427
+    },
+    {
+        "strategy": "threshold_strategy_0.00768",
+        "score": -21.166030745531685
+    },
+    {
+        "strategy": "threshold_strategy_0.01559",
+        "score": -30.315563685236434
+    },
+    {
+        "strategy": "threshold_strategy_0.01529",
+        "score": -22.015490020439167
+    },
+    {
+        "strategy": "threshold_strategy_0.01674",
+        "score": -39.494495030128306
+    },
+    {
+        "strategy": "threshold_strategy_0.00587",
+        "score": -45.16729741667362
+    },
+    {
+        "strategy": "threshold_strategy_0.00517",
+        "score": -59.39319285591604
+    },
+    {
+        "strategy": "threshold_strategy_0.00527",
+        "score": -1.5231027748479136
+    },
+    {
+        "strategy": "threshold_strategy_0.01348",
+        "score": -39.57112502057951
+    },
+    {
+        "strategy": "threshold_strategy_0.01649",
+        "score": -53.304290334803206
+    },
+    {
+        "strategy": "threshold_strategy_0.00602",
+        "score": 7.323738781716585
+    },
+    {
+        "strategy": "threshold_strategy_0.00648",
+        "score": -43.70197545898017
+    },
+    {
+        "strategy": "threshold_strategy_0.01604",
+        "score": 12.323186729958039
+    },
+    {
+        "strategy": "threshold_strategy_0.01389",
+        "score": -27.168074660139084
+    },
+    {
+        "strategy": "threshold_strategy_0.0166",
+        "score": -42.557160501048585
+    },
+    {
+        "strategy": "threshold_strategy_0.01652",
+        "score": -0.9087485837403548
+    },
+    {
+        "strategy": "threshold_strategy_0.01422",
+        "score": -42.67644826568471
+    },
+    {
+        "strategy": "threshold_strategy_0.0175",
+        "score": 28.17700958949517
+    },
+    {
+        "strategy": "threshold_strategy_0.0159",
+        "score": -7.541097921036254
+    },
+    {
+        "strategy": "threshold_strategy_0.00543",
+        "score": -59.9115579768288
+    },
+    {
+        "strategy": "threshold_strategy_0.00616",
+        "score": 75.29120822582348
+    },
+    {
+        "strategy": "threshold_strategy_0.00616",
+        "score": -8.064648125885846
+    },
+    {
+        "strategy": "threshold_strategy_0.0175",
+        "score": -5.705368027598283
+    },
+    {
+        "strategy": "threshold_strategy_0.01604",
+        "score": -48.475147255931965
+    },
+    {
+        "strategy": "threshold_strategy_0.00602",
+        "score": 16.591863317473155
+    },
+    {
+        "strategy": "threshold_strategy_0.01652",
+        "score": -37.13188070420048
+    },
+    {
+        "strategy": "threshold_strategy_0.01451",
+        "score": -20.120830703584645
+    },
+    {
+        "strategy": "threshold_strategy_0.01905",
+        "score": 72.26730457218855
+    },
+    {
+        "strategy": "threshold_strategy_0.00613",
+        "score": -40.610963266758404
+    },
+    {
+        "strategy": "threshold_strategy_0.01678",
+        "score": -9.577050547583525
+    },
+    {
+        "strategy": "threshold_strategy_0.01514",
+        "score": 22.86338466114057
+    },
+    {
+        "strategy": "threshold_strategy_0.0056",
+        "score": 48.20575258770381
+    },
+    {
+        "strategy": "threshold_strategy_0.01769",
+        "score": 7.632132950229604
+    },
+    {
+        "strategy": "threshold_strategy_0.01546",
+        "score": -53.65183245893152
+    },
+    {
+        "strategy": "threshold_strategy_0.01644",
+        "score": 25.795608971778364
+    },
+    {
+        "strategy": "threshold_strategy_0.00636",
+        "score": -0.44508957170310737
+    },
+    {
+        "strategy": "threshold_strategy_0.01711",
+        "score": -26.4672552220361
+    },
+    {
+        "strategy": "threshold_strategy_0.0153",
+        "score": -23.217287241354576
+    },
+    {
+        "strategy": "threshold_strategy_0.01755",
+        "score": 13.72751967398559
+    },
+    {
+        "strategy": "threshold_strategy_0.00733",
+        "score": 8.876751820451176
+    },
+    {
+        "strategy": "threshold_strategy_0.00615",
+        "score": 1.641217961501468
+    },
+    {
+        "strategy": "threshold_strategy_0.01905",
+        "score": 43.891041176776355
+    },
+    {
+        "strategy": "threshold_strategy_0.0056",
+        "score": -25.6302389164547
+    },
+    {
+        "strategy": "threshold_strategy_0.01644",
+        "score": -16.39043815557254
+    },
+    {
+        "strategy": "threshold_strategy_0.01514",
+        "score": -22.601189182010017
+    },
+    {
+        "strategy": "threshold_strategy_0.00602",
+        "score": 28.041191068522117
+    },
+    {
+        "strategy": "threshold_strategy_0.01784",
+        "score": -43.51528428414355
+    },
+    {
+        "strategy": "threshold_strategy_0.00645",
+        "score": 25.379970724487066
+    },
+    {
+        "strategy": "threshold_strategy_0.01953",
+        "score": 10.120765416608066
+    },
+    {
+        "strategy": "threshold_strategy_0.01557",
+        "score": 30.67412666863956
+    },
+    {
+        "strategy": "threshold_strategy_0.01533",
+        "score": -32.26170292800881
+    },
+    {
+        "strategy": "threshold_strategy_0.01644",
+        "score": -16.108025805080985
+    },
+    {
+        "strategy": "threshold_strategy_0.00589",
+        "score": -37.65128844414568
+    },
+    {
+        "strategy": "threshold_strategy_0.00551",
+        "score": -53.44618071056087
+    },
+    {
+        "strategy": "threshold_strategy_0.00538",
+        "score": -30.621490860675166
+    },
+    {
+        "strategy": "threshold_strategy_0.01558",
+        "score": -8.574342167419758
+    },
+    {
+        "strategy": "threshold_strategy_0.0165",
+        "score": -47.21978423491636
+    },
+    {
+        "strategy": "threshold_strategy_0.01615",
+        "score": 9.189982780711404
+    },
+    {
+        "strategy": "threshold_strategy_0.01513",
+        "score": -27.068670403888703
+    },
+    {
+        "strategy": "threshold_strategy_0.01689",
+        "score": 18.631254129724326
+    },
+    {
+        "strategy": "threshold_strategy_0.00605",
+        "score": -27.39363857031276
+    },
+    {
+        "strategy": "threshold_strategy_0.01905",
+        "score": -42.97405516882904
+    },
+    {
+        "strategy": "threshold_strategy_0.01557",
+        "score": 2.6499789661746433
+    },
+    {
+        "strategy": "threshold_strategy_0.00602",
+        "score": -28.963488611107273
+    },
+    {
+        "strategy": "threshold_strategy_0.00645",
+        "score": 6.191792102497345
+    },
+    {
+        "strategy": "threshold_strategy_0.01689",
+        "score": -12.078928231778058
+    },
+    {
+        "strategy": "threshold_strategy_0.0168",
+        "score": -37.83991858974545
+    },
+    {
+        "strategy": "threshold_strategy_0.00526",
+        "score": -7.047728901953974
+    },
+    {
+        "strategy": "threshold_strategy_0.01839",
+        "score": -31.037639398339806
+    },
+    {
+        "strategy": "threshold_strategy_0.01676",
+        "score": -41.063919918157694
+    },
+    {
+        "strategy": "threshold_strategy_0.00513",
+        "score": 9.710530896128716
+    },
+    {
+        "strategy": "threshold_strategy_0.00452",
+        "score": -11.292711238778345
+    },
+    {
+        "strategy": "threshold_strategy_0.00617",
+        "score": -48.97733003447779
+    },
+    {
+        "strategy": "threshold_strategy_0.0067",
+        "score": -56.87524494688847
+    },
+    {
+        "strategy": "threshold_strategy_0.0182",
+        "score": -57.76533989255545
+    },
+    {
+        "strategy": "threshold_strategy_0.01705",
+        "score": 16.65854488022785
+    },
+    {
+        "strategy": "threshold_strategy_0.00511",
+        "score": 4.353246573395978
+    },
+    {
+        "strategy": "threshold_strategy_0.00638",
+        "score": -15.730053819227585
+    },
+    {
+        "strategy": "threshold_strategy_0.01932",
+        "score": 14.637634448110354
+    },
+    {
+        "strategy": "threshold_strategy_0.01715",
+        "score": 37.24358071060247
+    },
+    {
+        "strategy": "threshold_strategy_0.00592",
+        "score": 14.655091549635841
+    },
+    {
+        "strategy": "threshold_strategy_0.01715",
+        "score": -21.49609652205823
+    },
+    {
+        "strategy": "threshold_strategy_0.01705",
+        "score": -10.741406527917967
+    },
+    {
+        "strategy": "threshold_strategy_0.00592",
+        "score": -46.30385113190388
+    },
+    {
+        "strategy": "threshold_strategy_0.01932",
+        "score": -50.921965730895025
+    },
+    {
+        "strategy": "threshold_strategy_0.00513",
+        "score": 25.63247489096706
+    },
+    {
+        "strategy": "threshold_strategy_0.00726",
+        "score": -5.833454637213691
+    },
+    {
+        "strategy": "threshold_strategy_0.01637",
+        "score": 20.381395895369167
+    },
+    {
+        "strategy": "threshold_strategy_0.00353",
+        "score": -52.46618699586578
+    },
+    {
+        "strategy": "threshold_strategy_0.01775",
+        "score": -34.88386430470029
+    },
+    {
+        "strategy": "threshold_strategy_0.01885",
+        "score": -4.826781008691839
+    },
+    {
+        "strategy": "threshold_strategy_0.01849",
+        "score": -34.234420386283595
+    },
+    {
+        "strategy": "threshold_strategy_0.01533",
+        "score": 31.46917045503895
+    },
+    {
+        "strategy": "threshold_strategy_0.00677",
+        "score": -66.72794940620119
+    },
+    {
+        "strategy": "threshold_strategy_0.01765",
+        "score": -30.30197161883835
+    },
+    {
+        "strategy": "threshold_strategy_0.02053",
+        "score": -42.66937308113467
+    },
+    {
+        "strategy": "threshold_strategy_0.00626",
+        "score": -6.960157214542676
+    },
+    {
+        "strategy": "threshold_strategy_0.01739",
+        "score": -3.5684175848238056
+    },
+    {
+        "strategy": "threshold_strategy_0.00389",
+        "score": -16.543981044953966
+    },
+    {
+        "strategy": "threshold_strategy_0.01517",
+        "score": -46.43629512455058
+    },
+    {
+        "strategy": "threshold_strategy_0.01787",
+        "score": 27.97843271127435
+    },
+    {
+        "strategy": "threshold_strategy_0.01533",
+        "score": -17.789340073577804
+    },
+    {
+        "strategy": "threshold_strategy_0.01787",
+        "score": -46.130210604021656
+    },
+    {
+        "strategy": "threshold_strategy_0.00513",
+        "score": 3.8753135651752117
+    },
+    {
+        "strategy": "threshold_strategy_0.01637",
+        "score": -28.70217242597937
+    },
+    {
+        "strategy": "threshold_strategy_0.01739",
+        "score": -51.747570491246584
+    },
+    {
+        "strategy": "threshold_strategy_0.01693",
+        "score": -62.22202464333415
+    },
+    {
+        "strategy": "threshold_strategy_0.01797",
+        "score": -20.563361750250394
+    },
+    {
+        "strategy": "threshold_strategy_0.01811",
+        "score": -16.158230910604203
+    },
+    {
+        "strategy": "threshold_strategy_0.01782",
+        "score": -9.779673957120508
+    },
+    {
+        "strategy": "threshold_strategy_0.01633",
+        "score": -29.607843681073945
+    },
+    {
+        "strategy": "threshold_strategy_0.01366",
+        "score": -29.829684286234567
+    },
+    {
+        "strategy": "threshold_strategy_0.01705",
+        "score": -23.68684306992843
+    },
+    {
+        "strategy": "threshold_strategy_0.00459",
+        "score": 22.697621980099143
+    },
+    {
+        "strategy": "threshold_strategy_0.01716",
+        "score": -4.7253990977433205
+    },
+    {
+        "strategy": "threshold_strategy_0.01539",
+        "score": -10.921164988755578
+    },
+    {
+        "strategy": "threshold_strategy_0.01907",
+        "score": -7.651826012548511
+    },
+    {
+        "strategy": "threshold_strategy_0.01675",
+        "score": -16.664027904233848
+    },
+    {
+        "strategy": "threshold_strategy_0.01817",
+        "score": -12.799075249719792
+    },
+    {
+        "strategy": "threshold_strategy_0.01751",
+        "score": -38.38528953767192
+    },
+    {
+        "strategy": "threshold_strategy_0.01482",
+        "score": 11.316623027599803
+    },
+    {
+        "strategy": "threshold_strategy_0.00767",
+        "score": -26.78503236187217
+    },
+    {
+        "strategy": "threshold_strategy_0.01808",
+        "score": -14.431058288307511
+    },
+    {
+        "strategy": "threshold_strategy_0.00795",
+        "score": 5.622670155611303
+    },
+    {
+        "strategy": "threshold_strategy_0.01295",
+        "score": 8.85337154059927
+    },
+    {
+        "strategy": "threshold_strategy_0.01108",
+        "score": -55.22223736398653
+    },
+    {
+        "strategy": "threshold_strategy_0.00903",
+        "score": -26.52056741035291
+    },
+    {
+        "strategy": "threshold_strategy_0.00963",
+        "score": -19.539450237633915
+    },
+    {
+        "strategy": "threshold_strategy_0.01366",
+        "score": -30.896474435298074
+    },
+    {
+        "strategy": "threshold_strategy_0.00813",
+        "score": -3.1669015569031984
+    },
+    {
+        "strategy": "threshold_strategy_0.0199",
+        "score": -23.260890343773397
+    },
+    {
+        "strategy": "threshold_strategy_0.01154",
+        "score": -50.01696313075668
+    },
+    {
+        "strategy": "threshold_strategy_0.01719",
+        "score": 8.188529119368042
+    },
+    {
+        "strategy": "threshold_strategy_0.01124",
+        "score": -20.38426553135325
+    },
+    {
+        "strategy": "threshold_strategy_0.00202",
+        "score": 5.934075800955071
+    },
+    {
+        "strategy": "threshold_strategy_0.01293",
+        "score": -26.42342766559461
+    },
+    {
+        "strategy": "threshold_strategy_0.00442",
+        "score": 11.853574601481341
+    },
+    {
+        "strategy": "threshold_strategy_0.00316",
+        "score": 20.6083256903691
+    },
+    {
+        "strategy": "threshold_strategy_0.01513",
+        "score": -27.22376484590994
+    },
+    {
+        "strategy": "threshold_strategy_0.01005",
+        "score": 1.3781239109954058
+    },
+    {
+        "strategy": "threshold_strategy_0.01205",
+        "score": -21.665664776017536
+    },
+    {
+        "strategy": "threshold_strategy_0.00316",
+        "score": 12.898335225313446
+    },
+    {
+        "strategy": "threshold_strategy_0.00442",
+        "score": -13.742977523996174
+    },
+    {
+        "strategy": "threshold_strategy_0.01295",
+        "score": -8.058515081497276
+    },
+    {
+        "strategy": "threshold_strategy_0.01719",
+        "score": 5.474538909634553
+    },
+    {
+        "strategy": "threshold_strategy_0.00202",
+        "score": -55.940368800541115
+    },
+    {
+        "strategy": "threshold_strategy_0.00139",
+        "score": 62.83038332555449
+    },
+    {
+        "strategy": "threshold_strategy_0.00127",
+        "score": -8.350195995260393
+    },
+    {
+        "strategy": "threshold_strategy_0.01667",
+        "score": -57.14418068360386
+    },
+    {
+        "strategy": "threshold_strategy_0.00401",
+        "score": 4.776565099936619
+    },
+    {
+        "strategy": "threshold_strategy_0.00637",
+        "score": 10.364328567279472
+    },
+    {
+        "strategy": "threshold_strategy_0.00137",
+        "score": -19.424210985157615
+    },
+    {
+        "strategy": "threshold_strategy_0.01799",
+        "score": -14.064067615755832
+    },
+    {
+        "strategy": "threshold_strategy_0.01268",
+        "score": -19.8358909006529
+    },
+    {
+        "strategy": "threshold_strategy_0.01215",
+        "score": -8.642369762753447
+    },
+    {
+        "strategy": "threshold_strategy_0.00488",
+        "score": -20.700558471477066
+    },
+    {
+        "strategy": "threshold_strategy_0.00299",
+        "score": -52.01229216720122
+    },
+    {
+        "strategy": "threshold_strategy_0.01374",
+        "score": -54.37092703754616
+    },
+    {
+        "strategy": "threshold_strategy_0.0147",
+        "score": -17.764304773520763
+    },
+    {
+        "strategy": "threshold_strategy_0.003",
+        "score": -38.29057489924068
+    },
+    {
+        "strategy": "threshold_strategy_0.00625",
+        "score": -38.473519361389805
+    },
+    {
+        "strategy": "threshold_strategy_0.00139",
+        "score": -10.377061838583202
+    },
+    {
+        "strategy": "threshold_strategy_0.00316",
+        "score": -8.00843074346696
+    },
+    {
+        "strategy": "threshold_strategy_0.00637",
+        "score": -20.170485916067165
+    },
+    {
+        "strategy": "threshold_strategy_0.01719",
+        "score": 24.942780000677786
+    },
+    {
+        "strategy": "threshold_strategy_0.00401",
+        "score": 13.535626850905281
+    },
+    {
+        "strategy": "threshold_strategy_0.00593",
+        "score": 62.56562365823751
+    },
+    {
+        "strategy": "threshold_strategy_0.01694",
+        "score": 24.95099739198166
+    },
+    {
+        "strategy": "threshold_strategy_0.00503",
+        "score": 26.676615532139962
+    },
+    {
+        "strategy": "threshold_strategy_0.00112",
+        "score": -15.400832985179264
+    },
+    {
+        "strategy": "threshold_strategy_0.00086",
+        "score": -43.62927063893616
+    },
+    {
+        "strategy": "threshold_strategy_0.0041",
+        "score": -7.764721889101537
+    },
+    {
+        "strategy": "threshold_strategy_0.00504",
+        "score": -14.711445493642913
+    },
+    {
+        "strategy": "threshold_strategy_0.00521",
+        "score": -43.47947078992362
+    },
+    {
+        "strategy": "threshold_strategy_0.01898",
+        "score": -43.313201762296075
+    },
+    {
+        "strategy": "threshold_strategy_0.00663",
+        "score": -9.41682595440313
+    },
+    {
+        "strategy": "threshold_strategy_0.00481",
+        "score": -14.2182196649987
+    },
+    {
+        "strategy": "threshold_strategy_0.00307",
+        "score": -9.796120469426697
+    },
+    {
+        "strategy": "threshold_strategy_0.01632",
+        "score": -25.783527973333122
+    },
+    {
+        "strategy": "threshold_strategy_0.00261",
+        "score": -35.90731341445276
+    },
+    {
+        "strategy": "threshold_strategy_0.01898",
+        "score": -21.593368289984824
+    },
+    {
+        "strategy": "threshold_strategy_0.00593",
+        "score": -44.78708315412918
+    },
+    {
+        "strategy": "threshold_strategy_0.00503",
+        "score": -34.58517154001207
+    },
+    {
+        "strategy": "threshold_strategy_0.01694",
+        "score": -20.380695562826716
+    },
+    {
+        "strategy": "threshold_strategy_0.01719",
+        "score": -49.45720560503122
+    },
+    {
+        "strategy": "threshold_strategy_0.00401",
+        "score": -13.682792323581161
+    },
+    {
+        "strategy": "threshold_strategy_0.01633",
+        "score": -52.50737174992486
+    },
+    {
+        "strategy": "threshold_strategy_0.00417",
+        "score": -12.871987396250404
+    },
+    {
+        "strategy": "threshold_strategy_0.01917",
+        "score": -6.354600511556697
+    },
+    {
+        "strategy": "threshold_strategy_0.00581",
+        "score": -75.72681826841611
+    },
+    {
+        "strategy": "threshold_strategy_0.00337",
+        "score": -39.69547561574595
+    },
+    {
+        "strategy": "threshold_strategy_0.00228",
+        "score": -22.757786282720552
+    },
+    {
+        "strategy": "threshold_strategy_0.01503",
+        "score": 0.8855975607165192
+    },
+    {
+        "strategy": "threshold_strategy_0.00764",
+        "score": -34.95258037060408
+    },
+    {
+        "strategy": "threshold_strategy_0.01495",
+        "score": -29.30317703629693
+    },
+    {
+        "strategy": "threshold_strategy_0.00706",
+        "score": -3.526539576891736
+    },
+    {
+        "strategy": "threshold_strategy_0.00606",
+        "score": -32.38907223439405
+    },
+    {
+        "strategy": "threshold_strategy_0.00507",
+        "score": 46.81901427912075
+    },
+    {
+        "strategy": "threshold_strategy_0.01552",
+        "score": -49.83497754080868
+    },
+    {
+        "strategy": "threshold_strategy_0.0055",
+        "score": -41.135034518739005
+    },
+    {
+        "strategy": "threshold_strategy_0.01502",
+        "score": -11.478415605447914
+    },
+    {
+        "strategy": "threshold_strategy_0.00507",
+        "score": 64.4996085951709
+    },
+    {
+        "strategy": "threshold_strategy_0.01503",
+        "score": 14.118250307413852
+    },
+    {
+        "strategy": "threshold_strategy_0.00706",
+        "score": -33.060183447114746
+    },
+    {
+        "strategy": "threshold_strategy_0.01917",
+        "score": -27.101382075981178
+    },
+    {
+        "strategy": "threshold_strategy_0.01502",
+        "score": -39.2403928784332
+    },
+    {
+        "strategy": "threshold_strategy_0.02001",
+        "score": -8.009411275214632
+    },
+    {
+        "strategy": "threshold_strategy_0.0187",
+        "score": -26.952039373002066
+    },
+    {
+        "strategy": "threshold_strategy_0.01534",
+        "score": -1.234823195522189
+    },
+    {
+        "strategy": "threshold_strategy_0.01649",
+        "score": -31.10976492071235
+    },
+    {
+        "strategy": "threshold_strategy_0.01452",
+        "score": 7.43373771869291
+    },
+    {
+        "strategy": "threshold_strategy_0.01532",
+        "score": 18.248758962125862
+    },
+    {
+        "strategy": "threshold_strategy_0.00475",
+        "score": -42.017297266436465
+    },
+    {
+        "strategy": "threshold_strategy_0.01474",
+        "score": -47.31994241378045
+    },
+    {
+        "strategy": "threshold_strategy_0.01567",
+        "score": -38.7122294444545
+    },
+    {
+        "strategy": "threshold_strategy_0.00513",
+        "score": -50.83243496029855
+    },
+    {
+        "strategy": "threshold_strategy_0.00561",
+        "score": -70.0586542267053
+    },
+    {
+        "strategy": "threshold_strategy_0.01594",
+        "score": 47.564013843365004
+    },
+    {
+        "strategy": "threshold_strategy_0.00431",
+        "score": -40.03282704841507
+    },
+    {
+        "strategy": "threshold_strategy_0.02065",
+        "score": -31.86729632391912
+    },
+    {
+        "strategy": "threshold_strategy_0.01655",
+        "score": -23.842263008722014
+    },
+    {
+        "strategy": "threshold_strategy_0.00507",
+        "score": 39.61182169900674
+    },
+    {
+        "strategy": "threshold_strategy_0.01594",
+        "score": -11.582396231495366
+    },
+    {
+        "strategy": "threshold_strategy_0.01532",
+        "score": 8.320709963597253
+    },
+    {
+        "strategy": "threshold_strategy_0.01503",
+        "score": -22.309623178288838
+    },
+    {
+        "strategy": "threshold_strategy_0.01452",
+        "score": 15.480507923500177
+    },
+    {
+        "strategy": "threshold_strategy_0.01571",
+        "score": -43.403617171911165
+    },
+    {
+        "strategy": "threshold_strategy_0.01442",
+        "score": -39.878450702192765
+    },
+    {
+        "strategy": "threshold_strategy_0.01621",
+        "score": -6.376047792793372
+    },
+    {
+        "strategy": "threshold_strategy_0.0155",
+        "score": -36.99885651028697
+    },
+    {
+        "strategy": "threshold_strategy_0.00483",
+        "score": -50.975271133553164
+    },
+    {
+        "strategy": "threshold_strategy_0.01264",
+        "score": 3.7221502308728276
+    },
+    {
+        "strategy": "threshold_strategy_0.00526",
+        "score": -47.60005767669212
+    },
+    {
+        "strategy": "threshold_strategy_0.00471",
+        "score": 20.929324637797663
+    },
+    {
+        "strategy": "threshold_strategy_0.01526",
+        "score": 1.498662182415508
+    },
+    {
+        "strategy": "threshold_strategy_0.01254",
+        "score": -40.98001645224015
+    },
+    {
+        "strategy": "threshold_strategy_0.00331",
+        "score": -22.442363028983166
+    },
+    {
+        "strategy": "threshold_strategy_0.00595",
+        "score": -11.390106928806787
+    },
+    {
+        "strategy": "threshold_strategy_0.01516",
+        "score": 18.54580802027826
+    },
+    {
+        "strategy": "threshold_strategy_0.01388",
+        "score": 0.9129713280899239
+    },
+    {
+        "strategy": "threshold_strategy_0.01555",
+        "score": -48.82714508238192
+    },
+    {
+        "strategy": "threshold_strategy_0.00507",
+        "score": -66.63400449673865
+    },
+    {
+        "strategy": "threshold_strategy_0.00471",
+        "score": -59.11536860477821
+    },
+    {
+        "strategy": "threshold_strategy_0.01516",
+        "score": 2.617289852450668
+    },
+    {
+        "strategy": "threshold_strategy_0.01452",
+        "score": 66.35856247334405
+    },
+    {
+        "strategy": "threshold_strategy_0.01532",
+        "score": 10.467876692973448
+    },
+    {
+        "strategy": "threshold_strategy_0.00684",
+        "score": -47.356848134714895
+    },
+    {
+        "strategy": "threshold_strategy_0.01396",
+        "score": -75.48192445305413
+    },
+    {
+        "strategy": "threshold_strategy_0.01636",
+        "score": -45.827999407242295
+    },
+    {
+        "strategy": "threshold_strategy_0.01564",
+        "score": 16.721141916795176
+    },
+    {
+        "strategy": "threshold_strategy_0.01306",
+        "score": -39.6513288745063
+    },
+    {
+        "strategy": "threshold_strategy_0.00635",
+        "score": -6.727310730279498
+    },
+    {
+        "strategy": "threshold_strategy_0.00442",
+        "score": -57.27862671406879
+    },
+    {
+        "strategy": "threshold_strategy_0.01336",
+        "score": 4.719349418021309
+    },
+    {
+        "strategy": "threshold_strategy_0.0161",
+        "score": -47.773931665115
+    },
+    {
+        "strategy": "threshold_strategy_0.01341",
+        "score": -33.48857263532953
+    },
+    {
+        "strategy": "threshold_strategy_0.01342",
+        "score": -4.879839263352785
+    },
+    {
+        "strategy": "threshold_strategy_0.01389",
+        "score": -3.772302929703727
+    },
+    {
+        "strategy": "threshold_strategy_0.01335",
+        "score": -22.96076171544324
+    },
+    {
+        "strategy": "threshold_strategy_0.00372",
+        "score": -24.727874943726434
+    },
+    {
+        "strategy": "threshold_strategy_0.01478",
+        "score": -79.81122858008322
+    },
+    {
+        "strategy": "threshold_strategy_0.01452",
+        "score": -49.0451586482445
+    },
+    {
+        "strategy": "threshold_strategy_0.01564",
+        "score": -17.665453148049636
+    },
+    {
+        "strategy": "threshold_strategy_0.01532",
+        "score": 53.75463486929608
+    },
+    {
+        "strategy": "threshold_strategy_0.01336",
+        "score": -32.31328596083033
+    },
+    {
+        "strategy": "threshold_strategy_0.01516",
+        "score": 40.277434155146565
+    },
+    {
+        "strategy": "threshold_strategy_0.01463",
+        "score": -25.607180273749464
+    },
+    {
+        "strategy": "threshold_strategy_0.01755",
+        "score": 16.65520248464746
+    },
+    {
+        "strategy": "threshold_strategy_0.01545",
+        "score": -44.9280792893284
+    },
+    {
+        "strategy": "threshold_strategy_0.01634",
+        "score": -42.433346022640436
+    },
+    {
+        "strategy": "threshold_strategy_0.0169",
+        "score": -15.067357282372114
+    },
+    {
+        "strategy": "threshold_strategy_0.01209",
+        "score": -13.096069493832516
+    },
+    {
+        "strategy": "threshold_strategy_0.01415",
+        "score": -12.83405002329792
+    },
+    {
+        "strategy": "threshold_strategy_0.01762",
+        "score": 2.6941538057452554
+    },
+    {
+        "strategy": "threshold_strategy_0.01682",
+        "score": -30.050736889575923
+    },
+    {
+        "strategy": "threshold_strategy_0.01269",
+        "score": 10.724152722965556
+    },
+    {
+        "strategy": "threshold_strategy_0.01303",
+        "score": -56.65868037179358
+    },
+    {
+        "strategy": "threshold_strategy_0.01524",
+        "score": 1.8787755697156143
+    },
+    {
+        "strategy": "threshold_strategy_0.01595",
+        "score": -65.29157851742647
+    },
+    {
+        "strategy": "threshold_strategy_0.01288",
+        "score": 10.862407172759056
+    },
+    {
+        "strategy": "threshold_strategy_0.0143",
+        "score": 4.225748279944256
+    },
+    {
+        "strategy": "threshold_strategy_0.01532",
+        "score": -7.316124461372183
+    },
+    {
+        "strategy": "threshold_strategy_0.01516",
+        "score": -20.57815541557939
+    },
+    {
+        "strategy": "threshold_strategy_0.01755",
+        "score": 7.535239543260673
+    },
+    {
+        "strategy": "threshold_strategy_0.01288",
+        "score": 15.11853729853867
+    },
+    {
+        "strategy": "threshold_strategy_0.01269",
+        "score": -4.018375034512459
+    },
+    {
+        "strategy": "threshold_strategy_0.01361",
+        "score": -50.60032600762179
+    },
+    {
+        "strategy": "threshold_strategy_0.01707",
+        "score": 5.577109385007347
+    },
+    {
+        "strategy": "threshold_strategy_0.01753",
+        "score": -10.776725791593634
+    },
+    {
+        "strategy": "threshold_strategy_0.01217",
+        "score": -8.607854229647259
+    },
+    {
+        "strategy": "threshold_strategy_0.01391",
+        "score": -73.4423919503902
+    },
+    {
+        "strategy": "threshold_strategy_0.01646",
+        "score": 5.157903572661851
+    },
+    {
+        "strategy": "threshold_strategy_0.01333",
+        "score": -36.37246140800218
+    },
+    {
+        "strategy": "threshold_strategy_0.01864",
+        "score": -30.61283900282386
+    },
+    {
+        "strategy": "threshold_strategy_0.01487",
+        "score": 6.008729682247335
+    },
+    {
+        "strategy": "threshold_strategy_0.0114",
+        "score": 3.122353016127832
+    },
+    {
+        "strategy": "threshold_strategy_0.01195",
+        "score": 11.886532285864789
+    },
+    {
+        "strategy": "threshold_strategy_0.01102",
+        "score": 6.1535092389976
+    },
+    {
+        "strategy": "threshold_strategy_0.01635",
+        "score": -44.233172599027824
+    },
+    {
+        "strategy": "threshold_strategy_0.01626",
+        "score": -4.045365803500516
+    },
+    {
+        "strategy": "threshold_strategy_0.01169",
+        "score": -32.007907284612884
+    },
+    {
+        "strategy": "threshold_strategy_0.01288",
+        "score": -4.838151114809435
+    },
+    {
+        "strategy": "threshold_strategy_0.01195",
+        "score": -17.1670063926193
+    },
+    {
+        "strategy": "threshold_strategy_0.01755",
+        "score": -44.108290694678075
+    },
+    {
+        "strategy": "threshold_strategy_0.01102",
+        "score": -4.762742534670572
+    },
+    {
+        "strategy": "threshold_strategy_0.01487",
+        "score": 5.1095574107524016
+    },
+    {
+        "strategy": "threshold_strategy_0.0137",
+        "score": -20.930639088204153
+    },
+    {
+        "strategy": "threshold_strategy_0.00986",
+        "score": -16.05745262960997
+    },
+    {
+        "strategy": "threshold_strategy_0.01236",
+        "score": 16.977981001789757
+    },
+    {
+        "strategy": "threshold_strategy_0.01554",
+        "score": -21.409874384925857
+    },
+    {
+        "strategy": "threshold_strategy_0.01124",
+        "score": 36.08668398472314
+    },
+    {
+        "strategy": "threshold_strategy_0.01086",
+        "score": -23.238640745176966
+    },
+    {
+        "strategy": "threshold_strategy_0.01677",
+        "score": 61.26099163830855
+    },
+    {
+        "strategy": "threshold_strategy_0.01271",
+        "score": -58.491108451168685
+    },
+    {
+        "strategy": "threshold_strategy_0.01331",
+        "score": -29.181179434459423
+    },
+    {
+        "strategy": "threshold_strategy_0.01113",
+        "score": 55.54361695717665
+    },
+    {
+        "strategy": "threshold_strategy_0.01252",
+        "score": -28.550374793948308
+    },
+    {
+        "strategy": "threshold_strategy_0.01078",
+        "score": 39.66251608317397
+    },
+    {
+        "strategy": "threshold_strategy_0.01488",
+        "score": -48.185693125491525
+    },
+    {
+        "strategy": "threshold_strategy_0.01339",
+        "score": -5.552335809021216
+    },
+    {
+        "strategy": "threshold_strategy_0.0136",
+        "score": -22.667088220598202
+    },
+    {
+        "strategy": "threshold_strategy_0.00909",
+        "score": -27.913083425056
+    },
+    {
+        "strategy": "threshold_strategy_0.00379",
+        "score": -43.234042914977834
+    },
+    {
+        "strategy": "threshold_strategy_0.01045",
+        "score": -41.861289362786486
+    },
+    {
+        "strategy": "threshold_strategy_0.01143",
+        "score": -30.77156016161635
+    },
+    {
+        "strategy": "threshold_strategy_0.01497",
+        "score": -70.06574409678385
+    },
+    {
+        "strategy": "threshold_strategy_0.01382",
+        "score": 33.387917526214906
+    },
+    {
+        "strategy": "threshold_strategy_0.01821",
+        "score": -0.6930397717299144
+    },
+    {
+        "strategy": "threshold_strategy_0.00684",
+        "score": -26.02963564964098
+    },
+    {
+        "strategy": "threshold_strategy_0.01246",
+        "score": 18.303202395597303
+    },
+    {
+        "strategy": "threshold_strategy_0.01967",
+        "score": -16.14448465925841
+    },
+    {
+        "strategy": "threshold_strategy_0.01614",
+        "score": 10.494355308242504
+    },
+    {
+        "strategy": "threshold_strategy_0.01704",
+        "score": 20.455557061412506
+    },
+    {
+        "strategy": "threshold_strategy_0.0053",
+        "score": -7.420675805851644
+    },
+    {
+        "strategy": "threshold_strategy_0.01102",
+        "score": 16.57474216416871
+    },
+    {
+        "strategy": "threshold_strategy_0.01726",
+        "score": -11.081657774104997
+    },
+    {
+        "strategy": "threshold_strategy_0.00205",
+        "score": -26.23357233966398
+    },
+    {
+        "strategy": "threshold_strategy_0.01867",
+        "score": 10.978536300919345
+    },
+    {
+        "strategy": "threshold_strategy_0.00224",
+        "score": -24.98563917390046
+    },
+    {
+        "strategy": "threshold_strategy_0.01296",
+        "score": 0.4061005488776033
+    },
+    {
+        "strategy": "threshold_strategy_0.0197",
+        "score": 4.1050424821190035
+    },
+    {
+        "strategy": "threshold_strategy_0.01382",
+        "score": -14.479350513136211
+    },
+    {
+        "strategy": "threshold_strategy_0.01704",
+        "score": 10.72274221572853
+    },
+    {
+        "strategy": "threshold_strategy_0.01246",
+        "score": 23.240272513258383
+    },
+    {
+        "strategy": "threshold_strategy_0.01102",
+        "score": -43.36348048101489
+    },
+    {
+        "strategy": "threshold_strategy_0.01867",
+        "score": -10.143671438671348
+    },
+    {
+        "strategy": "threshold_strategy_0.01337",
+        "score": -45.97878486527608
+    },
+    {
+        "strategy": "threshold_strategy_0.01559",
+        "score": -36.496208335903944
+    },
+    {
+        "strategy": "threshold_strategy_0.01428",
+        "score": -44.79628265286551
+    },
+    {
+        "strategy": "threshold_strategy_0.017",
+        "score": -44.52533897192033
+    },
+    {
+        "strategy": "threshold_strategy_0.01371",
+        "score": -56.59493799037967
+    },
+    {
+        "strategy": "threshold_strategy_0.01229",
+        "score": -43.026435388520724
+    },
+    {
+        "strategy": "threshold_strategy_0.01283",
+        "score": 51.876190390254706
+    },
+    {
+        "strategy": "threshold_strategy_0.01204",
+        "score": -20.212237695593203
+    },
+    {
+        "strategy": "threshold_strategy_0.01668",
+        "score": -17.23791172327651
+    },
+    {
+        "strategy": "threshold_strategy_0.01081",
+        "score": -30.995285101406083
+    },
+    {
+        "strategy": "threshold_strategy_0.01109",
+        "score": 7.254585642514812
+    },
+    {
+        "strategy": "threshold_strategy_0.0172",
+        "score": -23.46366544255355
+    },
+    {
+        "strategy": "threshold_strategy_0.01694",
+        "score": -7.026556370970866
+    },
+    {
+        "strategy": "threshold_strategy_0.01002",
+        "score": -57.14916931602943
+    },
+    {
+        "strategy": "threshold_strategy_0.01617",
+        "score": -21.230220078915792
+    },
+    {
+        "strategy": "threshold_strategy_0.01283",
+        "score": -76.5735235037311
+    },
+    {
+        "strategy": "threshold_strategy_0.01246",
+        "score": 6.871766091190558
+    },
+    {
+        "strategy": "threshold_strategy_0.01704",
+        "score": -11.63652222858802
+    },
+    {
+        "strategy": "threshold_strategy_0.01109",
+        "score": 49.43331514090768
+    },
+    {
+        "strategy": "threshold_strategy_0.01694",
+        "score": -6.920928175665523
+    },
+    {
+        "strategy": "threshold_strategy_0.01765",
+        "score": 38.342879948038146
+    },
+    {
+        "strategy": "threshold_strategy_0.01865",
+        "score": -46.47118694370391
+    },
+    {
+        "strategy": "threshold_strategy_0.01519",
+        "score": -0.5720011417201505
+    },
+    {
+        "strategy": "threshold_strategy_0.01173",
+        "score": -2.167621893450871
+    },
+    {
+        "strategy": "threshold_strategy_0.01766",
+        "score": 18.81728618970621
+    },
+    {
+        "strategy": "threshold_strategy_0.01371",
+        "score": -8.639636358372712
+    },
+    {
+        "strategy": "threshold_strategy_0.0129",
+        "score": 31.31612500332058
+    },
+    {
+        "strategy": "threshold_strategy_0.01903",
+        "score": -34.5984132413026
+    },
+    {
+        "strategy": "threshold_strategy_0.01291",
+        "score": -37.032174931910845
+    },
+    {
+        "strategy": "threshold_strategy_0.0107",
+        "score": 2.106220844501024
+    },
+    {
+        "strategy": "threshold_strategy_0.01719",
+        "score": -26.16126441765686
+    },
+    {
+        "strategy": "threshold_strategy_0.01733",
+        "score": -33.16132143894047
+    },
+    {
+        "strategy": "threshold_strategy_0.01353",
+        "score": -27.63955262025327
+    },
+    {
+        "strategy": "threshold_strategy_0.01546",
+        "score": -50.77887336124674
+    },
+    {
+        "strategy": "threshold_strategy_0.01855",
+        "score": -12.528005798763658
+    },
+    {
+        "strategy": "threshold_strategy_0.01109",
+        "score": 23.469553164541978
+    },
+    {
+        "strategy": "threshold_strategy_0.01765",
+        "score": -61.9240070548404
+    },
+    {
+        "strategy": "threshold_strategy_0.0129",
+        "score": -19.122800464737423
+    },
+    {
+        "strategy": "threshold_strategy_0.01766",
+        "score": -32.732834854101654
+    },
+    {
+        "strategy": "threshold_strategy_0.01246",
+        "score": -49.731277548290116
+    },
+    {
+        "strategy": "threshold_strategy_0.01341",
+        "score": -45.17145198888958
+    },
+    {
+        "strategy": "threshold_strategy_0.01132",
+        "score": -37.455388160390996
+    },
+    {
+        "strategy": "threshold_strategy_0.01328",
+        "score": -18.49040140351252
+    },
+    {
+        "strategy": "threshold_strategy_0.01062",
+        "score": -15.358941194809589
+    },
+    {
+        "strategy": "threshold_strategy_0.01272",
+        "score": -6.741951669253325
+    },
+    {
+        "strategy": "threshold_strategy_0.01679",
+        "score": -13.871418769879512
+    },
+    {
+        "strategy": "threshold_strategy_0.01151",
+        "score": -61.4636546394883
+    },
+    {
+        "strategy": "threshold_strategy_0.01224",
+        "score": 9.188688125394322
+    },
+    {
+        "strategy": "threshold_strategy_0.01743",
+        "score": -52.531784289121305
+    },
+    {
+        "strategy": "threshold_strategy_0.01635",
+        "score": -10.132406557808437
+    },
+    {
+        "strategy": "threshold_strategy_0.01478",
+        "score": -14.974745523418079
+    },
+    {
+        "strategy": "threshold_strategy_0.01806",
+        "score": -32.73089358237911
+    },
+    {
+        "strategy": "threshold_strategy_0.00988",
+        "score": -34.287078680161315
+    },
+    {
+        "strategy": "threshold_strategy_0.01699",
+        "score": -7.093741439815055
+    },
+    {
+        "strategy": "threshold_strategy_0.01405",
+        "score": -14.983337181707626
+    },
+    {
+        "strategy": "threshold_strategy_0.01109",
+        "score": -36.307034442598805
+    },
+    {
+        "strategy": "threshold_strategy_0.01224",
+        "score": -71.8781686506992
+    },
+    {
+        "strategy": "threshold_strategy_0.01272",
+        "score": -31.22904239280406
+    },
+    {
+        "strategy": "threshold_strategy_0.01699",
+        "score": -29.947317953904275
+    },
+    {
+        "strategy": "threshold_strategy_0.01635",
+        "score": 44.125106910360884
+    },
+    {
+        "strategy": "threshold_strategy_0.01246",
+        "score": -5.241007611427818
+    },
+    {
+        "strategy": "threshold_strategy_0.01461",
+        "score": 7.273913996219335
+    },
+    {
+        "strategy": "threshold_strategy_0.01777",
+        "score": -33.047743834491996
+    },
+    {
+        "strategy": "threshold_strategy_0.01255",
+        "score": -15.511064530806607
+    },
+    {
+        "strategy": "threshold_strategy_0.01753",
+        "score": -8.4648215974901
+    },
+    {
+        "strategy": "threshold_strategy_0.01513",
+        "score": -39.61256899223912
+    },
+    {
+        "strategy": "threshold_strategy_0.01713",
+        "score": -16.786555077883335
+    },
+    {
+        "strategy": "threshold_strategy_0.01246",
+        "score": -4.808780156106494
+    },
+    {
+        "strategy": "threshold_strategy_0.01335",
+        "score": -1.2713618184619264
+    },
+    {
+        "strategy": "threshold_strategy_0.01807",
+        "score": -23.990880609416607
+    },
+    {
+        "strategy": "threshold_strategy_0.01061",
+        "score": -39.85057949826468
+    },
+    {
+        "strategy": "threshold_strategy_0.01761",
+        "score": 2.706944269379264
+    },
+    {
+        "strategy": "threshold_strategy_0.01184",
+        "score": -10.686624983316719
+    },
+    {
+        "strategy": "threshold_strategy_0.01441",
+        "score": 23.312126934163118
+    },
+    {
+        "strategy": "threshold_strategy_0.01606",
+        "score": 4.0240656124339935
+    },
+    {
+        "strategy": "threshold_strategy_0.01635",
+        "score": 50.55565455300348
+    },
+    {
+        "strategy": "threshold_strategy_0.01441",
+        "score": -38.6018081598434
+    },
+    {
+        "strategy": "threshold_strategy_0.01461",
+        "score": -23.662128883812613
+    },
+    {
+        "strategy": "threshold_strategy_0.01606",
+        "score": -10.082076643133533
+    },
+    {
+        "strategy": "threshold_strategy_0.01761",
+        "score": -47.080590003738806
+    },
+    {
+        "strategy": "threshold_strategy_0.01613",
+        "score": -20.10577249831961
+    },
+    {
+        "strategy": "threshold_strategy_0.01261",
+        "score": -17.80896655845234
+    },
+    {
+        "strategy": "threshold_strategy_0.01325",
+        "score": -22.058639526625328
+    },
+    {
+        "strategy": "threshold_strategy_0.01597",
+        "score": -11.937409730273565
+    },
+    {
+        "strategy": "threshold_strategy_0.01632",
+        "score": 29.815628655146142
+    },
+    {
+        "strategy": "threshold_strategy_0.01483",
+        "score": -7.413888496062839
+    },
+    {
+        "strategy": "threshold_strategy_0.01438",
+        "score": 9.891405565445439
+    },
+    {
+        "strategy": "threshold_strategy_0.0149",
+        "score": -25.166818110393095
+    },
+    {
+        "strategy": "threshold_strategy_0.01549",
+        "score": -48.721062432002554
+    },
+    {
+        "strategy": "threshold_strategy_0.01611",
+        "score": -46.753694194971445
+    },
+    {
+        "strategy": "threshold_strategy_0.01609",
+        "score": -62.04674579867753
+    },
+    {
+        "strategy": "threshold_strategy_0.01566",
+        "score": -24.893667726064713
+    },
+    {
+        "strategy": "threshold_strategy_0.01436",
+        "score": 5.407413178353398
+    },
+    {
+        "strategy": "threshold_strategy_0.01785",
+        "score": -57.104762927437974
+    },
+    {
+        "strategy": "threshold_strategy_0.01726",
+        "score": -48.91911880996028
+    },
+    {
+        "strategy": "threshold_strategy_0.01635",
+        "score": -14.485553708414784
+    },
+    {
+        "strategy": "threshold_strategy_0.01632",
+        "score": -35.857502694745655
+    },
+    {
+        "strategy": "threshold_strategy_0.01438",
+        "score": -27.766778292667972
+    },
+    {
+        "strategy": "threshold_strategy_0.01436",
+        "score": -50.70572189463603
+    },
+    {
+        "strategy": "threshold_strategy_0.01483",
+        "score": -16.322571930747706
+    },
+    {
+        "strategy": "threshold_strategy_0.01559",
+        "score": -21.521497709236215
+    },
+    {
+        "strategy": "threshold_strategy_0.01371",
+        "score": -1.1591142572414128
+    },
+    {
+        "strategy": "threshold_strategy_0.01406",
+        "score": 14.486578449732889
+    },
+    {
+        "strategy": "threshold_strategy_0.01432",
+        "score": -50.93785436640587
+    },
+    {
+        "strategy": "threshold_strategy_0.01313",
+        "score": 1.797710134696345
+    },
+    {
+        "strategy": "threshold_strategy_0.01517",
+        "score": 11.77547630289044
+    },
+    {
+        "strategy": "threshold_strategy_0.01488",
+        "score": -19.941195729349104
+    },
+    {
+        "strategy": "threshold_strategy_0.01767",
+        "score": -30.443020240022435
+    },
+    {
+        "strategy": "threshold_strategy_0.01458",
+        "score": 8.466472629970625
+    },
+    {
+        "strategy": "threshold_strategy_0.01739",
+        "score": -38.07917932608972
+    },
+    {
+        "strategy": "threshold_strategy_0.01432",
+        "score": -20.706763857146598
+    },
+    {
+        "strategy": "threshold_strategy_0.01516",
+        "score": -15.691856818387521
+    },
+    {
+        "strategy": "threshold_strategy_0.01692",
+        "score": -12.082101887197197
+    },
+    {
+        "strategy": "threshold_strategy_0.01569",
+        "score": 3.623895717241396
+    },
+    {
+        "strategy": "threshold_strategy_0.01612",
+        "score": -19.34733957766629
+    },
+    {
+        "strategy": "threshold_strategy_0.01406",
+        "score": 2.595328214229326
+    },
+    {
+        "strategy": "threshold_strategy_0.01517",
+        "score": -7.559253438117082
+    },
+    {
+        "strategy": "threshold_strategy_0.01458",
+        "score": -0.06521901864967106
+    },
+    {
+        "strategy": "threshold_strategy_0.01569",
+        "score": -25.70983722277711
+    },
+    {
+        "strategy": "threshold_strategy_0.01313",
+        "score": -12.412808750410335
+    },
+    {
+        "strategy": "threshold_strategy_0.01431",
+        "score": -48.761122333504865
+    },
+    {
+        "strategy": "threshold_strategy_0.01475",
+        "score": -25.382559349681657
+    },
+    {
+        "strategy": "threshold_strategy_0.01314",
+        "score": 7.259459518459693
+    },
+    {
+        "strategy": "threshold_strategy_0.01519",
+        "score": -33.82423321843493
+    },
+    {
+        "strategy": "threshold_strategy_0.01169",
+        "score": -25.156633975805946
+    },
+    {
+        "strategy": "threshold_strategy_0.0114",
+        "score": -8.115218867249453
+    },
+    {
+        "strategy": "threshold_strategy_0.01254",
+        "score": -46.744949877854424
+    },
+    {
+        "strategy": "threshold_strategy_0.01425",
+        "score": -34.311471942879436
+    },
+    {
+        "strategy": "threshold_strategy_0.01518",
+        "score": -11.031683445190211
+    },
+    {
+        "strategy": "threshold_strategy_0.01331",
+        "score": 6.997003543209146
+    },
+    {
+        "strategy": "threshold_strategy_0.01404",
+        "score": -2.784481565171447
+    },
+    {
+        "strategy": "threshold_strategy_0.01403",
+        "score": 16.232393271623323
+    },
+    {
+        "strategy": "threshold_strategy_0.01258",
+        "score": 7.194862416915512
+    },
+    {
+        "strategy": "threshold_strategy_0.01588",
+        "score": -16.226709417750143
+    },
+    {
+        "strategy": "threshold_strategy_0.01685",
+        "score": -6.041387222831389
+    },
+    {
+        "strategy": "threshold_strategy_0.01403",
+        "score": -59.75531921423999
+    },
+    {
+        "strategy": "threshold_strategy_0.01314",
+        "score": -31.083674457929774
+    },
+    {
+        "strategy": "threshold_strategy_0.01258",
+        "score": -18.47638746721826
+    },
+    {
+        "strategy": "threshold_strategy_0.01331",
+        "score": -43.995922163050075
+    },
+    {
+        "strategy": "threshold_strategy_0.01406",
+        "score": -28.285745597238943
+    },
+    {
+        "strategy": "threshold_strategy_0.01139",
+        "score": -29.757636570764006
+    },
+    {
+        "strategy": "threshold_strategy_0.01438",
+        "score": -16.245470908542565
+    },
+    {
+        "strategy": "threshold_strategy_0.01227",
+        "score": -36.11964575593674
+    },
+    {
+        "strategy": "threshold_strategy_0.01542",
+        "score": 11.668718065474678
+    },
+    {
+        "strategy": "threshold_strategy_0.0121",
+        "score": 73.45248303145185
+    },
+    {
+        "strategy": "threshold_strategy_0.01185",
+        "score": -20.90891918721406
+    },
+    {
+        "strategy": "threshold_strategy_0.01305",
+        "score": -24.970085354500128
+    },
+    {
+        "strategy": "threshold_strategy_0.0143",
+        "score": -23.476025866974332
+    },
+    {
+        "strategy": "threshold_strategy_0.01296",
+        "score": -25.931447523808302
+    },
+    {
+        "strategy": "threshold_strategy_0.01153",
+        "score": 3.3586102413661507
+    },
+    {
+        "strategy": "threshold_strategy_0.01223",
+        "score": -14.706185674414044
+    },
+    {
+        "strategy": "threshold_strategy_0.01297",
+        "score": -8.027146140947451
+    },
+    {
+        "strategy": "threshold_strategy_0.01452",
+        "score": -29.425947680264464
+    },
+    {
+        "strategy": "threshold_strategy_0.01551",
+        "score": 7.965829250067436
+    },
+    {
+        "strategy": "threshold_strategy_0.0149",
+        "score": 11.266259566039764
+    },
+    {
+        "strategy": "threshold_strategy_0.0121",
+        "score": 29.114591539634397
+    },
+    {
+        "strategy": "threshold_strategy_0.01542",
+        "score": -21.933005923585384
+    },
+    {
+        "strategy": "threshold_strategy_0.0149",
+        "score": -22.71816368293716
+    },
+    {
+        "strategy": "threshold_strategy_0.01551",
+        "score": -26.82296447985567
+    },
+    {
+        "strategy": "threshold_strategy_0.01153",
+        "score": -37.26145761738175
+    },
+    {
+        "strategy": "threshold_strategy_0.01634",
+        "score": 3.7788017203933606
+    },
+    {
+        "strategy": "threshold_strategy_0.01093",
+        "score": 23.27282646428438
+    },
+    {
+        "strategy": "threshold_strategy_0.01314",
+        "score": -1.0155915865648666
+    },
+    {
+        "strategy": "threshold_strategy_0.01073",
+        "score": 12.514103303309625
+    },
+    {
+        "strategy": "threshold_strategy_0.01636",
+        "score": 3.3679129151818046
+    },
+    {
+        "strategy": "threshold_strategy_0.01543",
+        "score": -44.649025943900895
+    },
+    {
+        "strategy": "threshold_strategy_0.01528",
+        "score": -2.764447905517329
+    },
+    {
+        "strategy": "threshold_strategy_0.01508",
+        "score": -36.6569361539069
+    },
+    {
+        "strategy": "threshold_strategy_0.01585",
+        "score": -13.840304592385841
+    },
+    {
+        "strategy": "threshold_strategy_0.01128",
+        "score": -21.349701268876643
+    },
+    {
+        "strategy": "threshold_strategy_0.01267",
+        "score": -1.9969225946075682
+    },
+    {
+        "strategy": "threshold_strategy_0.01484",
+        "score": -33.18595546860348
+    },
+    {
+        "strategy": "threshold_strategy_0.01442",
+        "score": -17.745965615657155
+    },
+    {
+        "strategy": "threshold_strategy_0.01533",
+        "score": 4.199893283817659
+    },
+    {
+        "strategy": "threshold_strategy_0.01521",
+        "score": -8.68427814551113
+    },
+    {
+        "strategy": "threshold_strategy_0.00358",
+        "score": -19.564884999496485
+    },
+    {
+        "strategy": "threshold_strategy_0.00527",
+        "score": -4.569273040380821
+    },
+    {
+        "strategy": "threshold_strategy_0.01729",
+        "score": -46.31411914997767
+    },
+    {
+        "strategy": "threshold_strategy_0.00179",
+        "score": -50.02121979123133
+    },
+    {
+        "strategy": "threshold_strategy_0.0092",
+        "score": -37.85938902474631
+    },
+    {
+        "strategy": "threshold_strategy_0.00843",
+        "score": 14.75261903760287
+    },
+    {
+        "strategy": "threshold_strategy_0.01047",
+        "score": -21.308255171129854
+    },
+    {
+        "strategy": "threshold_strategy_0.01683",
+        "score": 38.088109347543636
+    },
+    {
+        "strategy": "threshold_strategy_0.01126",
+        "score": -21.43169346008319
+    },
+    {
+        "strategy": "threshold_strategy_0.0039",
+        "score": 3.6339213431698596
+    },
+    {
+        "strategy": "threshold_strategy_0.01163",
+        "score": 24.572327579046288
+    },
+    {
+        "strategy": "threshold_strategy_0.01644",
+        "score": 22.324016419991153
+    },
+    {
+        "strategy": "threshold_strategy_0.00249",
+        "score": -18.039120695892365
     }
 ]

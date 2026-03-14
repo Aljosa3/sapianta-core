@@ -5,7 +5,7 @@ Purpose
 -------
 Coordinates the Governed Autonomous Development (GAD) pipeline.
 
-The orchestrator supports two development modes:
+The orchestrator supports three development modes:
 
 1. Strategic Mode
    Human provides strategic direction.
@@ -13,9 +13,13 @@ The orchestrator supports two development modes:
 2. Autonomous Mode
    System detects capability gaps and proposes development tasks.
 
+3. Implementation Mode
+   Triggered from sapianta discuss.
+   Generates a patch proposal instead of executing code generation.
+
 Pipeline
 
-Strategic Direction / Capability Gap
+Strategic Direction / Capability Gap / Discussion Request
         ↓
 Architecture Proposal
         ↓
@@ -34,47 +38,60 @@ from runtime.development.mutation_validator import MutationValidator
 from runtime.development.code_generator import CodeGenerator
 from runtime.system.system_knowledge import SystemKnowledge
 from runtime.development.capability_gap_detector import CapabilityGapDetector
+from runtime.development.architecture_agent import ArchitectureAgent
 
 
 class DevelopmentOrchestrator:
+
+    """
+    Coordinates governed development of the SAPIANTA system.
+    """
+
+    # ------------------------------------------------
+    # Immutable core protection
+    # ------------------------------------------------
+
+    FORBIDDEN_PATHS = [
+        "runtime/governance",
+        "runtime/system",
+        "runtime/ledger",
+        "runtime/safety",
+        "runtime/layer2",
+    ]
+
+    ALLOWED_PATHS = [
+        "runtime/research",
+        "runtime/strategies",
+        "runtime/memory",
+        "runtime/experiments",
+        "runtime/analytics",
+        "sapianta-domain-",
+        "runtime/development",
+    ]
 
     def __init__(self):
 
         self.validator = MutationValidator()
         self.code_generator = CodeGenerator()
 
-        # new components
+        # knowledge + gap detection
         self.system_knowledge = SystemKnowledge()
         self.gap_detector = CapabilityGapDetector()
 
+        # architecture reasoning
+        self.architecture_agent = ArchitectureAgent(self.system_knowledge)
+
     # ------------------------------------------------
-    # Architecture proposal (strategic mode)
+    # Architecture proposal
     # ------------------------------------------------
 
     def propose_architecture(self, strategic_direction: str):
 
         """
-        Converts strategic direction into an architecture proposal.
-
-        This is currently a stub and will later be replaced by
-        the Architecture Agent.
+        Delegates architecture reasoning to ArchitectureAgent.
         """
 
-        if "market regime" in strategic_direction.lower():
-
-            return {
-                "description": "Add Market Regime Engine",
-                "files_to_create": [
-                    "runtime/market/regime_engine.py"
-                ],
-                "files_to_modify": []
-            }
-
-        return {
-            "description": "No proposal generated",
-            "files_to_create": [],
-            "files_to_modify": []
-        }
+        return self.architecture_agent.propose(strategic_direction)
 
     # ------------------------------------------------
     # Autonomous capability proposal
@@ -87,25 +104,15 @@ class DevelopmentOrchestrator:
         if not proposals:
             return None
 
-        p = proposals[0]  # first proposal for now
+        p = proposals[0]
 
-        mapping = {
-
-            "portfolio_engine": "runtime/portfolio/portfolio_engine.py",
-
-            "regime_detection": "runtime/market/regime_detector.py",
-
-            "risk_engine": "runtime/risk/risk_engine.py"
-        }
-
-        file_path = mapping.get(
-            p["capability"],
-            f"runtime/development/{p['capability']}.py"
+        blueprint = self.architecture_agent.design_capability(
+            p["capability"]
         )
 
         return {
-            "description": f"Add capability: {p['capability']}",
-            "files_to_create": [file_path],
+            "description": blueprint["description"],
+            "files_to_create": blueprint["modules"],
             "files_to_modify": []
         }
 
@@ -124,6 +131,51 @@ class DevelopmentOrchestrator:
             plan.append(f)
 
         return plan
+
+    # ------------------------------------------------
+    # IMPLEMENT MODE (from sapianta discuss)
+    # ------------------------------------------------
+
+    def run_implementation(self, discussion_context: str):
+
+        """
+        Generates patch proposal from discussion context.
+        Does NOT automatically write code.
+        """
+
+        print("\nIMPLEMENT MODE activated.")
+        print("\nAnalyzing discussion context...")
+
+        architecture = self.propose_architecture(discussion_context)
+
+        if not architecture["files_to_create"] and not architecture["files_to_modify"]:
+            print("\nNo implementation proposal generated.")
+            return None
+
+        implementation_plan = self.build_implementation_plan(architecture)
+
+        self._check_core_modification(implementation_plan)
+
+        print("\nGenerating PATCH PROPOSAL...\n")
+
+        patch = {
+            "description": architecture["description"],
+            "files": implementation_plan,
+            "generated_at": datetime.now(UTC).isoformat()
+        }
+
+        print("PATCH PROPOSAL")
+        print("----------------")
+
+        print("\nDescription:")
+        print(patch["description"])
+
+        print("\nAffected files:")
+
+        for f in patch["files"]:
+            print("-", f)
+
+        return patch
 
     # ------------------------------------------------
     # Strategic development pipeline
@@ -175,6 +227,8 @@ class DevelopmentOrchestrator:
             print("\nNo implementation required.")
             return
 
+        self._check_core_modification(implementation_plan)
+
         print("\nProposed file changes:")
 
         for p in implementation_plan:
@@ -221,6 +275,22 @@ class DevelopmentOrchestrator:
 
         print("\n✅ Code generation completed.")
 
+    # ------------------------------------------------
+    # Core mutation protection
+    # ------------------------------------------------
+
+    def _check_core_modification(self, file_list):
+
+        for path in file_list:
+
+            for forbidden in self.FORBIDDEN_PATHS:
+
+                if path.startswith(forbidden):
+
+                    raise Exception(
+                        f"Mutation forbidden: {path} is immutable core."
+                    )
+
 
 # ------------------------------------------------
 # Manual test
@@ -230,11 +300,17 @@ if __name__ == "__main__":
 
     orchestrator = DevelopmentOrchestrator()
 
-    mode = input("Mode (strategic / autonomous): ")
+    mode = input("Mode (strategic / autonomous / implement): ")
 
     if mode == "autonomous":
 
         orchestrator.run_autonomous()
+
+    elif mode == "implement":
+
+        context = input("\nDiscussion context:\n")
+
+        orchestrator.run_implementation(context)
 
     else:
 
