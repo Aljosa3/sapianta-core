@@ -1,0 +1,21 @@
+{
+  "portfolio_engine": {
+    "depends_on": ["risk_engine", "regime_detection"]
+  },
+
+  "risk_engine": {
+    "depends_on": ["analytics"]
+  },
+
+  "regime_detection": {
+    "depends_on": ["market"]
+  },
+
+  "analytics": {
+    "depends_on": []
+  },
+
+  "market": {
+    "depends_on": []
+  }
+}

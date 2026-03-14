@@ -12,12 +12,13 @@ Features
 • append-only artifact history
 • artifact lineage tracking
 • reproducibility support
+• replay verification support
 """
 
 import json
 import os
 import hashlib
-from datetime import datetime
+from datetime import datetime, UTC
 
 
 REGISTRY_PATH = "runtime/history/artifact_registry.jsonl"
@@ -27,10 +28,24 @@ REGISTRY_PATH = "runtime/history/artifact_registry.jsonl"
 # HASHING
 # ------------------------------------------------------------
 
+def _canonical_json(data: dict) -> str:
+    """
+    Deterministic JSON serialization.
+    """
+    return json.dumps(
+        data,
+        sort_keys=True,
+        separators=(",", ":")
+    )
+
+
 def _hash_artifact(data: dict) -> str:
 
-    serialized = json.dumps(data, sort_keys=True)
-    return hashlib.sha256(serialized.encode()).hexdigest()
+    serialized = _canonical_json(data)
+
+    return hashlib.sha256(
+        serialized.encode("utf-8")
+    ).hexdigest()
 
 
 # ------------------------------------------------------------
@@ -42,7 +57,8 @@ def register_artifact(
     domain_id: str,
     artifact_location: str,
     producer: str,
-    metadata: dict
+    metadata: dict,
+    parent_artifact: str | None = None
 ):
 
     artifact_hash = _hash_artifact(metadata)
@@ -51,17 +67,18 @@ def register_artifact(
         "artifact_id": artifact_hash[:16],
         "artifact_type": artifact_type,
         "domain_id": domain_id,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "artifact_hash": artifact_hash,
         "artifact_location": artifact_location,
         "producer": producer,
+        "parent_artifact": parent_artifact,
         "metadata": metadata
     }
 
     os.makedirs(os.path.dirname(REGISTRY_PATH), exist_ok=True)
 
-    with open(REGISTRY_PATH, "a") as f:
-        f.write(json.dumps(artifact) + "\n")
+    with open(REGISTRY_PATH, "a", encoding="utf-8") as f:
+        f.write(_canonical_json(artifact) + "\n")
 
     return artifact
 
@@ -77,8 +94,12 @@ def list_artifacts():
 
     artifacts = []
 
-    with open(REGISTRY_PATH) as f:
+    with open(REGISTRY_PATH, encoding="utf-8") as f:
         for line in f:
+
+            if not line.strip():
+                continue
+
             artifacts.append(json.loads(line))
 
     return artifacts
@@ -103,10 +124,52 @@ def find_by_domain(domain_id: str):
 def find_by_id(artifact_id: str):
 
     for artifact in list_artifacts():
+
         if artifact["artifact_id"] == artifact_id:
             return artifact
 
     return None
+
+
+def find_children(parent_artifact: str):
+
+    return [
+        a for a in list_artifacts()
+        if a.get("parent_artifact") == parent_artifact
+    ]
+
+
+# ------------------------------------------------------------
+# REPLAY VERIFICATION
+# ------------------------------------------------------------
+
+def verify_artifact(artifact):
+
+    expected_hash = _hash_artifact(
+        artifact["metadata"]
+    )
+
+    return expected_hash == artifact["artifact_hash"]
+
+
+def verify_registry():
+
+    """
+    Verify integrity of entire registry.
+    """
+
+    results = []
+
+    for artifact in list_artifacts():
+
+        ok = verify_artifact(artifact)
+
+        results.append({
+            "artifact_id": artifact["artifact_id"],
+            "valid": ok
+        })
+
+    return results
 
 
 # ------------------------------------------------------------
@@ -118,4 +181,7 @@ if __name__ == "__main__":
     print("Registered artifacts:")
 
     for artifact in list_artifacts():
-        print(artifact["artifact_id"], artifact["artifact_type"])
+        print(
+            artifact["artifact_id"],
+            artifact["artifact_type"]
+        )

@@ -23,11 +23,15 @@ Strategic Direction / Capability Gap / Discussion Request
         ↓
 Architecture Proposal
         ↓
-Implementation Plan
+Artifact Registry (hash)
+        ↓
+Promotion Gate
+        ↓
+Mutation Guard
         ↓
 Mutation Validation
         ↓
-Human Approval
+Human Approval (if required)
         ↓
 Code Generation
 """
@@ -36,9 +40,14 @@ from datetime import datetime, UTC
 
 from runtime.development.mutation_validator import MutationValidator
 from runtime.development.code_generator import CodeGenerator
+from runtime.development.mutation_guard import MutationGuard
 from runtime.system.system_knowledge import SystemKnowledge
 from runtime.development.capability_gap_detector import CapabilityGapDetector
+from runtime.system.capability_planner import CapabilityPlanner
 from runtime.development.architecture_agent import ArchitectureAgent
+
+from runtime.governance.promotion_gate import classify_change, requires_approval
+from runtime.artifacts.artifact_registry import register_artifact
 
 
 class DevelopmentOrchestrator:
@@ -74,11 +83,14 @@ class DevelopmentOrchestrator:
         self.validator = MutationValidator()
         self.code_generator = CodeGenerator()
 
-        # knowledge + gap detection
+        self.mutation_guard = MutationGuard()
+
         self.system_knowledge = SystemKnowledge()
+
         self.gap_detector = CapabilityGapDetector()
 
-        # architecture reasoning
+        self.capability_planner = CapabilityPlanner()
+
         self.architecture_agent = ArchitectureAgent(self.system_knowledge)
 
     # ------------------------------------------------
@@ -86,10 +98,6 @@ class DevelopmentOrchestrator:
     # ------------------------------------------------
 
     def propose_architecture(self, strategic_direction: str):
-
-        """
-        Delegates architecture reasoning to ArchitectureAgent.
-        """
 
         return self.architecture_agent.propose(strategic_direction)
 
@@ -104,10 +112,19 @@ class DevelopmentOrchestrator:
         if not proposals:
             return None
 
-        p = proposals[0]
+        proposals = sorted(
+            proposals,
+            key=lambda p: p["capability"]
+        )
+
+        capability = proposals[0]["capability"]
+
+        ordered_capabilities = self.capability_planner.plan(capability)
+
+        target_capability = ordered_capabilities[-1]
 
         blueprint = self.architecture_agent.design_capability(
-            p["capability"]
+            target_capability
         )
 
         return {
@@ -133,15 +150,10 @@ class DevelopmentOrchestrator:
         return plan
 
     # ------------------------------------------------
-    # IMPLEMENT MODE (from sapianta discuss)
+    # IMPLEMENT MODE
     # ------------------------------------------------
 
     def run_implementation(self, discussion_context: str):
-
-        """
-        Generates patch proposal from discussion context.
-        Does NOT automatically write code.
-        """
 
         print("\nIMPLEMENT MODE activated.")
         print("\nAnalyzing discussion context...")
@@ -155,6 +167,27 @@ class DevelopmentOrchestrator:
         implementation_plan = self.build_implementation_plan(architecture)
 
         self._check_core_modification(implementation_plan)
+
+        print("\nRunning Promotion Gate...")
+
+        change_level = classify_change(implementation_plan)
+
+        print("Change classification:", change_level)
+
+        if requires_approval(change_level):
+
+            approval = input("\nApprove implementation plan? (y/n): ")
+
+            if approval.lower() != "y":
+
+                print("\nDevelopment cancelled.")
+                return None
+
+        print("\nRunning Mutation Guard...")
+
+        self.mutation_guard.validate_patch(implementation_plan)
+
+        print("Mutation Guard passed.")
 
         print("\nGenerating PATCH PROPOSAL...\n")
 
@@ -229,10 +262,52 @@ class DevelopmentOrchestrator:
 
         self._check_core_modification(implementation_plan)
 
+        # ------------------------------------------------
+        # Artifact Registry
+        # ------------------------------------------------
+
+        print("\nRegistering architecture artifact...")
+
+        artifact = register_artifact(
+            artifact_type="architecture_proposal",
+            domain_id="core",
+            artifact_location="runtime/development/dev_orchestrator",
+            producer="development_orchestrator",
+            metadata=architecture
+        )
+
+        print("Artifact registered:", artifact["artifact_id"])
+
+        # ------------------------------------------------
+        # Promotion Gate
+        # ------------------------------------------------
+
+        print("\nRunning Promotion Gate...")
+
+        change_level = classify_change(implementation_plan)
+
+        print("Change classification:", change_level)
+
+        approval_required = requires_approval(change_level)
+
+        # ------------------------------------------------
+        # Mutation Guard
+        # ------------------------------------------------
+
+        print("\nRunning Mutation Guard...")
+
+        self.mutation_guard.validate_patch(implementation_plan)
+
+        print("Mutation Guard passed.")
+
         print("\nProposed file changes:")
 
         for p in implementation_plan:
             print("-", p)
+
+        # ------------------------------------------------
+        # Mutation validation
+        # ------------------------------------------------
 
         print("\nRunning mutation validation...")
 
@@ -255,12 +330,22 @@ class DevelopmentOrchestrator:
 
         print("\n✅ Mutation validation passed.")
 
-        approval = input("\nApprove implementation plan? (y/n): ")
+        # ------------------------------------------------
+        # Conditional human approval
+        # ------------------------------------------------
 
-        if approval.lower() != "y":
+        if approval_required:
 
-            print("\nDevelopment cancelled.")
-            return
+            approval = input("\nApprove implementation plan? (y/n): ")
+
+            if approval.lower() != "y":
+
+                print("\nDevelopment cancelled.")
+                return
+
+        # ------------------------------------------------
+        # Code generation
+        # ------------------------------------------------
 
         print("\nImplementation approved.")
 

@@ -1,17 +1,25 @@
 """
 SAPIANTA Capability Gap Detector
 
-Analyzes system_state.json and identifies missing capabilities.
+Analyzes system_state.json and runtime structure
+to identify missing capabilities.
+
+The detector combines:
+
+1. Declared gaps from system_state.json
+2. Runtime capability introspection using CapabilityGraph
 
 The module produces development proposals which can later
 be passed to the Governed Autonomous Development pipeline.
 
-This is the first step toward self-directed system evolution.
+This is a key component of self-directed system evolution.
 """
 
 import json
 import os
 from datetime import datetime, UTC
+
+from runtime.system.capability_graph import CapabilityGraph
 
 
 SYSTEM_STATE_PATH = os.path.join(
@@ -32,20 +40,29 @@ class CapabilityGapDetector:
         with open(SYSTEM_STATE_PATH, encoding="utf-8") as f:
             self.state = json.load(f)
 
+        self.graph = CapabilityGraph()
+
     # ---------------------------------------------------------
     # GAP DETECTION
     # ---------------------------------------------------------
 
     def detect(self):
 
-        missing = self.state.get("missing_capabilities", [])
+        declared_missing = self.state.get("missing_capabilities", [])
+
+        # build runtime capability graph
+        self.graph.build()
 
         proposals = []
 
-        for cap in missing:
+        for capability in declared_missing:
+
+            # if runtime already has the capability skip it
+            if self.graph.has_capability(capability):
+                continue
 
             proposals.append(
-                self._build_proposal(cap)
+                self._build_proposal(capability)
             )
 
         return proposals

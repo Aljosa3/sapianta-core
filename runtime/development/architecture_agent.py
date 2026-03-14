@@ -15,6 +15,11 @@ The agent supports two reasoning modes:
    Used by sapianta discuss when human strategic direction
    is converted into an architecture proposal.
 
+Guardrails
+----------
+ArchitectureAgent never proposes mutations in immutable
+core layers of the SAPIANTA system.
+
 Pipeline
 
 Capability Gap / Strategic Context
@@ -31,10 +36,69 @@ from datetime import datetime, UTC
 
 class ArchitectureAgent:
 
+    # ---------------------------------------------------------
+    # Guardrails
+    # ---------------------------------------------------------
+
+    FORBIDDEN_PATHS = [
+        "runtime/system",
+        "runtime/governance",
+        "runtime/ledger",
+        "runtime/safety",
+        "runtime/layer2",
+    ]
+
+    ALLOWED_PREFIXES = [
+        "runtime/research",
+        "runtime/strategies",
+        "runtime/memory",
+        "runtime/experiments",
+        "runtime/analytics",
+        "runtime/development",
+        "runtime/portfolio",
+        "runtime/market",
+        "runtime/risk",
+        "sapianta-domain-"
+    ]
+
     def __init__(self, system_knowledge=None):
 
         # optional dependency
         self.system_knowledge = system_knowledge
+
+    # ---------------------------------------------------------
+    # Guardrail filtering
+    # ---------------------------------------------------------
+
+    def _filter_paths(self, paths):
+
+        filtered = []
+
+        for path in paths:
+
+            forbidden = False
+
+            for fp in self.FORBIDDEN_PATHS:
+
+                if path.startswith(fp):
+                    forbidden = True
+                    break
+
+            if forbidden:
+                continue
+
+            allowed = False
+
+            for ap in self.ALLOWED_PREFIXES:
+
+                if path.startswith(ap):
+                    allowed = True
+                    break
+
+            if allowed:
+                filtered.append(path)
+
+        return filtered
 
     # ---------------------------------------------------------
     # CONTEXT MODE (from sapianta discuss)
@@ -105,6 +169,15 @@ class ArchitectureAgent:
                 "reason": "Context not recognized by ArchitectureAgent"
             }
 
+        # apply guardrails
+        proposal["files_to_create"] = self._filter_paths(
+            proposal["files_to_create"]
+        )
+
+        proposal["files_to_modify"] = self._filter_paths(
+            proposal["files_to_modify"]
+        )
+
         proposal["generated_at"] = datetime.now(UTC).isoformat()
 
         return proposal
@@ -121,13 +194,19 @@ class ArchitectureAgent:
 
         if capability == "portfolio_engine":
 
-            return self._portfolio_architecture()
+            blueprint = self._portfolio_architecture()
 
-        if capability == "regime_detection":
+        elif capability == "regime_detection":
 
-            return self._regime_architecture()
+            blueprint = self._regime_architecture()
 
-        return self._generic_architecture(capability)
+        else:
+
+            blueprint = self._generic_architecture(capability)
+
+        blueprint["modules"] = self._filter_paths(blueprint["modules"])
+
+        return blueprint
 
     # ---------------------------------------------------------
     # PORTFOLIO ARCHITECTURE
