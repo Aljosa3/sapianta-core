@@ -8,7 +8,8 @@ from cli.commands import (
     show,
     list as list_cmd,
     inspect,
-    sswa,   # ← DODANO
+    sswa,      # ← že obstoječe
+    discuss,   # ← DODANO
 )
 
 # Kanonični command surface (LOCKED)
@@ -19,7 +20,8 @@ COMMANDS = {
     "show": show,
     "list": list_cmd,
     "inspect": inspect,
-    "sswa": sswa,   # ← DODANO
+    "sswa": sswa,      # ← že obstoječe
+    "discuss": discuss # ← DODANO
 }
 
 
@@ -43,3 +45,4 @@ def main(argv=None):
         raise InvalidCommandError(f"Unknown command: {command_name}")
 
     COMMANDS[command_name].run(args)
+    
