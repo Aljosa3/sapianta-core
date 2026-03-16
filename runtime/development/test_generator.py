@@ -43,7 +43,9 @@ class TestGenerator:
 
     def generate_test_content(self, module_path):
 
-        module_name = Path(module_path).stem
+        module_path = Path(module_path)
+
+        module_name = module_path.stem
 
         content = f"""
 import pytest
@@ -69,9 +71,21 @@ def test_placeholder_{module_name}():
 
     def generate_test_file(self, module_path):
 
+        module_path = str(module_path)
+
+        # remove possible "module:" prefix from reflection engine
+        if module_path.startswith("module:"):
+            module_path = module_path.split("module:")[1]
+
         module_path = Path(module_path)
 
-        test_file_name = f"test_{module_path.stem}.py"
+        # convert path to module-like string
+        module_name = module_path.with_suffix("").as_posix()
+
+        # normalize to safe filename
+        safe_name = module_name.replace("/", "_").replace(".", "_")
+
+        test_file_name = f"test_{safe_name}.py"
 
         tests_dir = self.repo_path / "tests"
 
