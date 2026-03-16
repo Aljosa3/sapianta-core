@@ -6,23 +6,17 @@ Purpose
 Generates architecture blueprints and architecture proposals
 for new system capabilities.
 
-The agent supports two reasoning modes:
-
-1. Capability Mode
-   Used by autonomous development when a capability gap is detected.
-
-2. Context Mode
-   Used by sapianta discuss when human strategic direction
-   is converted into an architecture proposal.
-
-Guardrails
-----------
-ArchitectureAgent never proposes mutations in immutable
-core layers of the SAPIANTA system.
+Repo-aware ArchitectureAgent:
+- scans repository structure
+- detects architectural domains
+- proposes architecture-compliant modules
+- enforces guardrails
 
 Pipeline
 
 Capability Gap / Strategic Context
+        ↓
+Repository Scan
         ↓
 Architecture Reasoning
         ↓
@@ -31,6 +25,7 @@ Module Design
 Development Blueprint
 """
 
+import os
 from datetime import datetime, UTC
 
 
@@ -56,15 +51,49 @@ class ArchitectureAgent:
         "runtime/analytics",
         "runtime/development",
         "runtime/portfolio",
-        "runtime/market",
         "runtime/risk",
         "sapianta-domain-"
     ]
 
-    def __init__(self, system_knowledge=None):
+    # ---------------------------------------------------------
+    # INIT
+    # ---------------------------------------------------------
 
-        # optional dependency
+    def __init__(self, system_knowledge=None, repo_root="runtime"):
+
         self.system_knowledge = system_knowledge
+        self.repo_root = repo_root
+
+        # build repository map
+        self.repo_map = self._scan_repo()
+
+    # ---------------------------------------------------------
+    # REPOSITORY SCAN
+    # ---------------------------------------------------------
+
+    def _scan_repo(self):
+
+        repo_map = {}
+
+        for root, dirs, files in os.walk(self.repo_root):
+
+            modules = []
+
+            for file in files:
+                if file.endswith(".py"):
+                    modules.append(file)
+
+            repo_map[root] = modules
+
+        return repo_map
+
+    # ---------------------------------------------------------
+    # CHECK MODULE EXISTENCE
+    # ---------------------------------------------------------
+
+    def _module_exists(self, path):
+
+        return os.path.exists(path)
 
     # ---------------------------------------------------------
     # Guardrail filtering
@@ -79,7 +108,6 @@ class ArchitectureAgent:
             forbidden = False
 
             for fp in self.FORBIDDEN_PATHS:
-
                 if path.startswith(fp):
                     forbidden = True
                     break
@@ -90,7 +118,6 @@ class ArchitectureAgent:
             allowed = False
 
             for ap in self.ALLOWED_PREFIXES:
-
                 if path.startswith(ap):
                     allowed = True
                     break
@@ -99,6 +126,67 @@ class ArchitectureAgent:
                 filtered.append(path)
 
         return filtered
+
+    # ---------------------------------------------------------
+    # DOMAIN DETECTION
+    # ---------------------------------------------------------
+
+    def _detect_domain(self, context):
+
+        ctx = context.lower()
+
+        if "regime" in ctx or "market" in ctx:
+            return "analytics"
+
+        if "memory" in ctx or "history" in ctx:
+            return "memory"
+
+        if "strategy" in ctx:
+            return "strategies"
+
+        if "risk" in ctx:
+            return "risk"
+
+        if "portfolio" in ctx:
+            return "portfolio"
+
+        if "research" in ctx:
+            return "research"
+
+        return "analytics"
+
+    # ---------------------------------------------------------
+    # MODULE NAME GENERATION
+    # ---------------------------------------------------------
+
+    def _generate_module_name(self, context):
+
+        ctx = context.lower()
+
+        if "regime" in ctx:
+            return "regime_detector.py"
+
+        if "memory" in ctx:
+            return "strategy_memory.py"
+
+        if "risk" in ctx:
+            return "risk_engine.py"
+
+        if "portfolio" in ctx:
+            return "portfolio_engine.py"
+
+        if "signal" in ctx:
+            return "signal_engine.py"
+
+        return "module.py"
+
+    # ---------------------------------------------------------
+    # BUILD MODULE PATH
+    # ---------------------------------------------------------
+
+    def _build_module_path(self, domain, module):
+
+        return f"runtime/{domain}/{module}"
 
     # ---------------------------------------------------------
     # CONTEXT MODE (from sapianta discuss)
@@ -110,66 +198,28 @@ class ArchitectureAgent:
         Generate architecture proposal from discussion context.
         """
 
-        context_lower = context.lower()
-
-        # optional system introspection
         if self.system_knowledge:
             _ = self.system_knowledge.build_knowledge()
 
-        if "memory" in context_lower:
+        domain = self._detect_domain(context)
 
-            proposal = {
-                "description": "Add strategy memory persistence",
-                "files_to_create": [
-                    "runtime/memory/strategy_memory.py"
-                ],
-                "files_to_modify": [],
-                "reason": "Strategies require persistent memory."
-            }
+        module = self._generate_module_name(context)
 
-        elif "market regime" in context_lower or "regime detection" in context_lower:
+        module_path = self._build_module_path(domain, module)
 
-            proposal = {
-                "description": "Add market regime detection engine",
-                "files_to_create": [
-                    "runtime/market/regime_engine.py"
-                ],
-                "files_to_modify": [],
-                "reason": "Strategies require regime awareness."
-            }
+        files_to_create = []
 
-        elif "risk" in context_lower:
+        # avoid duplicates
+        if not self._module_exists(module_path):
+            files_to_create.append(module_path)
 
-            proposal = {
-                "description": "Add portfolio risk engine",
-                "files_to_create": [
-                    "runtime/risk/risk_engine.py"
-                ],
-                "files_to_modify": [],
-                "reason": "Risk management capability missing."
-            }
+        proposal = {
+            "description": context,
+            "files_to_create": files_to_create,
+            "files_to_modify": [],
+            "reason": "ArchitectureAgent repo-aware proposal"
+        }
 
-        elif "portfolio" in context_lower:
-
-            proposal = {
-                "description": "Add portfolio allocation engine",
-                "files_to_create": [
-                    "runtime/portfolio/portfolio_engine.py"
-                ],
-                "files_to_modify": [],
-                "reason": "Portfolio allocation capability missing."
-            }
-
-        else:
-
-            proposal = {
-                "description": "No architecture change proposed",
-                "files_to_create": [],
-                "files_to_modify": [],
-                "reason": "Context not recognized by ArchitectureAgent"
-            }
-
-        # apply guardrails
         proposal["files_to_create"] = self._filter_paths(
             proposal["files_to_create"]
         )
@@ -187,10 +237,6 @@ class ArchitectureAgent:
     # ---------------------------------------------------------
 
     def design_capability(self, capability):
-
-        """
-        Converts capability gaps into architecture blueprints.
-        """
 
         if capability == "portfolio_engine":
 
@@ -235,9 +281,9 @@ class ArchitectureAgent:
             "generated_at": datetime.now(UTC).isoformat(),
             "capability": "regime_detection",
             "modules": [
-                "runtime/market/regime_detector.py",
-                "runtime/market/regime_classifier.py",
-                "runtime/market/regime_features.py"
+                "runtime/analytics/regime_detector.py",
+                "runtime/analytics/regime_classifier.py",
+                "runtime/analytics/regime_features.py"
             ],
             "description": "Market regime detection and classification system."
         }
@@ -259,20 +305,20 @@ class ArchitectureAgent:
 
 
 # ---------------------------------------------------------
-# TEST
+# LOCAL TEST
 # ---------------------------------------------------------
 
 if __name__ == "__main__":
 
     agent = ArchitectureAgent()
 
-    blueprint = agent.design_capability("regime_detection")
+    proposal = agent.propose("add regime detection engine")
 
-    print("\nArchitecture Blueprint:\n")
+    print("\nArchitecture Proposal:\n")
 
-    print("Capability:", blueprint["capability"])
+    print("Description:", proposal["description"])
 
-    print("Modules:")
+    print("\nFiles to create:")
 
-    for m in blueprint["modules"]:
+    for m in proposal["files_to_create"]:
         print("-", m)

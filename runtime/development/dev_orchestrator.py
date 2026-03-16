@@ -4,44 +4,16 @@ SAPIANTA Development Orchestrator
 Purpose
 -------
 Coordinates the Governed Autonomous Development (GAD) pipeline.
-
-The orchestrator supports three development modes:
-
-1. Strategic Mode
-   Human provides strategic direction.
-
-2. Autonomous Mode
-   System detects capability gaps and proposes development tasks.
-
-3. Implementation Mode
-   Triggered from sapianta discuss.
-   Generates a patch proposal instead of executing code generation.
-
-Pipeline
-
-Strategic Direction / Capability Gap / Discussion Request
-        ↓
-Architecture Proposal
-        ↓
-Artifact Registry (hash)
-        ↓
-Promotion Gate
-        ↓
-Mutation Guard
-        ↓
-Mutation Validation
-        ↓
-Human Approval (if required)
-        ↓
-Code Generation
 """
 
 from datetime import datetime, UTC
+from pathlib import Path
 
 from runtime.development.mutation_validator import MutationValidator
 from runtime.development.code_generator import CodeGenerator
 from runtime.development.mutation_guard import MutationGuard
 from runtime.system.system_knowledge import SystemKnowledge
+from runtime.system.repository_context import RepositoryContextBuilder
 from runtime.development.capability_gap_detector import CapabilityGapDetector
 from runtime.system.capability_planner import CapabilityPlanner
 from runtime.development.architecture_agent import ArchitectureAgent
@@ -55,10 +27,6 @@ class DevelopmentOrchestrator:
     """
     Coordinates governed development of the SAPIANTA system.
     """
-
-    # ------------------------------------------------
-    # Immutable core protection
-    # ------------------------------------------------
 
     FORBIDDEN_PATHS = [
         "runtime/governance",
@@ -82,72 +50,42 @@ class DevelopmentOrchestrator:
 
         self.validator = MutationValidator()
         self.code_generator = CodeGenerator()
-
         self.mutation_guard = MutationGuard()
 
         self.system_knowledge = SystemKnowledge()
 
         self.gap_detector = CapabilityGapDetector()
-
         self.capability_planner = CapabilityPlanner()
+
+        self.repo_context = RepositoryContextBuilder()
 
         self.architecture_agent = ArchitectureAgent(self.system_knowledge)
 
+        # store last patch proposal
+        self.current_patch = None
+
     # ------------------------------------------------
-    # Architecture proposal
+    # Architecture proposal (repository-aware)
     # ------------------------------------------------
 
     def propose_architecture(self, strategic_direction: str):
 
-        return self.architecture_agent.propose(strategic_direction)
-
-    # ------------------------------------------------
-    # Autonomous capability proposal
-    # ------------------------------------------------
-
-    def propose_from_capability_gaps(self):
-
-        proposals = self.gap_detector.detect()
-
-        if not proposals:
-            return None
-
-        proposals = sorted(
-            proposals,
-            key=lambda p: p["capability"]
+        repo_context = self.repo_context.summarize(
+            self.ALLOWED_PATHS,
+            self.FORBIDDEN_PATHS
         )
 
-        capability = proposals[0]["capability"]
+        enriched_prompt = f"""
+SYSTEM CONTEXT
+--------------
+{repo_context}
 
-        ordered_capabilities = self.capability_planner.plan(capability)
+DEVELOPMENT REQUEST
+-------------------
+{strategic_direction}
+"""
 
-        target_capability = ordered_capabilities[-1]
-
-        blueprint = self.architecture_agent.design_capability(
-            target_capability
-        )
-
-        return {
-            "description": blueprint["description"],
-            "files_to_create": blueprint["modules"],
-            "files_to_modify": []
-        }
-
-    # ------------------------------------------------
-    # Build implementation plan
-    # ------------------------------------------------
-
-    def build_implementation_plan(self, architecture_proposal):
-
-        plan = []
-
-        for f in architecture_proposal["files_to_create"]:
-            plan.append(f)
-
-        for f in architecture_proposal["files_to_modify"]:
-            plan.append(f)
-
-        return plan
+        return self.architecture_agent.propose(enriched_prompt)
 
     # ------------------------------------------------
     # IMPLEMENT MODE
@@ -197,6 +135,8 @@ class DevelopmentOrchestrator:
             "generated_at": datetime.now(UTC).isoformat()
         }
 
+        self.current_patch = patch
+
         print("PATCH PROPOSAL")
         print("----------------")
 
@@ -211,154 +151,50 @@ class DevelopmentOrchestrator:
         return patch
 
     # ------------------------------------------------
-    # Strategic development pipeline
+    # APPLY PATCH
     # ------------------------------------------------
 
-    def run(self, strategic_direction: str):
+    def apply_patch(self):
 
-        print("\nStrategic direction received:")
-        print(strategic_direction)
+        if not self.current_patch:
 
-        print("\nGenerating architecture proposal...")
-
-        architecture = self.propose_architecture(strategic_direction)
-
-        self._execute_pipeline(architecture)
-
-    # ------------------------------------------------
-    # Autonomous development pipeline
-    # ------------------------------------------------
-
-    def run_autonomous(self):
-
-        print("\nRunning autonomous development analysis...")
-
-        state = self.system_knowledge.build_knowledge()
-        self.system_knowledge.save(state)
-
-        architecture = self.propose_from_capability_gaps()
-
-        if not architecture:
-
-            print("\nNo capability gaps detected.")
+            print("No patch proposal available.")
             return
 
-        print("\nAutonomous proposal generated:")
-        print(architecture["description"])
+        print("Applying patch...\n")
 
-        self._execute_pipeline(architecture)
+        for file_path in self.current_patch["files"]:
 
-    # ------------------------------------------------
-    # Execute pipeline
-    # ------------------------------------------------
+            path = Path(file_path)
 
-    def _execute_pipeline(self, architecture):
+            path.parent.mkdir(parents=True, exist_ok=True)
 
-        implementation_plan = self.build_implementation_plan(architecture)
-
-        if not implementation_plan:
-            print("\nNo implementation required.")
-            return
-
-        self._check_core_modification(implementation_plan)
-
-        # ------------------------------------------------
-        # Artifact Registry
-        # ------------------------------------------------
-
-        print("\nRegistering architecture artifact...")
-
-        artifact = register_artifact(
-            artifact_type="architecture_proposal",
-            domain_id="core",
-            artifact_location="runtime/development/dev_orchestrator",
-            producer="development_orchestrator",
-            metadata=architecture
-        )
-
-        print("Artifact registered:", artifact["artifact_id"])
-
-        # ------------------------------------------------
-        # Promotion Gate
-        # ------------------------------------------------
-
-        print("\nRunning Promotion Gate...")
-
-        change_level = classify_change(implementation_plan)
-
-        print("Change classification:", change_level)
-
-        approval_required = requires_approval(change_level)
-
-        # ------------------------------------------------
-        # Mutation Guard
-        # ------------------------------------------------
-
-        print("\nRunning Mutation Guard...")
-
-        self.mutation_guard.validate_patch(implementation_plan)
-
-        print("Mutation Guard passed.")
-
-        print("\nProposed file changes:")
-
-        for p in implementation_plan:
-            print("-", p)
-
-        # ------------------------------------------------
-        # Mutation validation
-        # ------------------------------------------------
-
-        print("\nRunning mutation validation...")
-
-        validation = self.validator.validate_changes(implementation_plan)
-
-        rejected = False
-
-        for r in validation:
-
-            print(r)
-
-            if r["status"] == "REJECTED":
-                rejected = True
-
-        if rejected:
-
-            print("\n❌ Mutation validation failed.")
-            print("Changes violate governance policy.")
-            return
-
-        print("\n✅ Mutation validation passed.")
-
-        # ------------------------------------------------
-        # Conditional human approval
-        # ------------------------------------------------
-
-        if approval_required:
-
-            approval = input("\nApprove implementation plan? (y/n): ")
-
-            if approval.lower() != "y":
-
-                print("\nDevelopment cancelled.")
-                return
-
-        # ------------------------------------------------
-        # Code generation
-        # ------------------------------------------------
-
-        print("\nImplementation approved.")
-
-        print("\nGenerating code...")
-
-        for file_path in architecture["files_to_create"]:
+            print("Generating module:", file_path)
 
             self.code_generator.generate_module(
                 file_path,
-                architecture["description"]
+                self.current_patch["description"]
             )
 
-        print("\n✅ Code generation completed.")
+        print("\nPatch application completed.")
+
+        self.current_patch = None
+
+    # ------------------------------------------------
+    # Build implementation plan
+    # ------------------------------------------------
+
+    def build_implementation_plan(self, architecture_proposal):
+
+        plan = []
+
+        for f in architecture_proposal["files_to_create"]:
+            plan.append(f)
+
+        for f in architecture_proposal["files_to_modify"]:
+            plan.append(f)
+
+        return plan
 
     # ------------------------------------------------
     # Core mutation protection
@@ -387,18 +223,14 @@ if __name__ == "__main__":
 
     mode = input("Mode (strategic / autonomous / implement): ")
 
-    if mode == "autonomous":
-
-        orchestrator.run_autonomous()
-
-    elif mode == "implement":
+    if mode == "implement":
 
         context = input("\nDiscussion context:\n")
 
         orchestrator.run_implementation(context)
 
-    else:
+        confirm = input("\nApply patch? (y/n): ")
 
-        strategic_direction = input("\nEnter strategic direction:\n")
+        if confirm == "y":
 
-        orchestrator.run(strategic_direction)
+            orchestrator.apply_patch()

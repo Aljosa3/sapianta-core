@@ -9,8 +9,8 @@ import json
 import os
 from datetime import datetime
 
-
-MEMORY_PATH = "runtime/memory/strategy_memory.json"
+BASE_DIR = os.path.dirname(__file__)
+MEMORY_PATH = os.path.join(BASE_DIR, "strategy_memory.json")
 
 
 class StrategyMemory:
@@ -27,8 +27,11 @@ class StrategyMemory:
 
     def load(self):
 
-        with open(MEMORY_PATH, "r") as f:
-            return json.load(f)
+        try:
+            with open(MEMORY_PATH, "r") as f:
+                return json.load(f)
+        except Exception:
+            return []
 
     # ------------------------------------------------
     # SAVE MEMORY
@@ -46,6 +49,9 @@ class StrategyMemory:
     def register(self, strategy, evaluation):
 
         memory = self.load()
+
+        if self.exists(strategy):
+            return
 
         entry = {
             "timestamp": datetime.utcnow().isoformat(),
@@ -66,8 +72,8 @@ class StrategyMemory:
         memory = self.load()
 
         for entry in memory:
-
             if entry["strategy"] == strategy:
                 return True
 
         return False
+        
