@@ -65,6 +65,22 @@ class SystemReflectionEngine:
         return report
 
     # ---------------------------------------------------------
+    # PUBLIC API (for planners / orchestrators)
+    # ---------------------------------------------------------
+
+    def analyze(self):
+        """
+        Standard public API for programmatic system analysis.
+
+        Used by:
+        - ImprovementPlanner
+        - Autonomous Dev Orchestrator
+        - Monitoring / dashboards
+        """
+
+        return self.analyze_system()
+
+    # ---------------------------------------------------------
     # HEALTH SCORE
     # ---------------------------------------------------------
 
