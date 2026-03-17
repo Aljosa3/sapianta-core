@@ -3,6 +3,8 @@ import uuid
 
 from runtime.discussion.discussion_engine import DiscussionEngine
 from runtime.development.dev_orchestrator import DevelopmentOrchestrator
+from runtime.development.idea_detector import detect_idea
+from . import dev_add_task
 
 
 class IdeaParser:
@@ -131,3 +133,14 @@ def run(args):
         response = engine.ask(user_input)
 
         print("\nSAPIANTA:", response)
+
+        # --- AUTO IDEA DETECTION ---
+        if detect_idea(user_input):
+
+            print("\n[AI] Development idea detected.")
+
+            args = [user_input]
+
+            dev_add_task.run(args)
+
+            print("[AI] Task automatically added to registry.")
