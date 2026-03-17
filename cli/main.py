@@ -16,6 +16,7 @@ from .commands.dev_list import run as dev_list_run
 from .commands.dev_run_auto import run as dev_run_auto
 from .commands.dev_metrics import run as dev_metrics_run
 from .commands.dev_history import run as dev_history_run
+from .commands.dev_learn import run as dev_learn_run
 from .commands.discuss import run as discuss_run
 from .commands import dev_add_task
 
@@ -58,6 +59,9 @@ def main() -> None:
 
     elif command == "dev-history":
         dev_history_run()
+
+    elif command == "dev-learn":
+        dev_learn_run()
 
     elif command == "discuss":
         discuss_run(args)
