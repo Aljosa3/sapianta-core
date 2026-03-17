@@ -11,6 +11,7 @@ from .commands.doctor import run as doctor_run
 from .commands.version import run as version_run
 from .commands.dev_status import run as dev_status_run
 from .commands.dev_run import run as dev_run
+from .commands.dev_loop import run as dev_loop
 
 
 def main() -> None:
@@ -32,6 +33,9 @@ def main() -> None:
 
     elif command == "dev-run":
         dev_run()
+
+    elif command == "dev-loop":
+        dev_loop()
 
     else:
         print("Unknown command")
