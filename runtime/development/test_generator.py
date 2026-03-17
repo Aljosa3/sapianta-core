@@ -41,22 +41,28 @@ class TestGenerator:
     # GENERATE TEST FILE CONTENT
     # ---------------------------------------------------------
 
-    def generate_test_content(self, module_name):
+    def generate_test_content(self, module_path):
 
-        module_name = module_name.split(".")[-1]
+        # remove module prefix if present
+        if module_path.startswith("module:"):
+            module_path = module_path.replace("module:", "")
+
+        safe_name = module_path.replace(".", "_")
 
         content = f"""
-import pytest
-
-# TODO: update import path
-import {module_name}
+import importlib
 
 
-def test_import_{module_name}():
-    assert {module_name} is not None
+def test_import_{safe_name}():
+
+    module_path = "{module_path}"
+
+    module = importlib.import_module(module_path)
+
+    assert module is not None
 
 
-def test_placeholder_{module_name}():
+def test_placeholder_{safe_name}():
     # TODO: implement real test
     assert True
 """
@@ -71,14 +77,10 @@ def test_placeholder_{module_name}():
 
         module_path = str(module_path)
 
-        # remove "module:" prefix
         if module_path.startswith("module:"):
             module_path = module_path.replace("module:", "")
 
-        module_name = module_path
-
-        # convert module path to filename
-        safe_name = module_name.replace(".", "_")
+        safe_name = module_path.replace(".", "_")
 
         test_file_name = f"test_{safe_name}.py"
 
@@ -87,7 +89,7 @@ def test_placeholder_{module_name}():
 
         test_path = tests_dir / test_file_name
 
-        content = self.generate_test_content(module_name)
+        content = self.generate_test_content(module_path)
 
         with open(test_path, "w") as f:
             f.write(content)
