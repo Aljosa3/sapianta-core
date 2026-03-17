@@ -10,6 +10,7 @@ from runtime.development.dev_task_registry_hash_index import DevTaskRegistryHash
 from runtime.development.dev_task_planner import DevTaskPlanner
 from runtime.development.dev_governance_gate import DevGovernanceGate
 from runtime.development.dev_sandbox_runner import DevSandboxRunner
+from runtime.development.dev_memory import DevMemory
 
 
 class DevAutonomousLoop:
@@ -24,6 +25,7 @@ class DevAutonomousLoop:
         self.planner = DevTaskPlanner()
         self.gate = DevGovernanceGate()
         self.sandbox = DevSandboxRunner()
+        self.memory = DevMemory()
 
     def submit_task(self, task: dict) -> str:
         """
@@ -57,6 +59,7 @@ class DevAutonomousLoop:
         if decision == DevGovernanceGate.BLOCK:
 
             self.registry.reject_task(task)
+            self.memory.record_blocked(task)
 
             return {
                 "status": "blocked",
@@ -81,11 +84,14 @@ print("development sandbox test")
         if result["status"] == "success":
 
             self.registry.complete_task(task)
+            self.memory.record_completed(task)
 
             return {
                 "status": "completed",
                 "task": task
             }
+
+        self.memory.record_failed(task)
 
         return {
             "status": "failed",
