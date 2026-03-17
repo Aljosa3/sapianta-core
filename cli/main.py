@@ -12,6 +12,7 @@ from .commands.version import run as version_run
 from .commands.dev_status import run as dev_status_run
 from .commands.dev_run import run as dev_run
 from .commands.dev_loop import run as dev_loop
+from .commands.dev_list import run as dev_list_run
 from .commands import dev_add_task
 
 
@@ -41,6 +42,9 @@ def main() -> None:
 
     elif command == "dev-add-task":
         dev_add_task.run(args)
+
+    elif command == "dev-list":
+        dev_list_run()
 
     else:
         print("Unknown command")
