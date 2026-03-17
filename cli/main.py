@@ -9,6 +9,7 @@ import sys
 
 from .commands.doctor import run as doctor_run
 from .commands.version import run as version_run
+from .commands.dev_status import run as dev_status_run
 
 
 def main() -> None:
@@ -21,11 +22,17 @@ def main() -> None:
 
     if command == "doctor":
         doctor_run()
+
     elif command == "version":
         version_run()
+
+    elif command == "dev-status":
+        dev_status_run()
+
     else:
         print("Unknown command")
 
 
 if __name__ == "__main__":
     main()
+    
