@@ -3,7 +3,7 @@ from runtime.development.dev_task_registry import DevTaskRegistry
 
 def test_registry_task_lifecycle():
 
-    registry = DevTaskRegistry()
+    registry = DevTaskRegistry(reset=True)
 
     task = {
         "task_type": "implementation",
