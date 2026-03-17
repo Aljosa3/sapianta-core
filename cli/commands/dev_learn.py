@@ -1,3 +1,9 @@
+"""
+SAPIANTA Development Learning
+
+Analyzes development history and suggests optimal development strategy.
+"""
+
 import json
 from pathlib import Path
 
@@ -18,10 +24,10 @@ def run():
     else:
         metrics = {}
 
-    tasks_processed = metrics.get("tasks_processed", 0)
-    completed = metrics.get("completed", 0)
-    failed = metrics.get("failed", 0)
-    blocked = metrics.get("blocked", 0)
+    tasks_processed = metrics.get("tasks_processed", metrics.get("processed", 0))
+    completed = metrics.get("tasks_completed", metrics.get("completed", 0))
+    failed = metrics.get("tasks_failed", metrics.get("failed", 0))
+    blocked = metrics.get("tasks_blocked", metrics.get("blocked", 0))
 
     print("\nMETRICS")
     print(f"Tasks processed: {tasks_processed}")
@@ -30,8 +36,8 @@ def run():
     print(f"Blocked: {blocked}")
 
     if tasks_processed:
-        success_rate = completed / tasks_processed * 100
-        print(f"Success rate: {success_rate:.2f}%")
+        success_rate = completed / tasks_processed
+        print(f"Success rate: {success_rate:.2%}")
     else:
         success_rate = 0
         print("Success rate: n/a")
@@ -65,20 +71,78 @@ def run():
 
     print("\nRejected implementations:", len(rejected_tasks))
 
-    # --- Simple insight ---
+    # --- Insight ---
     print("\nINSIGHT")
 
-    if success_rate < 5:
-        print(
+    if success_rate < 0.05:
+        insight = (
             "Implementation success rate is very low. "
             "Manual development with AI assistance recommended."
         )
-    elif success_rate < 30:
-        print(
+    elif success_rate < 0.30:
+        insight = (
             "System is partially stable. "
             "Hybrid development (human + discuss) recommended."
         )
     else:
-        print(
+        insight = (
             "System stable enough for discuss-driven development."
         )
+
+    print(insight)
+
+    # --- Strategy suggestion ---
+    print("\nSTRATEGY SUGGESTION")
+
+    if success_rate > 0.8:
+
+        strategy = "DISCUSS_DRIVEN"
+
+        print("\nRecommended development strategy:")
+        print("DISCUSS_DRIVEN")
+
+        print("\nReason:")
+        print("High success rate indicates discuss-driven development is stable.")
+
+    elif success_rate > 0.5:
+
+        strategy = "HYBRID"
+
+        print("\nRecommended development strategy:")
+        print("HYBRID (discuss + manual CLI)")
+
+        print("\nReason:")
+        print(
+            "Moderate success rate suggests combining automated "
+            "and manual development."
+        )
+
+    else:
+
+        strategy = "MANUAL"
+
+        print("\nRecommended development strategy:")
+        print("MANUAL AI-assisted development")
+
+        print("\nReason:")
+        print("Low success rate indicates manual development is safer.")
+
+    # --- Next action ---
+    print("\nNEXT ACTION")
+
+    if strategy == "DISCUSS_DRIVEN":
+
+        print("\nYou can safely use:")
+        print("sapianta discuss")
+        print("followed by:")
+        print("sapianta dev-run-auto")
+
+    elif strategy == "HYBRID":
+
+        print("\nRecommended workflow:")
+        print("discuss → dev-add-task → dev-run")
+
+    else:
+
+        print("\nRecommended workflow:")
+        print("manual coding with AI assistance")
