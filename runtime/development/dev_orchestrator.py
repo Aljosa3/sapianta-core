@@ -22,9 +22,10 @@ from runtime.governance.promotion_gate import classify_change, requires_approval
 from runtime.artifacts.artifact_registry import register_artifact
 
 from runtime.development.artifact_outcome_tracker import ArtifactOutcomeTracker
+from runtime.development.artifact_evaluator import ArtifactEvaluator
 
 # ✅ NEW IMPORT
-from runtime.development.artifact_evaluator import ArtifactEvaluator
+from runtime.development.strategy_selector import StrategySelector
 
 
 class DevelopmentOrchestrator:
@@ -69,8 +70,11 @@ class DevelopmentOrchestrator:
         # tracking
         self.outcome_tracker = ArtifactOutcomeTracker()
 
-        # ✅ NEW: evaluator (stateless → safe)
+        # evaluation
         self.evaluator = ArtifactEvaluator()
+
+        # ✅ NEW: strategy selector
+        self.strategy_selector = StrategySelector()
 
         # store last patch proposal
         self.current_patch = None
@@ -171,7 +175,7 @@ DEVELOPMENT REQUEST
         return patch
 
     # ------------------------------------------------
-    # AUTO IMPLEMENTATION (WITH EVALUATION)
+    # AUTO IMPLEMENTATION (WITH EVALUATION + STRATEGY)
     # ------------------------------------------------
 
     def run_auto(self, discussion_context=None):
@@ -225,8 +229,14 @@ DEVELOPMENT REQUEST
                 "generated_at": datetime.now(UTC).isoformat()
             }
 
-            # ✅ NEW: evaluation
+            # evaluation
             evaluation = self.evaluator.evaluate(artifact)
+
+            # ✅ NEW: strategy selection
+            strategy = self.strategy_selector.select(evaluation)
+
+            print(f"\nEvaluation score: {evaluation['score']}")
+            print(f"Selected strategy: {strategy}")
 
             # register artifact
             artifact_id = register_artifact(
@@ -239,7 +249,8 @@ DEVELOPMENT REQUEST
                     "mode": "auto",
                     "files": implementation_plan,
                     "timestamp": artifact["generated_at"],
-                    "evaluation": evaluation  # ✅ NEW
+                    "evaluation": evaluation,
+                    "strategy": strategy  # ✅ NEW
                 }
             )
 
@@ -249,7 +260,6 @@ DEVELOPMENT REQUEST
                 status="success"
             )
 
-            print(f"\nEvaluation score: {evaluation['score']}")
             print("AUTO IMPLEMENTATION COMPLETED")
 
             return artifact
