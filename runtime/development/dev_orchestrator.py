@@ -21,6 +21,9 @@ from runtime.development.architecture_agent import ArchitectureAgent
 from runtime.governance.promotion_gate import classify_change, requires_approval
 from runtime.artifacts.artifact_registry import register_artifact
 
+# ✅ NEW IMPORT (minimal, isolated)
+from runtime.development.artifact_outcome_tracker import ArtifactOutcomeTracker
+
 
 class DevelopmentOrchestrator:
 
@@ -61,6 +64,9 @@ class DevelopmentOrchestrator:
 
         self.architecture_agent = ArchitectureAgent(self.system_knowledge)
 
+        # ✅ NEW: outcome tracker (deterministic, local)
+        self.outcome_tracker = ArtifactOutcomeTracker()
+
         # store last patch proposal
         self.current_patch = None
 
@@ -97,10 +103,6 @@ DEVELOPMENT REQUEST
         print("\nAnalyzing discussion context...")
 
         architecture = self.propose_architecture(discussion_context)
-
-        # ----------------------------------------
-        # FALLBACK: minimal viable architecture
-        # ----------------------------------------
 
         if not architecture["files_to_create"] and not architecture["files_to_modify"]:
 
@@ -164,7 +166,7 @@ DEVELOPMENT REQUEST
         return patch
 
     # ------------------------------------------------
-    # AUTO IMPLEMENTATION (FIXED)
+    # AUTO IMPLEMENTATION (UPDATED WITH TRACKING)
     # ------------------------------------------------
 
     def run_auto(self, discussion_context=None):
@@ -175,67 +177,86 @@ DEVELOPMENT REQUEST
             print("No discussion context provided. Using generic task.")
             discussion_context = "Implement generic system improvement"
 
-        architecture = self.propose_architecture(discussion_context)
+        artifact_id = None
 
-        if not architecture["files_to_create"] and not architecture["files_to_modify"]:
+        try:
 
-            print("⚠️ No implementation proposal generated.")
-            print("➡️ Falling back to IMPLEMENT MODE...\n")
+            architecture = self.propose_architecture(discussion_context)
 
-            try:
+            if not architecture["files_to_create"] and not architecture["files_to_modify"]:
+
+                print("⚠️ No implementation proposal generated.")
+                print("➡️ Falling back to IMPLEMENT MODE...\n")
+
                 return self.run_implementation(discussion_context)
-            except Exception as e:
-                print(f"[ERROR] Fallback implementation failed: {e}")
-                return None
 
-        implementation_plan = self.build_implementation_plan(architecture)
+            implementation_plan = self.build_implementation_plan(architecture)
 
-        self._check_core_modification(implementation_plan)
+            self._check_core_modification(implementation_plan)
 
-        print("Running Mutation Guard...")
+            print("Running Mutation Guard...")
 
-        self.mutation_guard.validate_patch(implementation_plan)
+            self.mutation_guard.validate_patch(implementation_plan)
 
-        print("Mutation Guard passed.")
+            print("Mutation Guard passed.")
 
-        print("\nGenerating modules...\n")
+            print("\nGenerating modules...\n")
 
-        for file_path in implementation_plan:
+            for file_path in implementation_plan:
 
-            path = Path(file_path)
+                path = Path(file_path)
+                path.parent.mkdir(parents=True, exist_ok=True)
 
-            path.parent.mkdir(parents=True, exist_ok=True)
+                print("Generating module:", file_path)
 
-            print("Generating module:", file_path)
+                self.code_generator.generate_module(
+                    file_path,
+                    architecture["description"]
+                )
 
-            self.code_generator.generate_module(
-                file_path,
-                architecture["description"]
+            artifact = {
+                "description": architecture["description"],
+                "files": implementation_plan,
+                "generated_at": datetime.now(UTC).isoformat()
+            }
+
+            # register artifact
+            artifact_id = register_artifact(
+                artifact_type="auto_development_patch",
+                domain_id="development",
+                artifact_location="runtime/development",
+                producer="DevelopmentOrchestrator",
+                metadata={
+                    "artifact": artifact,
+                    "mode": "auto",
+                    "files": implementation_plan,
+                    "timestamp": artifact["generated_at"]
+                }
             )
 
-        artifact = {
-            "description": architecture["description"],
-            "files": implementation_plan,
-            "generated_at": datetime.now(UTC).isoformat()
-        }
+            # ✅ SUCCESS TRACKING
+            self.outcome_tracker.record_outcome(
+                artifact_id=artifact_id,
+                status="success"
+            )
 
-        # ✅ FIXED CALL (SAPIANTA-compliant)
-        register_artifact(
-            artifact_type="auto_development_patch",
-            domain_id="development",
-            artifact_location="runtime/development",
-            producer="DevelopmentOrchestrator",
-            metadata={
-                "artifact": artifact,
-                "mode": "auto",
-                "files": implementation_plan,
-                "timestamp": artifact["generated_at"]
-            }
-        )
+            print("\nAUTO IMPLEMENTATION COMPLETED")
 
-        print("\nAUTO IMPLEMENTATION COMPLETED")
+            return artifact
 
-        return artifact
+        except Exception as e:
+
+            print(f"\n[ERROR] AUTO DEVELOPMENT FAILED: {e}")
+
+            # ✅ FAILURE TRACKING (fail-closed compliant)
+            if artifact_id:
+                self.outcome_tracker.record_outcome(
+                    artifact_id=artifact_id,
+                    status="failed",
+                    error=str(e)
+                )
+
+            return None
 
     # ------------------------------------------------
     # APPLY PATCH

@@ -6,7 +6,6 @@ Telemetry module for monitoring the autonomous development system.
 
 import json
 import os
-import time
 
 
 METRICS_FILE = os.path.join(
@@ -24,6 +23,13 @@ class DevMetrics:
         with open(METRICS_FILE, "r") as f:
             self.data = json.load(f)
 
+        # ✅ NEW: deterministic schema reconciliation
+        self._ensure_schema()
+
+    # ------------------------------------------------
+    # Ensure file exists
+    # ------------------------------------------------
+
     def _ensure_file(self):
 
         if not os.path.exists(METRICS_FILE):
@@ -39,32 +45,78 @@ class DevMetrics:
             with open(METRICS_FILE, "w") as f:
                 json.dump(data, f, indent=2)
 
+    # ------------------------------------------------
+    # Ensure schema (FIX)
+    # ------------------------------------------------
+
+    def _ensure_schema(self):
+        """
+        Ensures all required keys exist (deterministic migration).
+        """
+
+        defaults = {
+            "tasks_processed": 0,
+            "tasks_completed": 0,
+            "tasks_failed": 0,
+            "tasks_blocked": 0,
+            "total_execution_time": 0.0
+        }
+
+        updated = False
+
+        for key, value in defaults.items():
+            if key not in self.data:
+                self.data[key] = value
+                updated = True
+
+        if updated:
+            self._persist()
+
+    # ------------------------------------------------
+    # Persist
+    # ------------------------------------------------
+
     def _persist(self):
 
         with open(METRICS_FILE, "w") as f:
             json.dump(self.data, f, indent=2)
 
+    # ------------------------------------------------
+    # Record cycle
+    # ------------------------------------------------
+
     def record_cycle(self, status: str, execution_time: float):
+
+        # ✅ SAFE access (deterministic)
+        self.data.setdefault("tasks_processed", 0)
+        self.data.setdefault("total_execution_time", 0.0)
 
         self.data["tasks_processed"] += 1
         self.data["total_execution_time"] += execution_time
 
         if status == "completed":
+            self.data.setdefault("tasks_completed", 0)
             self.data["tasks_completed"] += 1
 
         elif status == "failed":
+            self.data.setdefault("tasks_failed", 0)
             self.data["tasks_failed"] += 1
 
         elif status == "blocked":
+            self.data.setdefault("tasks_blocked", 0)
             self.data["tasks_blocked"] += 1
 
         self._persist()
+
+    # ------------------------------------------------
+    # Get metrics
+    # ------------------------------------------------
 
     def get_metrics(self):
 
         data = dict(self.data)
 
-        # Backward compatibility with reconcile-generated metrics
+        # Backward compatibility
         processed = data.get("tasks_processed", data.get("processed", 0))
 
         completed = data.get("tasks_completed", data.get("completed", 0))
