@@ -215,18 +215,29 @@ DEVELOPMENT REQUEST
                 )
 
             # ------------------------------------------------
-            # TEST + AUTO-FIX LOOP (SAFE)
+            # TEST + AUTO-FIX LOOP (max 2 retries)
             # ------------------------------------------------
 
             if not is_running_under_pytest():
 
-                print("\nRunning test suite...")
+                MAX_RETRIES = 2
+                attempt = 0
 
-                test_result = self.test_runner.run_tests()
+                while attempt <= MAX_RETRIES:
 
-                print("Test success:", test_result.success)
+                    print(f"\nRunning test suite (attempt {attempt + 1})...")
 
-                if not test_result.success:
+                    test_result = self.test_runner.run_tests()
+
+                    print("Test success:", test_result.success)
+
+                    if test_result.success:
+                        print("All tests passed.")
+                        break
+
+                    if attempt == MAX_RETRIES:
+                        print("Max retries reached. Manual intervention required.")
+                        break
 
                     print("\nTests failed → attempting auto-fix...")
 
@@ -237,6 +248,10 @@ DEVELOPMENT REQUEST
                     })
 
                     print("Fix result:", fix)
+
+                    # ⚠️ trenutno NE izvajamo patcha (governance-safe)
+
+                    attempt += 1
 
             # ------------------------------------------------
             # ARTIFACT + EVALUATION
