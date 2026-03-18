@@ -152,3 +152,6 @@ tests/**/*.pyc
 *.pyc
 *.pyo
 
+runtime/development/*.json
+runtime/history/*.jsonl
+runtime/development/generated/
