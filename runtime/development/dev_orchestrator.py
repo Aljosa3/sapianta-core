@@ -175,6 +175,35 @@ DEVELOPMENT REQUEST
         return patch
 
     # ------------------------------------------------
+    # APPLY FIX
+    # ------------------------------------------------
+
+    def apply_fix(self, fix, implementation_plan):
+        """
+        Governance-safe placeholder:
+        logs fix attempts without mutating source files.
+        """
+
+        if not fix:
+            return False
+
+        try:
+            log_path = Path("runtime/development/logs/auto_fix.log")
+            log_path.parent.mkdir(parents=True, exist_ok=True)
+
+            with open(log_path, "a", encoding="utf-8") as f:
+                f.write("\n--- AUTO FIX ATTEMPT ---\n")
+                f.write(f"Fix: {fix}\n")
+                f.write(f"Files: {implementation_plan}\n")
+
+            print("Auto-fix logged (no patch applied).")
+            return True
+
+        except Exception as e:
+            print(f"[ERROR] apply_fix failed: {e}")
+            return False
+
+    # ------------------------------------------------
     # AUTO IMPLEMENTATION
     # ------------------------------------------------
 
@@ -208,6 +237,8 @@ DEVELOPMENT REQUEST
 
                 path = Path(file_path)
                 path.parent.mkdir(parents=True, exist_ok=True)
+
+                print("Generating module:", file_path)
 
                 self.code_generator.generate_module(
                     file_path,
@@ -249,7 +280,19 @@ DEVELOPMENT REQUEST
 
                     print("Fix result:", fix)
 
-                    # ⚠️ trenutno NE izvajamo patcha (governance-safe)
+                    applied = self.apply_fix(fix, implementation_plan)
+
+                    print("Fix applied:", applied)
+
+                    print("\nRe-running tests after fix...")
+
+                    test_result = self.test_runner.run_tests()
+
+                    print("Post-fix success:", test_result.success)
+
+                    if test_result.success:
+                        print("Fix successful.")
+                        break
 
                     attempt += 1
 
