@@ -8,6 +8,7 @@ Coordinates the Governed Autonomous Development (GAD) pipeline.
 
 from datetime import datetime, UTC
 from pathlib import Path
+import os
 
 from runtime.development.mutation_validator import MutationValidator
 from runtime.development.code_generator import CodeGenerator
@@ -23,9 +24,18 @@ from runtime.artifacts.artifact_registry import register_artifact
 
 from runtime.development.artifact_outcome_tracker import ArtifactOutcomeTracker
 from runtime.development.artifact_evaluator import ArtifactEvaluator
-
-# ✅ NEW IMPORT
 from runtime.development.strategy_selector import StrategySelector
+
+from runtime.development.test_runner import TestRunner
+from runtime.development.auto_fix_engine import AutoFixEngine
+
+
+# ------------------------------------------------
+# EXECUTION CONTEXT DETECTOR
+# ------------------------------------------------
+
+def is_running_under_pytest():
+    return "PYTEST_CURRENT_TEST" in os.environ
 
 
 class DevelopmentOrchestrator:
@@ -73,14 +83,17 @@ class DevelopmentOrchestrator:
         # evaluation
         self.evaluator = ArtifactEvaluator()
 
-        # ✅ NEW: strategy selector
+        # strategy
         self.strategy_selector = StrategySelector()
 
-        # store last patch proposal
+        # testing + auto-fix
+        self.test_runner = TestRunner()
+        self.auto_fix_engine = AutoFixEngine()
+
         self.current_patch = None
 
     # ------------------------------------------------
-    # Architecture proposal (repository-aware)
+    # Architecture proposal
     # ------------------------------------------------
 
     def propose_architecture(self, strategic_direction: str):
@@ -151,8 +164,6 @@ DEVELOPMENT REQUEST
 
         print("Mutation Guard passed.")
 
-        print("\nGenerating PATCH PROPOSAL...\n")
-
         patch = {
             "description": architecture["description"],
             "files": implementation_plan,
@@ -161,21 +172,10 @@ DEVELOPMENT REQUEST
 
         self.current_patch = patch
 
-        print("PATCH PROPOSAL")
-        print("----------------")
-
-        print("\nDescription:")
-        print(patch["description"])
-
-        print("\nAffected files:")
-
-        for f in patch["files"]:
-            print("-", f)
-
         return patch
 
     # ------------------------------------------------
-    # AUTO IMPLEMENTATION (WITH EVALUATION + STRATEGY)
+    # AUTO IMPLEMENTATION
     # ------------------------------------------------
 
     def run_auto(self, discussion_context=None):
@@ -183,7 +183,6 @@ DEVELOPMENT REQUEST
         print("\nAUTO DEVELOPMENT MODE")
 
         if not discussion_context:
-            print("No discussion context provided. Using generic task.")
             discussion_context = "Implement generic system improvement"
 
         artifact_id = None
@@ -193,10 +192,6 @@ DEVELOPMENT REQUEST
             architecture = self.propose_architecture(discussion_context)
 
             if not architecture["files_to_create"] and not architecture["files_to_modify"]:
-
-                print("⚠️ No implementation proposal generated.")
-                print("➡️ Falling back to IMPLEMENT MODE...\n")
-
                 return self.run_implementation(discussion_context)
 
             implementation_plan = self.build_implementation_plan(architecture)
@@ -204,9 +199,7 @@ DEVELOPMENT REQUEST
             self._check_core_modification(implementation_plan)
 
             print("Running Mutation Guard...")
-
             self.mutation_guard.validate_patch(implementation_plan)
-
             print("Mutation Guard passed.")
 
             print("\nGenerating modules...\n")
@@ -216,12 +209,38 @@ DEVELOPMENT REQUEST
                 path = Path(file_path)
                 path.parent.mkdir(parents=True, exist_ok=True)
 
-                print("Generating module:", file_path)
-
                 self.code_generator.generate_module(
                     file_path,
                     architecture["description"]
                 )
+
+            # ------------------------------------------------
+            # TEST + AUTO-FIX LOOP (SAFE)
+            # ------------------------------------------------
+
+            if not is_running_under_pytest():
+
+                print("\nRunning test suite...")
+
+                test_result = self.test_runner.run_tests()
+
+                print("Test success:", test_result.success)
+
+                if not test_result.success:
+
+                    print("\nTests failed → attempting auto-fix...")
+
+                    fix = self.auto_fix_engine.attempt_fix({
+                        "success": test_result.success,
+                        "error": test_result.raw_error,
+                        "output": test_result.raw_output
+                    })
+
+                    print("Fix result:", fix)
+
+            # ------------------------------------------------
+            # ARTIFACT + EVALUATION
+            # ------------------------------------------------
 
             artifact = {
                 "description": architecture["description"],
@@ -229,16 +248,9 @@ DEVELOPMENT REQUEST
                 "generated_at": datetime.now(UTC).isoformat()
             }
 
-            # evaluation
             evaluation = self.evaluator.evaluate(artifact)
-
-            # ✅ NEW: strategy selection
             strategy = self.strategy_selector.select(evaluation)
 
-            print(f"\nEvaluation score: {evaluation['score']}")
-            print(f"Selected strategy: {strategy}")
-
-            # register artifact
             artifact_id = register_artifact(
                 artifact_type="auto_development_patch",
                 domain_id="development",
@@ -250,11 +262,10 @@ DEVELOPMENT REQUEST
                     "files": implementation_plan,
                     "timestamp": artifact["generated_at"],
                     "evaluation": evaluation,
-                    "strategy": strategy  # ✅ NEW
+                    "strategy": strategy
                 }
             )
 
-            # success tracking
             self.outcome_tracker.record_outcome(
                 artifact_id=artifact_id,
                 status="success"
@@ -284,25 +295,17 @@ DEVELOPMENT REQUEST
     def apply_patch(self):
 
         if not self.current_patch:
-            print("No patch proposal available.")
             return
-
-        print("Applying patch...\n")
 
         for file_path in self.current_patch["files"]:
 
             path = Path(file_path)
-
             path.parent.mkdir(parents=True, exist_ok=True)
-
-            print("Generating module:", file_path)
 
             self.code_generator.generate_module(
                 file_path,
                 self.current_patch["description"]
             )
-
-        print("\nPatch application completed.")
 
         self.current_patch = None
 
@@ -312,15 +315,10 @@ DEVELOPMENT REQUEST
 
     def build_implementation_plan(self, architecture_proposal):
 
-        plan = []
-
-        for f in architecture_proposal["files_to_create"]:
-            plan.append(f)
-
-        for f in architecture_proposal["files_to_modify"]:
-            plan.append(f)
-
-        return plan
+        return (
+            architecture_proposal["files_to_create"] +
+            architecture_proposal["files_to_modify"]
+        )
 
     # ------------------------------------------------
     # Core mutation protection
