@@ -219,12 +219,14 @@ DEVELOPMENT REQUEST
             "generated_at": datetime.now(UTC).isoformat()
         }
 
+        # ✅ FIXED CALL (SAPIANTA-compliant)
         register_artifact(
             artifact_type="auto_development_patch",
-            artifact=artifact,
+            domain_id="development",
             artifact_location="runtime/development",
             producer="DevelopmentOrchestrator",
             metadata={
+                "artifact": artifact,
                 "mode": "auto",
                 "files": implementation_plan,
                 "timestamp": artifact["generated_at"]
