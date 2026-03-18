@@ -98,9 +98,23 @@ DEVELOPMENT REQUEST
 
         architecture = self.propose_architecture(discussion_context)
 
+        # ----------------------------------------
+        # FALLBACK: minimal viable architecture
+        # ----------------------------------------
+
         if not architecture["files_to_create"] and not architecture["files_to_modify"]:
-            print("\nNo implementation proposal generated.")
-            return None
+
+            print("\n⚠️ No architecture proposal generated.")
+            print("➡️ Activating fallback architecture generator...\n")
+
+            safe_name = discussion_context.lower().replace(" ", "_")[:40]
+            fallback_file = f"runtime/development/generated/{safe_name}.py"
+
+            architecture = {
+                "description": f"Auto-generated fallback for: {discussion_context}",
+                "files_to_create": [fallback_file],
+                "files_to_modify": []
+            }
 
         implementation_plan = self.build_implementation_plan(architecture)
 
@@ -117,7 +131,6 @@ DEVELOPMENT REQUEST
             approval = input("\nApprove implementation plan? (y/n): ")
 
             if approval.lower() != "y":
-
                 print("\nDevelopment cancelled.")
                 return None
 
@@ -151,13 +164,84 @@ DEVELOPMENT REQUEST
         return patch
 
     # ------------------------------------------------
+    # AUTO IMPLEMENTATION (FIXED)
+    # ------------------------------------------------
+
+    def run_auto(self, discussion_context=None):
+
+        print("\nAUTO DEVELOPMENT MODE")
+
+        if not discussion_context:
+            print("No discussion context provided. Using generic task.")
+            discussion_context = "Implement generic system improvement"
+
+        architecture = self.propose_architecture(discussion_context)
+
+        if not architecture["files_to_create"] and not architecture["files_to_modify"]:
+
+            print("⚠️ No implementation proposal generated.")
+            print("➡️ Falling back to IMPLEMENT MODE...\n")
+
+            try:
+                return self.run_implementation(discussion_context)
+            except Exception as e:
+                print(f"[ERROR] Fallback implementation failed: {e}")
+                return None
+
+        implementation_plan = self.build_implementation_plan(architecture)
+
+        self._check_core_modification(implementation_plan)
+
+        print("Running Mutation Guard...")
+
+        self.mutation_guard.validate_patch(implementation_plan)
+
+        print("Mutation Guard passed.")
+
+        print("\nGenerating modules...\n")
+
+        for file_path in implementation_plan:
+
+            path = Path(file_path)
+
+            path.parent.mkdir(parents=True, exist_ok=True)
+
+            print("Generating module:", file_path)
+
+            self.code_generator.generate_module(
+                file_path,
+                architecture["description"]
+            )
+
+        artifact = {
+            "description": architecture["description"],
+            "files": implementation_plan,
+            "generated_at": datetime.now(UTC).isoformat()
+        }
+
+        register_artifact(
+            artifact_type="auto_development_patch",
+            artifact=artifact,
+            artifact_location="runtime/development",
+            producer="DevelopmentOrchestrator",
+            metadata={
+                "mode": "auto",
+                "files": implementation_plan,
+                "timestamp": artifact["generated_at"]
+            }
+        )
+
+        print("\nAUTO IMPLEMENTATION COMPLETED")
+
+        return artifact
+
+    # ------------------------------------------------
     # APPLY PATCH
     # ------------------------------------------------
 
     def apply_patch(self):
 
         if not self.current_patch:
-
             print("No patch proposal available.")
             return
 
@@ -207,30 +291,6 @@ DEVELOPMENT REQUEST
             for forbidden in self.FORBIDDEN_PATHS:
 
                 if path.startswith(forbidden):
-
                     raise Exception(
                         f"Mutation forbidden: {path} is immutable core."
                     )
-
-
-# ------------------------------------------------
-# Manual test
-# ------------------------------------------------
-
-if __name__ == "__main__":
-
-    orchestrator = DevelopmentOrchestrator()
-
-    mode = input("Mode (strategic / autonomous / implement): ")
-
-    if mode == "implement":
-
-        context = input("\nDiscussion context:\n")
-
-        orchestrator.run_implementation(context)
-
-        confirm = input("\nApply patch? (y/n): ")
-
-        if confirm == "y":
-
-            orchestrator.apply_patch()
