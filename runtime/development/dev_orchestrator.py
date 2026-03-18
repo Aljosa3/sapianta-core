@@ -21,8 +21,10 @@ from runtime.development.architecture_agent import ArchitectureAgent
 from runtime.governance.promotion_gate import classify_change, requires_approval
 from runtime.artifacts.artifact_registry import register_artifact
 
-# ✅ NEW IMPORT (minimal, isolated)
 from runtime.development.artifact_outcome_tracker import ArtifactOutcomeTracker
+
+# ✅ NEW IMPORT
+from runtime.development.artifact_evaluator import ArtifactEvaluator
 
 
 class DevelopmentOrchestrator:
@@ -64,8 +66,11 @@ class DevelopmentOrchestrator:
 
         self.architecture_agent = ArchitectureAgent(self.system_knowledge)
 
-        # ✅ NEW: outcome tracker (deterministic, local)
+        # tracking
         self.outcome_tracker = ArtifactOutcomeTracker()
+
+        # ✅ NEW: evaluator (stateless → safe)
+        self.evaluator = ArtifactEvaluator()
 
         # store last patch proposal
         self.current_patch = None
@@ -166,7 +171,7 @@ DEVELOPMENT REQUEST
         return patch
 
     # ------------------------------------------------
-    # AUTO IMPLEMENTATION (UPDATED WITH TRACKING)
+    # AUTO IMPLEMENTATION (WITH EVALUATION)
     # ------------------------------------------------
 
     def run_auto(self, discussion_context=None):
@@ -220,6 +225,9 @@ DEVELOPMENT REQUEST
                 "generated_at": datetime.now(UTC).isoformat()
             }
 
+            # ✅ NEW: evaluation
+            evaluation = self.evaluator.evaluate(artifact)
+
             # register artifact
             artifact_id = register_artifact(
                 artifact_type="auto_development_patch",
@@ -230,17 +238,19 @@ DEVELOPMENT REQUEST
                     "artifact": artifact,
                     "mode": "auto",
                     "files": implementation_plan,
-                    "timestamp": artifact["generated_at"]
+                    "timestamp": artifact["generated_at"],
+                    "evaluation": evaluation  # ✅ NEW
                 }
             )
 
-            # ✅ SUCCESS TRACKING
+            # success tracking
             self.outcome_tracker.record_outcome(
                 artifact_id=artifact_id,
                 status="success"
             )
 
-            print("\nAUTO IMPLEMENTATION COMPLETED")
+            print(f"\nEvaluation score: {evaluation['score']}")
+            print("AUTO IMPLEMENTATION COMPLETED")
 
             return artifact
 
@@ -248,7 +258,6 @@ DEVELOPMENT REQUEST
 
             print(f"\n[ERROR] AUTO DEVELOPMENT FAILED: {e}")
 
-            # ✅ FAILURE TRACKING (fail-closed compliant)
             if artifact_id:
                 self.outcome_tracker.record_outcome(
                     artifact_id=artifact_id,
