@@ -11,29 +11,16 @@ Repo-aware ArchitectureAgent:
 - detects architectural domains
 - proposes architecture-compliant modules
 - enforces guardrails
-
-Pipeline
-
-Capability Gap / Strategic Context
-        ↓
-Repository Scan
-        ↓
-Architecture Reasoning
-        ↓
-Module Design
-        ↓
-Development Blueprint
+- enforces deterministic JSON architecture contract
+- extracts DEVELOPMENT REQUEST from enriched prompts
 """
 
 import os
+import json
 from datetime import datetime, UTC
 
 
 class ArchitectureAgent:
-
-    # ---------------------------------------------------------
-    # Guardrails
-    # ---------------------------------------------------------
 
     FORBIDDEN_PATHS = [
         "runtime/system",
@@ -55,21 +42,11 @@ class ArchitectureAgent:
         "sapianta-domain-"
     ]
 
-    # ---------------------------------------------------------
-    # INIT
-    # ---------------------------------------------------------
-
     def __init__(self, system_knowledge=None, repo_root="runtime"):
 
         self.system_knowledge = system_knowledge
         self.repo_root = repo_root
-
-        # build repository map
         self.repo_map = self._scan_repo()
-
-    # ---------------------------------------------------------
-    # REPOSITORY SCAN
-    # ---------------------------------------------------------
 
     def _scan_repo(self):
 
@@ -87,17 +64,29 @@ class ArchitectureAgent:
 
         return repo_map
 
-    # ---------------------------------------------------------
-    # CHECK MODULE EXISTENCE
-    # ---------------------------------------------------------
+    def _extract_request(self, context: str) -> str:
+
+        marker = "DEVELOPMENT REQUEST"
+
+        if marker not in context:
+            return context.strip()
+
+        _, tail = context.split(marker, 1)
+
+        tail = tail.strip()
+
+        lines = tail.splitlines()
+
+        cleaned = []
+        for line in lines:
+            if set(line.strip()) == {"-"}:
+                continue
+            cleaned.append(line)
+
+        return "\n".join(cleaned).strip()
 
     def _module_exists(self, path):
-
         return os.path.exists(path)
-
-    # ---------------------------------------------------------
-    # Guardrail filtering
-    # ---------------------------------------------------------
 
     def _filter_paths(self, paths):
 
@@ -105,35 +94,20 @@ class ArchitectureAgent:
 
         for path in paths:
 
-            forbidden = False
-
-            for fp in self.FORBIDDEN_PATHS:
-                if path.startswith(fp):
-                    forbidden = True
-                    break
-
-            if forbidden:
+            if any(path.startswith(fp) for fp in self.FORBIDDEN_PATHS):
                 continue
 
-            allowed = False
-
-            for ap in self.ALLOWED_PREFIXES:
-                if path.startswith(ap):
-                    allowed = True
-                    break
-
-            if allowed:
+            if any(path.startswith(ap) for ap in self.ALLOWED_PREFIXES):
                 filtered.append(path)
 
         return filtered
 
-    # ---------------------------------------------------------
-    # DOMAIN DETECTION
-    # ---------------------------------------------------------
+    def _detect_domain(self, request):
 
-    def _detect_domain(self, context):
+        ctx = request.lower()
 
-        ctx = context.lower()
+        if "test" in ctx or "pipeline" in ctx:
+            return "development"
 
         if "regime" in ctx or "market" in ctx:
             return "analytics"
@@ -153,15 +127,17 @@ class ArchitectureAgent:
         if "research" in ctx:
             return "research"
 
-        return "analytics"
+        return "development"
 
-    # ---------------------------------------------------------
-    # MODULE NAME GENERATION
-    # ---------------------------------------------------------
+    def _generate_module_name(self, request):
 
-    def _generate_module_name(self, context):
+        ctx = request.lower()
 
-        ctx = context.lower()
+        if "test pipeline" in ctx:
+            return "test_pipeline.py"
+
+        if "test" in ctx:
+            return "test_module.py"
 
         if "regime" in ctx:
             return "regime_detector.py"
@@ -178,57 +154,106 @@ class ArchitectureAgent:
         if "signal" in ctx:
             return "signal_engine.py"
 
-        return "module.py"
+        if "optimizer" in ctx:
+            return "optimizer.py"
 
-    # ---------------------------------------------------------
-    # BUILD MODULE PATH
-    # ---------------------------------------------------------
+        return "generated_module.py"
 
     def _build_module_path(self, domain, module):
-
         return f"runtime/{domain}/{module}"
 
+    def _validate_contract(self, proposal):
+
+        required = [
+            "description",
+            "files_to_create",
+            "files_to_modify"
+        ]
+
+        for key in required:
+            if key not in proposal:
+                raise Exception(
+                    f"ArchitectureAgent: missing required field '{key}'"
+                )
+
+        if not isinstance(proposal["files_to_create"], list):
+            raise Exception("files_to_create must be list")
+
+        if not isinstance(proposal["files_to_modify"], list):
+            raise Exception("files_to_modify must be list")
+
+        return proposal
+
     # ---------------------------------------------------------
-    # CONTEXT MODE (from sapianta discuss)
+    # SELF-HEALING PROPOSAL (NOVO)
     # ---------------------------------------------------------
 
     def propose(self, context: str):
 
-        """
-        Generate architecture proposal from discussion context.
-        """
-
         if self.system_knowledge:
             _ = self.system_knowledge.build_knowledge()
 
-        domain = self._detect_domain(context)
+        request = self._extract_request(context)
 
-        module = self._generate_module_name(context)
+        # ----------------------------------------
+        # FIRST ATTEMPT (normal logic)
+        # ----------------------------------------
 
+        proposal = self._build_proposal(request)
+
+        # ----------------------------------------
+        # RETRY (simplified logic)
+        # ----------------------------------------
+
+        if not proposal["files_to_create"] and not proposal["files_to_modify"]:
+
+            print("[ARCH] Empty architecture → retry simplified logic")
+
+            simplified_request = f"implement minimal {request}"
+
+            proposal = self._build_proposal(simplified_request)
+
+        # ----------------------------------------
+        # HARD FAILSAFE
+        # ----------------------------------------
+
+        if not proposal["files_to_create"] and not proposal["files_to_modify"]:
+
+            print("[ARCH] Hard fallback → forcing minimal output")
+
+            safe_name = request.lower().replace(" ", "_")[:40]
+
+            proposal = {
+                "description": f"Forced architecture for: {request}",
+                "files_to_create": [
+                    f"runtime/development/generated/{safe_name}.py"
+                ],
+                "files_to_modify": []
+            }
+
+        return self._validate_contract(proposal)
+
+    # ---------------------------------------------------------
+    # CORE BUILDER (ločeno za retry reuse)
+    # ---------------------------------------------------------
+
+    def _build_proposal(self, request):
+
+        domain = self._detect_domain(request)
+        module = self._generate_module_name(request)
         module_path = self._build_module_path(domain, module)
 
         files_to_create = []
 
-        # avoid duplicates
         if not self._module_exists(module_path):
             files_to_create.append(module_path)
 
         proposal = {
-            "description": context,
-            "files_to_create": files_to_create,
+            "description": request,
+            "files_to_create": self._filter_paths(files_to_create),
             "files_to_modify": [],
-            "reason": "ArchitectureAgent repo-aware proposal"
+            "generated_at": datetime.now(UTC).isoformat()
         }
-
-        proposal["files_to_create"] = self._filter_paths(
-            proposal["files_to_create"]
-        )
-
-        proposal["files_to_modify"] = self._filter_paths(
-            proposal["files_to_modify"]
-        )
-
-        proposal["generated_at"] = datetime.now(UTC).isoformat()
 
         return proposal
 
@@ -239,24 +264,17 @@ class ArchitectureAgent:
     def design_capability(self, capability):
 
         if capability == "portfolio_engine":
-
             blueprint = self._portfolio_architecture()
 
         elif capability == "regime_detection":
-
             blueprint = self._regime_architecture()
 
         else:
-
             blueprint = self._generic_architecture(capability)
 
         blueprint["modules"] = self._filter_paths(blueprint["modules"])
 
         return blueprint
-
-    # ---------------------------------------------------------
-    # PORTFOLIO ARCHITECTURE
-    # ---------------------------------------------------------
 
     def _portfolio_architecture(self):
 
@@ -271,10 +289,6 @@ class ArchitectureAgent:
             "description": "Portfolio allocation and position sizing system."
         }
 
-    # ---------------------------------------------------------
-    # REGIME ARCHITECTURE
-    # ---------------------------------------------------------
-
     def _regime_architecture(self):
 
         return {
@@ -287,10 +301,6 @@ class ArchitectureAgent:
             ],
             "description": "Market regime detection and classification system."
         }
-
-    # ---------------------------------------------------------
-    # GENERIC CAPABILITY
-    # ---------------------------------------------------------
 
     def _generic_architecture(self, capability):
 
@@ -312,13 +322,20 @@ if __name__ == "__main__":
 
     agent = ArchitectureAgent()
 
-    proposal = agent.propose("add regime detection engine")
+    proposal = agent.propose("""
+SYSTEM CONTEXT
+--------------
+runtime/development
+runtime/analytics
+
+DEVELOPMENT REQUEST
+-------------------
+implement test pipeline
+""")
 
     print("\nArchitecture Proposal:\n")
-
     print("Description:", proposal["description"])
 
     print("\nFiles to create:")
-
     for m in proposal["files_to_create"]:
         print("-", m)

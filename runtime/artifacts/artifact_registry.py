@@ -48,6 +48,26 @@ def _hash_artifact(data: dict) -> str:
     ).hexdigest()
 
 
+def _build_hash_payload(
+    artifact_type: str,
+    domain_id: str,
+    artifact_location: str,
+    producer: str,
+    metadata: dict
+) -> dict:
+    """
+    Full deterministic payload used for hashing.
+    Prevents collisions across different artifact contexts.
+    """
+    return {
+        "artifact_type": artifact_type,
+        "domain_id": domain_id,
+        "artifact_location": artifact_location,
+        "producer": producer,
+        "metadata": metadata
+    }
+
+
 # ------------------------------------------------------------
 # REGISTER ARTIFACT
 # ------------------------------------------------------------
@@ -61,7 +81,15 @@ def register_artifact(
     parent_artifact: str | None = None
 ):
 
-    artifact_hash = _hash_artifact(metadata)
+    hash_payload = _build_hash_payload(
+        artifact_type,
+        domain_id,
+        artifact_location,
+        producer,
+        metadata
+    )
+
+    artifact_hash = _hash_artifact(hash_payload)
 
     artifact = {
         "artifact_id": artifact_hash[:16],
@@ -145,9 +173,15 @@ def find_children(parent_artifact: str):
 
 def verify_artifact(artifact):
 
-    expected_hash = _hash_artifact(
+    hash_payload = _build_hash_payload(
+        artifact["artifact_type"],
+        artifact["domain_id"],
+        artifact["artifact_location"],
+        artifact["producer"],
         artifact["metadata"]
     )
+
+    expected_hash = _hash_artifact(hash_payload)
 
     return expected_hash == artifact["artifact_hash"]
 

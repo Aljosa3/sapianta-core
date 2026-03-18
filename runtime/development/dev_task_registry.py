@@ -30,9 +30,20 @@ class DevTaskRegistry:
     Registry for development tasks with persistent storage.
     """
 
-    def __init__(self):
+    def __init__(self, reset: bool = False):
 
         self._ensure_file()
+
+        # deterministic reset mode for tests
+        if reset:
+            data = {
+                "active_tasks": [],
+                "completed_tasks": [],
+                "rejected_tasks": []
+            }
+
+            with open(REGISTRY_FILE, "w") as f:
+                json.dump(data, f, indent=2)
 
         with open(REGISTRY_FILE, "r") as f:
             data = json.load(f)

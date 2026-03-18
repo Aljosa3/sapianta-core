@@ -50,7 +50,6 @@ def run(args):
 
     while True:
 
-        # SAFE INPUT (Ctrl+C handling)
         try:
             user_input = input("\nYou: ").strip()
         except KeyboardInterrupt:
@@ -64,7 +63,9 @@ def run(args):
         if not user_input:
             continue
 
-        # ENTER IMPLEMENT MODE
+        # ------------------------------------------------
+        # IMPLEMENT MODE (manual)
+        # ------------------------------------------------
         if user_input.lower() == "implement":
 
             print("\nSwitching to IMPLEMENT MODE")
@@ -81,7 +82,9 @@ def run(args):
             implement_mode = True
             continue
 
+        # ------------------------------------------------
         # CONFIRM PATCH
+        # ------------------------------------------------
         if implement_mode and user_input.lower() == "confirm":
 
             print("\nApplying patch...\n")
@@ -93,7 +96,9 @@ def run(args):
             implement_mode = False
             continue
 
-        # IDEA → TASK PROPOSAL
+        # ------------------------------------------------
+        # TASK MODE
+        # ------------------------------------------------
         if user_input.lower().startswith("task "):
 
             idea_text = user_input[5:]
@@ -108,7 +113,6 @@ def run(args):
             print(f"Description: {task['description']}")
             print(f"Priority: {task['priority']}")
 
-            # SAFE CONFIRM INPUT
             try:
                 confirm = input("\nCreate implementation for this task? (y/n): ")
             except KeyboardInterrupt:
@@ -129,12 +133,16 @@ def run(args):
 
             continue
 
+        # ------------------------------------------------
         # NORMAL DISCUSSION
+        # ------------------------------------------------
         response = engine.ask(user_input)
 
         print("\nSAPIANTA:", response)
 
-        # --- AUTO IDEA DETECTION ---
+        # ------------------------------------------------
+        # AUTO IDEA DETECTION → AUTO IMPLEMENT
+        # ------------------------------------------------
         if detect_idea(user_input):
 
             print("\n[AI] Development idea detected.")
@@ -144,3 +152,12 @@ def run(args):
             dev_add_task.run(args)
 
             print("[AI] Task automatically added to registry.")
+
+            print("[AI] Starting automatic implementation...")
+
+            try:
+                # 🔥 KLJUČNI POPRAVEK
+                orchestrator.run_auto(user_input)
+
+            except Exception as e:
+                print(f"[AI] Auto implementation failed: {e}")
