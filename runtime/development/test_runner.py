@@ -1,19 +1,23 @@
 """
 SAPIANTA Test Runner
 
-Executes pytest programmatically and produces structured diagnostics
+Executes pytest in isolated subprocess and produces structured diagnostics
 for the AI Software Factory (ASF).
 
 Design goals:
 - deterministic execution
+- no process leaks
+- full subprocess isolation
 - governance-compatible
-- no side effects outside test execution
 - machine-readable diagnostics
 """
 
 import subprocess
 import time
 import re
+import sys
+import os
+import signal
 from pathlib import Path
 
 
@@ -33,14 +37,14 @@ class TestRunResult:
         self.raw_output = ""
         self.raw_error = ""
 
-        # ✅ NEW
+        # execution control
         self.return_code = 0
         self.timeout = False
 
 
 class TestRunner:
 
-    def __init__(self, project_root=".", timeout=60):
+    def __init__(self, project_root=".", timeout=10):
         self.project_root = Path(project_root)
         self.timeout = timeout
 
@@ -48,46 +52,78 @@ class TestRunner:
 
         start = time.time()
 
+        # 🔥 anti-recursion guard
+        if os.environ.get("SAPIANTA_TEST_RUNNER") == "1":
+            diagnostics = TestRunResult()
+            diagnostics.success = False
+            diagnostics.raw_error = "Recursive TestRunner invocation prevented"
+            diagnostics.return_code = -3
+            return diagnostics
+
         cmd = [
+            sys.executable,
+            "-m",
             "pytest",
+            "runtime/development/generated",
             "-q",
             "--disable-warnings",
-            "--maxfail=50"
+            "--maxfail=1",
+            "--tb=short",
+            "-p",
+            "no:anyio",
+            "-k",
+            "not execution_stability"  # 🔥 prevents self-invocation
         ]
 
-        try:
-            result = subprocess.run(
-                cmd,
-                cwd=self.project_root,
-                capture_output=True,
-                text=True,
-                timeout=self.timeout
-            )
+        env = os.environ.copy()
+        env["SAPIANTA_TEST_RUNNER"] = "1"
 
+        process = subprocess.Popen(
+            cmd,
+            cwd=self.project_root,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            preexec_fn=os.setsid,
+            env=env
+        )
+
+        diagnostics = TestRunResult()
+
+        try:
+            output, _ = process.communicate(timeout=self.timeout)
             end = time.time()
 
-            diagnostics = self.collect_results(result.stdout, result.stderr)
-
+            diagnostics = self.collect_results(output, "")
             diagnostics.execution_time = round(end - start, 3)
-            diagnostics.success = result.returncode == 0
-            diagnostics.raw_output = result.stdout
-            diagnostics.raw_error = result.stderr
-            diagnostics.return_code = result.returncode
+            diagnostics.success = process.returncode == 0
+            diagnostics.raw_output = output
+            diagnostics.return_code = process.returncode
 
             return diagnostics
 
-        except subprocess.TimeoutExpired as e:
+        except subprocess.TimeoutExpired:
 
             end = time.time()
-
-            diagnostics = TestRunResult()
 
             diagnostics.success = False
             diagnostics.timeout = True
             diagnostics.execution_time = round(end - start, 3)
-            diagnostics.raw_output = e.stdout or ""
             diagnostics.raw_error = f"TIMEOUT after {self.timeout}s"
             diagnostics.return_code = -1
+
+            try:
+                os.killpg(os.getpgid(process.pid), signal.SIGTERM)
+            except Exception:
+                pass
+
+            try:
+                process.wait(timeout=2)
+            except subprocess.TimeoutExpired:
+                try:
+                    os.killpg(os.getpgid(process.pid), signal.SIGKILL)
+                except Exception:
+                    pass
 
             return diagnostics
 
@@ -95,14 +131,20 @@ class TestRunner:
 
             end = time.time()
 
-            diagnostics = TestRunResult()
-
             diagnostics.success = False
             diagnostics.execution_time = round(end - start, 3)
             diagnostics.raw_error = str(e)
             diagnostics.return_code = -2
 
             return diagnostics
+
+        finally:
+            # 🔒 guarantee cleanup
+            if process.poll() is None:
+                try:
+                    os.killpg(os.getpgid(process.pid), signal.SIGKILL)
+                except Exception:
+                    pass
 
     def collect_results(self, stdout, stderr):
 
@@ -168,11 +210,9 @@ class TestRunner:
             2
         )
 
-    # ✅ NEW: failure extraction (for AutoFixEngine)
     def extract_failures(self, diagnostics):
 
         lines = diagnostics.raw_output.splitlines()
-
         failures = [line for line in lines if "FAILED" in line]
 
         return failures
@@ -221,7 +261,7 @@ class TestRunner:
 
 if __name__ == "__main__":
 
-    runner = TestRunner(".", timeout=60)
+    runner = TestRunner(".", timeout=10)
 
     diagnostics = runner.run_tests()
 

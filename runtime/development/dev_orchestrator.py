@@ -10,7 +10,6 @@ from datetime import datetime, UTC
 from pathlib import Path
 import os
 import traceback
-import subprocess
 
 from runtime.development.mutation_validator import MutationValidator
 from runtime.development.code_generator import CodeGenerator
@@ -34,10 +33,9 @@ from runtime.development.auto_fix_engine import AutoFixEngine
 # 🔥 STRUCTURE-AWARE PATCHER
 from runtime.development.function_patcher import FunctionPatcher
 
+# 🧠 FIX MEMORY
+from runtime.development.fix_memory import FixMemory
 
-# ------------------------------------------------
-# EXECUTION CONTEXT DETECTOR
-# ------------------------------------------------
 
 def is_running_under_pytest():
     return "PYTEST_CURRENT_TEST" in os.environ
@@ -47,39 +45,31 @@ def _log(msg):
     print(f"[DEV_ORCH] {msg}")
 
 
-# ------------------------------------------------
-# STRICT TEST VALIDATION
-# ------------------------------------------------
-
+# ✅ UPDATED → subprocess-safe strict test runner
 def run_strict_generated_tests():
 
     _log("STRICT TEST MODE → validating generated modules")
 
-    result = subprocess.run(
-        ["pytest", "-vv", "runtime/development/generated"],
-        capture_output=True,
-        text=True
-    )
+    runner = TestRunner(project_root=".", timeout=10)
+    diagnostics = runner.run_tests()
 
-    output_text = result.stdout + result.stderr
-
-    no_tests_collected = "collected 0 items" in output_text
-    success = (result.returncode == 0) and not no_tests_collected
+    no_tests_collected = diagnostics.tests_total == 0
+    success = diagnostics.success and not no_tests_collected
 
     if no_tests_collected:
         _log("STRICT TEST FAILED → no tests collected")
 
     if not success:
         _log("STRICT TEST FAILED")
-        _log(result.stdout)
-        _log(result.stderr)
+        _log(diagnostics.raw_output)
+        _log(diagnostics.raw_error)
     else:
         _log("STRICT TEST PASSED")
 
     return {
         "success": success,
-        "error": output_text,
-        "output": result.stdout
+        "error": diagnostics.raw_output + diagnostics.raw_error,
+        "output": diagnostics.raw_output
     }
 
 
@@ -121,13 +111,16 @@ class DevelopmentOrchestrator:
         self.evaluator = ArtifactEvaluator()
         self.strategy_selector = StrategySelector()
 
-        self.test_runner = TestRunner()
+        # ✅ subprocess-safe runner
+        self.test_runner = TestRunner(project_root=".", timeout=10)
+
         self.auto_fix_engine = AutoFixEngine()
+        self.fix_memory = FixMemory()
 
         self.current_patch = None
 
     # ------------------------------------------------
-    # APPLY FIX (STRUCTURE-AWARE)
+    # APPLY FIX
     # ------------------------------------------------
 
     def apply_fix(self, fix, implementation_plan):
@@ -137,6 +130,9 @@ class DevelopmentOrchestrator:
             return False
 
         action = fix.get("action")
+
+        if not action and fix.get("strategy") in ["syntax_error", "syntax_fix"]:
+            action = "replace_file"
 
         target_file = fix.get("file") or (
             implementation_plan[0] if implementation_plan else None
@@ -155,9 +151,21 @@ class DevelopmentOrchestrator:
         try:
             code = path.read_text(encoding="utf-8")
 
-            # --------------------------------------------
-            # 🔥 STRUCTURE-AWARE PATCH
-            # --------------------------------------------
+            if action == "replace_file":
+
+                new_code = fix.get("code")
+
+                if not new_code:
+                    _log("Missing code for replace_file")
+                    return False
+
+                _log("Applying FULL FILE REPLACE")
+
+                path.write_text(new_code, encoding="utf-8")
+
+                _log("File replaced successfully")
+                return True
+
             if action == "replace_function":
 
                 function_name = fix.get("function")
@@ -180,9 +188,6 @@ class DevelopmentOrchestrator:
                 _log("Function replaced successfully")
                 return True
 
-            # --------------------------------------------
-            # FALLBACK (append)
-            # --------------------------------------------
             if fix.get("code"):
 
                 if fix["code"].strip() in code:
@@ -205,7 +210,7 @@ class DevelopmentOrchestrator:
             return False
 
     # ------------------------------------------------
-    # AUTO MODE (MULTI-FIX LOOP 🔥)
+    # AUTO MODE
     # ------------------------------------------------
 
     def run_auto(self, discussion_context=None):
@@ -238,30 +243,35 @@ class DevelopmentOrchestrator:
                     architecture["description"]
                 )
 
-            # -------------------------
-            # TEST + MULTI-FIX LOOP
-            # -------------------------
-
             MAX_RETRIES = 3
 
             for attempt in range(MAX_RETRIES):
 
                 _log(f"Test run {attempt + 1}")
 
-                test_result = self.test_runner.run_tests()
+                # ✅ subprocess-safe test execution
+                diagnostics = self.test_runner.run_tests()
                 strict_result = run_strict_generated_tests()
 
                 if strict_result["success"]:
                     _log("Tests PASSED (strict)")
-                    test_result.success = True
                     break
 
                 _log("Tests FAILED → fixing")
 
                 failure_info = strict_result
+                error_text = failure_info.get("error", "")
 
-                # 🔥 MULTI-FIX ENGINE
+                best_strategy = self.fix_memory.get_best_strategy(error_text)
+
                 fixes = self.auto_fix_engine.generate_fixes(failure_info)
+
+                if best_strategy:
+                    fixes = sorted(
+                        fixes,
+                        key=lambda f: 0 if f.get("strategy") == best_strategy else 1
+                    )
+                    _log(f"Memory boost → prioritizing strategy: {best_strategy}")
 
                 _log(f"Generated {len(fixes)} fix candidates")
 
@@ -277,11 +287,16 @@ class DevelopmentOrchestrator:
                         _log("Fix failed to apply → skipping")
                         continue
 
-                    # re-run strict test
                     strict_result = run_strict_generated_tests()
 
                     if strict_result["success"]:
                         _log(f"Fix SUCCESS with strategy: {fix.get('strategy')}")
+
+                        self.fix_memory.record_success(
+                            error_text,
+                            fix.get("strategy")
+                        )
+
                         applied_success = True
                         break
                     else:
@@ -291,10 +306,6 @@ class DevelopmentOrchestrator:
                     _log("All fixes failed")
                     break
 
-            else:
-                _log("Max retries reached → FAIL")
-                return None
-
             _log("AUTO MODE COMPLETE")
             return True
 
@@ -302,10 +313,6 @@ class DevelopmentOrchestrator:
             _log("AUTO MODE FAILED")
             _log(traceback.format_exc())
             return None
-
-    # ------------------------------------------------
-    # HELPERS
-    # ------------------------------------------------
 
     def propose_architecture(self, strategic_direction: str):
 
