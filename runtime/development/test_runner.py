@@ -33,11 +33,9 @@ class TestRunResult:
         self.test_files = 0
         self.coverage_potential = 0.0
 
-        # raw outputs
         self.raw_output = ""
         self.raw_error = ""
 
-        # execution control
         self.return_code = 0
         self.timeout = False
 
@@ -48,11 +46,13 @@ class TestRunner:
         self.project_root = Path(project_root)
         self.timeout = timeout
 
+        # 🔥 ključna sprememba → eksplicitno test območje
+        self.generated_test_path = "runtime/development/generated"
+
     def run_tests(self):
 
         start = time.time()
 
-        # 🔥 anti-recursion guard
         if os.environ.get("SAPIANTA_TEST_RUNNER") == "1":
             diagnostics = TestRunResult()
             diagnostics.success = False
@@ -60,19 +60,18 @@ class TestRunner:
             diagnostics.return_code = -3
             return diagnostics
 
+        # 🔥 KLJUČNA SPREMEMBA → ciljamo generated teste
         cmd = [
             sys.executable,
             "-m",
             "pytest",
-            "runtime/development/generated",
-            "-q",
-            "--disable-warnings",
+            self.generated_test_path,
+            "-v",                         # 👈 boljši output za parsing
             "--maxfail=1",
+            "--disable-warnings",
             "--tb=short",
             "-p",
             "no:anyio",
-            "-k",
-            "not execution_stability"  # 🔥 prevents self-invocation
         ]
 
         env = os.environ.copy()
@@ -94,7 +93,7 @@ class TestRunner:
             output, _ = process.communicate(timeout=self.timeout)
             end = time.time()
 
-            diagnostics = self.collect_results(output, "")
+            diagnostics = self.collect_results(output)
             diagnostics.execution_time = round(end - start, 3)
             diagnostics.success = process.returncode == 0
             diagnostics.raw_output = output
@@ -139,35 +138,34 @@ class TestRunner:
             return diagnostics
 
         finally:
-            # 🔒 guarantee cleanup
             if process.poll() is None:
                 try:
                     os.killpg(os.getpgid(process.pid), signal.SIGKILL)
                 except Exception:
                     pass
 
-    def collect_results(self, stdout, stderr):
+    def collect_results(self, stdout):
 
         result = TestRunResult()
 
-        summary_line = None
-
+        # 🔥 izboljšan parsing
         for line in stdout.splitlines():
+
+            if "collected" in line:
+                match = re.search(r"collected (\d+) items", line)
+                if match:
+                    result.tests_total = int(match.group(1))
+
             if "passed" in line or "failed" in line:
-                summary_line = line
+                passed = re.search(r"(\d+)\s+passed", line)
+                failed = re.search(r"(\d+)\s+failed", line)
 
-        if summary_line:
+                if passed:
+                    result.tests_passed = int(passed.group(1))
 
-            passed = re.search(r"(\d+)\s+passed", summary_line)
-            failed = re.search(r"(\d+)\s+failed", summary_line)
+                if failed:
+                    result.tests_failed = int(failed.group(1))
 
-            if passed:
-                result.tests_passed = int(passed.group(1))
-
-            if failed:
-                result.tests_failed = int(failed.group(1))
-
-        result.tests_total = result.tests_passed + result.tests_failed
         result.failed_modules = self.detect_failed_modules(stdout)
         result.test_files = self.count_test_files()
         result.coverage_potential = self.estimate_coverage(result)
@@ -183,9 +181,9 @@ class TestRunner:
 
                 module = line.split("::")[0]
 
-                module = module.replace("tests/test_", "")
                 module = module.replace(".py", "")
-                module = module.replace("_", ".")
+                module = module.replace("/", ".")
+                module = module.replace("\\", ".")
 
                 failed.append(module)
 
@@ -193,7 +191,7 @@ class TestRunner:
 
     def count_test_files(self):
 
-        test_dir = self.project_root / "tests"
+        test_dir = self.project_root / self.generated_test_path
 
         if not test_dir.exists():
             return 0
@@ -206,16 +204,16 @@ class TestRunner:
             return 0.0
 
         return round(
-            result.tests_passed / max(result.test_files, 1),
+            result.tests_passed / max(result.tests_total, 1),
             2
         )
 
     def extract_failures(self, diagnostics):
 
-        lines = diagnostics.raw_output.splitlines()
-        failures = [line for line in lines if "FAILED" in line]
-
-        return failures
+        return [
+            line for line in diagnostics.raw_output.splitlines()
+            if "FAILED" in line
+        ]
 
     def to_dict(self, diagnostics):
 
@@ -262,7 +260,5 @@ class TestRunner:
 if __name__ == "__main__":
 
     runner = TestRunner(".", timeout=10)
-
     diagnostics = runner.run_tests()
-
     runner.print_summary(diagnostics)

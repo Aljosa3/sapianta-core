@@ -30,11 +30,11 @@ from runtime.development.strategy_selector import StrategySelector
 from runtime.development.test_runner import TestRunner
 from runtime.development.auto_fix_engine import AutoFixEngine
 
-# 🔥 STRUCTURE-AWARE PATCHER
-from runtime.development.function_patcher import FunctionPatcher
-
-# 🧠 FIX MEMORY
 from runtime.development.fix_memory import FixMemory
+from runtime.development.execution_guard import ExecutionGuard
+
+# 🔴 NOVO: AST patcher
+from runtime.development.ast_function_patcher import ASTFunctionPatcher
 
 
 def is_running_under_pytest():
@@ -45,7 +45,6 @@ def _log(msg):
     print(f"[DEV_ORCH] {msg}")
 
 
-# ✅ UPDATED → subprocess-safe strict test runner
 def run_strict_generated_tests():
 
     _log("STRICT TEST MODE → validating generated modules")
@@ -111,13 +110,51 @@ class DevelopmentOrchestrator:
         self.evaluator = ArtifactEvaluator()
         self.strategy_selector = StrategySelector()
 
-        # ✅ subprocess-safe runner
         self.test_runner = TestRunner(project_root=".", timeout=10)
 
         self.auto_fix_engine = AutoFixEngine()
         self.fix_memory = FixMemory()
 
+        self.execution_guard = ExecutionGuard(
+            max_processes=3,
+            max_runtime=30
+        )
+
         self.current_patch = None
+
+    # =================================================
+    # ✅ AST FUNCTION REPLACEMENT (PRODUCTION READY)
+    # =================================================
+
+    def _apply_replace_function(self, fix: dict):
+
+        file_path = fix.get("file")
+        function_name = fix.get("function")
+        new_code = fix.get("code")
+
+        if not file_path or not function_name or not new_code:
+            return False
+
+        return ASTFunctionPatcher.replace_function(
+            file_path,
+            function_name,
+            new_code
+        )
+
+    # =================================================
+    # ✅ GOVERNANCE CHECK (FIX FOR TEST)
+    # =================================================
+
+    def _check_core_modification(self, plan):
+
+        forbidden = ["runtime/system/"]
+
+        for file in plan:
+            for f in forbidden:
+                if file.startswith(f):
+                    raise Exception("Mutation forbidden")
+
+        return True
 
     # ------------------------------------------------
     # APPLY FIX
@@ -149,8 +186,8 @@ class DevelopmentOrchestrator:
             return False
 
         try:
-            code = path.read_text(encoding="utf-8")
 
+            # FULL FILE REPLACE
             if action == "replace_file":
 
                 new_code = fix.get("code")
@@ -160,35 +197,28 @@ class DevelopmentOrchestrator:
                     return False
 
                 _log("Applying FULL FILE REPLACE")
-
                 path.write_text(new_code, encoding="utf-8")
-
                 _log("File replaced successfully")
                 return True
 
+            # 🔴 AST FUNCTION REPLACE
             if action == "replace_function":
 
-                function_name = fix.get("function")
-                new_function_code = fix.get("code")
+                _log(f"Applying replace_function → {fix.get('function')}")
 
-                if not function_name or not new_function_code:
-                    _log("Invalid replace_function payload")
+                success = self._apply_replace_function(fix)
+
+                if success:
+                    _log("Function replaced successfully (AST)")
+                    return True
+                else:
+                    _log("Function replace FAILED")
                     return False
 
-                _log(f"Applying replace_function → {function_name}")
-
-                new_code = FunctionPatcher.replace_function(
-                    code,
-                    function_name,
-                    new_function_code
-                )
-
-                path.write_text(new_code, encoding="utf-8")
-
-                _log("Function replaced successfully")
-                return True
-
+            # fallback append
             if fix.get("code"):
+
+                code = path.read_text(encoding="utf-8")
 
                 if fix["code"].strip() in code:
                     _log("Fix already present")
@@ -244,13 +274,24 @@ class DevelopmentOrchestrator:
                 )
 
             MAX_RETRIES = 3
+            strict_result = {"success": False}
 
             for attempt in range(MAX_RETRIES):
 
                 _log(f"Test run {attempt + 1}")
 
-                # ✅ subprocess-safe test execution
-                diagnostics = self.test_runner.run_tests()
+                ok, err = self.execution_guard.validate()
+                if not ok:
+                    _log(f"EXECUTION GUARD TRIGGERED → {err}")
+                    return False
+
+                self.test_runner.run_tests()
+
+                ok, err = self.execution_guard.validate()
+                if not ok:
+                    _log(f"EXECUTION GUARD TRIGGERED (post-test) → {err}")
+                    return False
+
                 strict_result = run_strict_generated_tests()
 
                 if strict_result["success"]:
@@ -263,7 +304,6 @@ class DevelopmentOrchestrator:
                 error_text = failure_info.get("error", "")
 
                 best_strategy = self.fix_memory.get_best_strategy(error_text)
-
                 fixes = self.auto_fix_engine.generate_fixes(failure_info)
 
                 if best_strategy:
@@ -303,11 +343,15 @@ class DevelopmentOrchestrator:
                         _log("Fix did not resolve issue → trying next")
 
                 if not applied_success:
-                    _log("All fixes failed")
-                    break
+                    _log("All fixes failed → FAIL-CLOSED")
+                    return False
 
-            _log("AUTO MODE COMPLETE")
-            return True
+            if strict_result["success"]:
+                _log("AUTO MODE COMPLETE → SUCCESS")
+                return True
+            else:
+                _log("AUTO MODE COMPLETE → FAILED")
+                return False
 
         except Exception:
             _log("AUTO MODE FAILED")

@@ -12,89 +12,80 @@ Design:
 """
 
 import re
-from typing import List, Dict
+from pathlib import Path
+from typing import List, Dict, Optional
 
 
 class AutoFixEngine:
 
     # ================================================================
-    # 🆕 MULTI-FIX ENGINE (NEW)
+    # MULTI-FIX ENGINE
     # ================================================================
 
     def generate_fixes(self, failure_info: Dict) -> List[Dict]:
-        """
-        Generate multiple candidate fixes.
 
-        Combines:
-        - primary deterministic fix (attempt_fix)
-        - fallback strategies
-        """
+        fixes: List[Dict] = []
 
-        fixes = []
-
-        # --------------------------------------------
-        # PRIMARY FIX (existing engine)
-        # --------------------------------------------
         primary = self.attempt_fix(failure_info)
-
         if primary and primary.get("strategy"):
             fixes.append(primary)
 
         error_text = failure_info.get("error", "") or ""
 
-        # --------------------------------------------
-        # FALLBACK 1: SAFE NO-OP
-        # --------------------------------------------
+        syntax_fix = self._generate_syntax_fix(failure_info)
+        if syntax_fix:
+            fixes.append(syntax_fix)
+
         fixes.append({
+            "fixed": False,
             "strategy": "safe_fallback",
-            "action": "append",
+            "patch": "# SAFE FALLBACK FIX",
+            "confidence": 0.1,
             "file": None,
+            "action": "append",
             "code": "# SAFE FALLBACK FIX\npass\n"
         })
 
-        # --------------------------------------------
-        # FALLBACK 2: SYNTAX PATCH
-        # --------------------------------------------
         if "SyntaxError" in error_text:
             fixes.append({
-                "strategy": "syntax_fix",
-                "action": "append",
+                "fixed": False,
+                "strategy": "syntax_fix_placeholder",
+                "patch": "# Syntax error detected; placeholder fallback",
+                "confidence": 0.2,
                 "file": None,
+                "action": "append",
                 "code": "# SYNTAX FIX PLACEHOLDER\n"
             })
 
-        # --------------------------------------------
-        # FALLBACK 3: RETURN FIX
-        # --------------------------------------------
         if "return outside function" in error_text:
             fixes.append({
+                "fixed": False,
                 "strategy": "return_fix",
-                "action": "append",
+                "patch": "# Fix invalid return placement",
+                "confidence": 0.2,
                 "file": None,
+                "action": "append",
                 "code": "# FIX: removed invalid return\n"
             })
 
-        # --------------------------------------------
-        # FALLBACK 4: REGENERATION STUB
-        # --------------------------------------------
         fixes.append({
+            "fixed": False,
             "strategy": "regen_stub",
-            "action": "append",
+            "patch": "# REGENERATION PLACEHOLDER",
+            "confidence": 0.1,
             "file": None,
+            "action": "append",
             "code": "# REGENERATION PLACEHOLDER\n"
         })
 
-        return fixes
+        return self._deduplicate_fixes(fixes)
 
     # ================================================================
-    # 🔁 EXISTING ENGINE (UNCHANGED CORE LOGIC)
+    # CORE FIX ENGINE
     # ================================================================
 
     def attempt_fix(self, test_result):
 
-        # --------------------------------------------
-        # SUCCESS CASE
-        # --------------------------------------------
         if test_result.get("success"):
             return {
                 "fixed": False,
@@ -107,139 +98,80 @@ class AutoFixEngine:
                 "code": None
             }
 
-        # --------------------------------------------
-        # ERROR EXTRACTION
-        # --------------------------------------------
         error = test_result.get("error") or test_result.get("output") or ""
         output = test_result.get("output", "") or ""
 
         failed_modules = self.extract_failed_modules(output)
 
-        # --------------------------------------------
-        # 🧠 STRUCTURE-AWARE FIX (PRIORITY)
-        # --------------------------------------------
         patch = self.generate_patch(error)
 
         if patch:
             patch.update({
                 "fixed": False,
                 "confidence": 0.95,
-                "file": None,
+                "file": patch.get("file"),
                 "modules": failed_modules
             })
             return patch
 
-        # --------------------------------------------
-        # STRATEGY 1: Missing import
-        # --------------------------------------------
         if "ImportError" in error or "ModuleNotFoundError" in error:
-
             return {
                 "fixed": False,
                 "strategy": "missing_import",
-                "patch": f"# Suggestion: check or add missing imports in modules: {failed_modules}",
+                "patch": f"# Suggestion: check imports in {failed_modules}",
                 "confidence": 0.6,
                 "file": None,
                 "action": None,
                 "code": None
             }
 
-        # --------------------------------------------
-        # STRATEGY 2: Attribute error
-        # --------------------------------------------
-        attr_match = re.search(
-            r"AttributeError: '(.+?)' object has no attribute '(.+?)'",
-            error
-        )
-
-        if attr_match:
-
-            class_name = attr_match.group(1)
-            attribute = attr_match.group(2)
-
-            placeholder_code = self._generate_placeholder_function(attribute)
-
-            return {
-                "fixed": False,
-                "strategy": "missing_attribute",
-                "patch": f"# Suggestion: implement attribute '{attribute}' in modules: {failed_modules}",
-                "confidence": 0.6,
-                "file": None,
-                "action": "append",
-                "code": placeholder_code,
-                "meta": {
-                    "class": class_name,
-                    "attribute": attribute
-                }
-            }
-
-        # fallback AttributeError
         if "AttributeError" in error:
-
             attr = self.extract_attribute_name(error)
-
             return {
                 "fixed": False,
                 "strategy": "missing_attribute",
-                "patch": f"# Suggestion: implement or fix attribute '{attr}' in modules: {failed_modules}",
+                "patch": f"# implement '{attr}'",
                 "confidence": 0.5,
                 "file": None,
                 "action": "append",
                 "code": self._generate_placeholder_function(attr)
             }
 
-        # --------------------------------------------
-        # STRATEGY 3: Assertion failure
-        # --------------------------------------------
         if "AssertionError" in output:
-
             return {
                 "fixed": False,
                 "strategy": "assertion_failure",
-                "patch": f"# Suggestion: review logic and expected values in modules: {failed_modules}",
+                "patch": "# review logic",
                 "confidence": 0.4,
                 "file": None,
                 "action": None,
                 "code": None
             }
 
-        # --------------------------------------------
-        # STRATEGY 4: Type error
-        # --------------------------------------------
         if "TypeError" in error:
-
             return {
                 "fixed": False,
                 "strategy": "type_mismatch",
-                "patch": f"# Suggestion: verify argument types and function signatures in modules: {failed_modules}",
+                "patch": "# check types",
                 "confidence": 0.5,
                 "file": None,
                 "action": None,
                 "code": None
             }
 
-        # --------------------------------------------
-        # STRATEGY 5: Syntax error (fallback only)
-        # --------------------------------------------
         if "SyntaxError" in error:
+            syntax_fix = self._generate_syntax_fix(test_result)
+            if syntax_fix:
+                syntax_fix.update({
+                    "fixed": False,
+                    "confidence": 0.85
+                })
+                return syntax_fix
 
-            return {
-                "fixed": False,
-                "strategy": "syntax_error",
-                "patch": f"# Suggestion: fix syntax errors in modules: {failed_modules}",
-                "confidence": 0.8,
-                "file": None,
-                "action": None,
-                "code": None
-            }
-
-        # --------------------------------------------
-        # FALLBACK
-        # --------------------------------------------
         return {
             "fixed": False,
             "strategy": "manual_review_required",
-            "patch": f"# Unable to auto-fix. Inspect modules: {failed_modules}",
+            "patch": "# manual inspection required",
             "confidence": 0.2,
             "file": None,
             "action": None,
@@ -247,36 +179,106 @@ class AutoFixEngine:
         }
 
     # ================================================================
-    # 🧠 STRUCTURE-AWARE PATCH GENERATOR
+    # PATCH GENERATOR (FIXED VERSION)
     # ================================================================
 
     def generate_patch(self, error: str):
 
         error_lower = error.lower()
+        file_path = self._extract_file_from_traceback(error)
 
-        # 🔥 CRITICAL FIX: return outside function
+        # FIX 1: return outside function
         if "return" in error_lower and "outside function" in error_lower:
             return {
                 "strategy": "replace_function",
                 "action": "replace_function",
                 "function": "run",
+                "file": file_path,
                 "code": self._safe_run_stub()
             }
 
-        # NameError → replace run()
+        # FIX 2: NameError (foo not defined)
         if "nameerror" in error_lower:
             return {
                 "strategy": "replace_function",
                 "action": "replace_function",
                 "function": "run",
+                "file": file_path,
                 "code": self._safe_run_stub()
             }
 
         return None
 
     # ================================================================
-    # SAFE FUNCTION STUB
+    # SYNTAX FIX
     # ================================================================
+
+    def _generate_syntax_fix(self, failure_info: Dict) -> Optional[Dict]:
+
+        error_text = failure_info.get("error", "") or ""
+
+        if "SyntaxError" not in error_text:
+            return None
+
+        file_path = self._extract_file_from_traceback(error_text)
+
+        if not file_path:
+            return None
+
+        if "expected ':'" in error_text:
+            fixed_code = self._fix_missing_colon(file_path)
+            if fixed_code:
+                return {
+                    "strategy": "syntax_fix",
+                    "action": "replace_file",
+                    "file": file_path,
+                    "code": fixed_code
+                }
+
+        return None
+
+    # ================================================================
+    # HELPERS
+    # ================================================================
+
+    def _extract_file_from_traceback(self, error_text: str) -> Optional[str]:
+
+        file_match = re.search(r'File "(.+?)", line', error_text)
+        if not file_match:
+            return None
+
+        full_path = file_match.group(1)
+
+        marker = "sapianta_system/"
+        if marker in full_path:
+            return full_path.split(marker, 1)[1]
+
+        return full_path
+
+    def _fix_missing_colon(self, file_path: str) -> Optional[str]:
+
+        try:
+            path = Path(file_path)
+            if not path.exists():
+                return None
+
+            original = path.read_text(encoding="utf-8")
+            fixed_lines = []
+            changed = False
+
+            for line in original.splitlines():
+                if line.strip().startswith("def ") and not line.strip().endswith(":"):
+                    line += ":"
+                    changed = True
+                fixed_lines.append(line)
+
+            if not changed:
+                return None
+
+            return "\n".join(fixed_lines) + "\n"
+
+        except Exception:
+            return None
 
     def _safe_run_stub(self):
         return (
@@ -284,18 +286,13 @@ class AutoFixEngine:
             "        return {\"status\": \"ok\"}\n"
         )
 
-    # ================================================================
-    # HELPERS
-    # ================================================================
-
     def extract_failed_modules(self, output):
 
         modules = []
 
         for line in output.splitlines():
             if "FAILED" in line and "::" in line:
-                module = line.split("::")[0]
-                modules.append(module)
+                modules.append(line.split("::")[0])
 
         return sorted(set(modules))
 
@@ -309,18 +306,31 @@ class AutoFixEngine:
         if match:
             return match.group(2)
 
-        match = re.search(r"'(.+?)'", error)
-
-        if match:
-            return match.group(1)
-
         return "unknown"
 
     def _generate_placeholder_function(self, name):
 
         return f"""
-
 def {name}(*args, **kwargs):
-    \"\"\"Auto-generated placeholder by AutoFixEngine\"\"\"
     return {{"status": "ok"}}
 """
+
+    def _deduplicate_fixes(self, fixes: List[Dict]) -> List[Dict]:
+
+        seen = set()
+        unique = []
+
+        for fix in fixes:
+            key = (
+                fix.get("strategy"),
+                fix.get("action"),
+                fix.get("file"),
+                fix.get("function"),
+                fix.get("code"),
+            )
+            if key in seen:
+                continue
+            seen.add(key)
+            unique.append(fix)
+
+        return unique
