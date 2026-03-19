@@ -6,14 +6,89 @@ Attempts to fix failed test results.
 Design:
 - deterministic
 - rule-based (v1)
+- multi-fix capable (v2)
 - safe (no direct file writes)
 - returns patch suggestions only
 """
 
 import re
+from typing import List, Dict
 
 
 class AutoFixEngine:
+
+    # ================================================================
+    # 🆕 MULTI-FIX ENGINE (NEW)
+    # ================================================================
+
+    def generate_fixes(self, failure_info: Dict) -> List[Dict]:
+        """
+        Generate multiple candidate fixes.
+
+        Combines:
+        - primary deterministic fix (attempt_fix)
+        - fallback strategies
+        """
+
+        fixes = []
+
+        # --------------------------------------------
+        # PRIMARY FIX (existing engine)
+        # --------------------------------------------
+        primary = self.attempt_fix(failure_info)
+
+        if primary and primary.get("strategy"):
+            fixes.append(primary)
+
+        error_text = failure_info.get("error", "") or ""
+
+        # --------------------------------------------
+        # FALLBACK 1: SAFE NO-OP
+        # --------------------------------------------
+        fixes.append({
+            "strategy": "safe_fallback",
+            "action": "append",
+            "file": None,
+            "code": "# SAFE FALLBACK FIX\npass\n"
+        })
+
+        # --------------------------------------------
+        # FALLBACK 2: SYNTAX PATCH
+        # --------------------------------------------
+        if "SyntaxError" in error_text:
+            fixes.append({
+                "strategy": "syntax_fix",
+                "action": "append",
+                "file": None,
+                "code": "# SYNTAX FIX PLACEHOLDER\n"
+            })
+
+        # --------------------------------------------
+        # FALLBACK 3: RETURN FIX
+        # --------------------------------------------
+        if "return outside function" in error_text:
+            fixes.append({
+                "strategy": "return_fix",
+                "action": "append",
+                "file": None,
+                "code": "# FIX: removed invalid return\n"
+            })
+
+        # --------------------------------------------
+        # FALLBACK 4: REGENERATION STUB
+        # --------------------------------------------
+        fixes.append({
+            "strategy": "regen_stub",
+            "action": "append",
+            "file": None,
+            "code": "# REGENERATION PLACEHOLDER\n"
+        })
+
+        return fixes
+
+    # ================================================================
+    # 🔁 EXISTING ENGINE (UNCHANGED CORE LOGIC)
+    # ================================================================
 
     def attempt_fix(self, test_result):
 
@@ -171,14 +246,11 @@ class AutoFixEngine:
             "code": None
         }
 
-    # ------------------------------------------------
-    # 🧠 STRUCTURE-AWARE PATCH GENERATOR (FIXED)
-    # ------------------------------------------------
+    # ================================================================
+    # 🧠 STRUCTURE-AWARE PATCH GENERATOR
+    # ================================================================
 
     def generate_patch(self, error: str):
-        """
-        Returns deterministic patch instruction.
-        """
 
         error_lower = error.lower()
 
@@ -202,23 +274,19 @@ class AutoFixEngine:
 
         return None
 
-    # ------------------------------------------------
+    # ================================================================
     # SAFE FUNCTION STUB
-    # ------------------------------------------------
+    # ================================================================
 
     def _safe_run_stub(self):
-        """
-        Returns FULL function replacement (correct indentation!)
-        """
-
         return (
             "    def run(self, context):\n"
             "        return {\"status\": \"ok\"}\n"
         )
 
-    # ------------------------------------------------
+    # ================================================================
     # HELPERS
-    # ------------------------------------------------
+    # ================================================================
 
     def extract_failed_modules(self, output):
 

@@ -163,6 +163,10 @@ class DevelopmentOrchestrator:
                 function_name = fix.get("function")
                 new_function_code = fix.get("code")
 
+                if not function_name or not new_function_code:
+                    _log("Invalid replace_function payload")
+                    return False
+
                 _log(f"Applying replace_function → {function_name}")
 
                 new_code = FunctionPatcher.replace_function(
@@ -197,10 +201,11 @@ class DevelopmentOrchestrator:
 
         except Exception as e:
             _log(f"apply_fix error: {e}")
+            _log(traceback.format_exc())
             return False
 
     # ------------------------------------------------
-    # AUTO MODE (FIXED CORE LOOP)
+    # AUTO MODE (MULTI-FIX LOOP 🔥)
     # ------------------------------------------------
 
     def run_auto(self, discussion_context=None):
@@ -234,7 +239,7 @@ class DevelopmentOrchestrator:
                 )
 
             # -------------------------
-            # TEST + FIX LOOP (CORRECTED)
+            # TEST + MULTI-FIX LOOP
             # -------------------------
 
             MAX_RETRIES = 3
@@ -246,27 +251,44 @@ class DevelopmentOrchestrator:
                 test_result = self.test_runner.run_tests()
                 strict_result = run_strict_generated_tests()
 
-                # 🔥 FIX: STRICT = SOURCE OF TRUTH
                 if strict_result["success"]:
                     _log("Tests PASSED (strict)")
-
-                    # align internal state
                     test_result.success = True
-
                     break
 
                 _log("Tests FAILED → fixing")
 
                 failure_info = strict_result
 
-                fix = self.auto_fix_engine.attempt_fix(failure_info)
+                # 🔥 MULTI-FIX ENGINE
+                fixes = self.auto_fix_engine.generate_fixes(failure_info)
 
-                _log(f"Fix strategy: {fix.get('strategy')}")
+                _log(f"Generated {len(fixes)} fix candidates")
 
-                applied = self.apply_fix(fix, implementation_plan)
+                applied_success = False
 
-                if not applied:
-                    _log("Fix failed to apply")
+                for fix in fixes:
+
+                    _log(f"Trying fix strategy: {fix.get('strategy')}")
+
+                    applied = self.apply_fix(fix, implementation_plan)
+
+                    if not applied:
+                        _log("Fix failed to apply → skipping")
+                        continue
+
+                    # re-run strict test
+                    strict_result = run_strict_generated_tests()
+
+                    if strict_result["success"]:
+                        _log(f"Fix SUCCESS with strategy: {fix.get('strategy')}")
+                        applied_success = True
+                        break
+                    else:
+                        _log("Fix did not resolve issue → trying next")
+
+                if not applied_success:
+                    _log("All fixes failed")
                     break
 
             else:
