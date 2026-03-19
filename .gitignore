@@ -1,5 +1,5 @@
 # ============================================================
-# SAPIANTA — Canonical .gitignore
+# SAPIANTA — Canonical .gitignore (UPDATED)
 # ============================================================
 
 # ------------------------------------------------------------
@@ -124,6 +124,15 @@ coverage.xml
 *.exe
 
 # ------------------------------------------------------------
+# 🔥 SAPIANTA RUNTIME (CRITICAL ADDITION)
+# ------------------------------------------------------------
+runtime/development/generated/
+runtime/development/generated_module.py
+runtime/development/dev_outcomes.jsonl
+runtime/development/*.json
+runtime/history/*.jsonl
+
+# ------------------------------------------------------------
 # Explicit NON-ignore (canonical domains — safety net)
 # ------------------------------------------------------------
 !governance/**
@@ -151,7 +160,3 @@ tests/**/*.pyc
 # ------------------------------------------------------------
 *.pyc
 *.pyo
-
-runtime/development/*.json
-runtime/history/*.jsonl
-runtime/development/generated/
