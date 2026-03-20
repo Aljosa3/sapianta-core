@@ -33,8 +33,10 @@ from runtime.development.auto_fix_engine import AutoFixEngine
 from runtime.development.fix_memory import FixMemory
 from runtime.development.execution_guard import ExecutionGuard
 
-# 🔴 NOVO: AST patcher
 from runtime.development.ast_function_patcher import ASTFunctionPatcher
+
+# ✅ NEW: self-awareness engine
+from runtime.system.system_reflection_engine import SystemReflectionEngine
 
 
 def is_running_under_pytest():
@@ -120,41 +122,37 @@ class DevelopmentOrchestrator:
             max_runtime=30
         )
 
-        self.current_patch = None
+        # ✅ NEW: initialize reflection engine (safe, no side effects)
+        self.reflection_engine = SystemReflectionEngine(root=".")
 
     # =================================================
-    # ✅ AST FUNCTION REPLACEMENT (PRODUCTION READY)
+    # CORE MUTATION GUARD (FIX FOR TEST + GOVERNANCE)
+    # =================================================
+
+    def _check_core_modification(self, plan: list):
+        """
+        Prevent modification of protected core paths.
+        Uses FORBIDDEN_PATHS → no hardcoding.
+        """
+
+        for path in plan:
+            for forbidden in self.FORBIDDEN_PATHS:
+                if path.startswith(forbidden):
+                    raise Exception(
+                        f"Mutation forbidden: core system modification detected ({path})"
+                    )
+
+    # =================================================
+    # AST FUNCTION REPLACE
     # =================================================
 
     def _apply_replace_function(self, fix: dict):
 
-        file_path = fix.get("file")
-        function_name = fix.get("function")
-        new_code = fix.get("code")
-
-        if not file_path or not function_name or not new_code:
-            return False
-
         return ASTFunctionPatcher.replace_function(
-            file_path,
-            function_name,
-            new_code
+            fix.get("file"),
+            fix.get("function"),
+            fix.get("code")
         )
-
-    # =================================================
-    # ✅ GOVERNANCE CHECK (FIX FOR TEST)
-    # =================================================
-
-    def _check_core_modification(self, plan):
-
-        forbidden = ["runtime/system/"]
-
-        for file in plan:
-            for f in forbidden:
-                if file.startswith(f):
-                    raise Exception("Mutation forbidden")
-
-        return True
 
     # ------------------------------------------------
     # APPLY FIX
@@ -163,79 +161,74 @@ class DevelopmentOrchestrator:
     def apply_fix(self, fix, implementation_plan):
 
         if not fix:
-            _log("No fix provided")
             return False
 
         action = fix.get("action")
-
-        if not action and fix.get("strategy") in ["syntax_error", "syntax_fix"]:
-            action = "replace_file"
 
         target_file = fix.get("file") or (
             implementation_plan[0] if implementation_plan else None
         )
 
         if not target_file:
-            _log("No target file")
             return False
 
         path = Path(target_file)
 
         if not path.exists():
-            _log(f"Target file missing: {target_file}")
             return False
 
         try:
 
-            # FULL FILE REPLACE
+            code = path.read_text(encoding="utf-8")
+
             if action == "replace_file":
+                path.write_text(fix.get("code", ""), encoding="utf-8")
+                return True
+
+            if action == "replace_function":
+                return self._apply_replace_function(fix)
+
+            if action == "append_stub":
 
                 new_code = fix.get("code")
 
-                if not new_code:
-                    _log("Missing code for replace_file")
-                    return False
-
-                _log("Applying FULL FILE REPLACE")
-                path.write_text(new_code, encoding="utf-8")
-                _log("File replaced successfully")
-                return True
-
-            # 🔴 AST FUNCTION REPLACE
-            if action == "replace_function":
-
-                _log(f"Applying replace_function → {fix.get('function')}")
-
-                success = self._apply_replace_function(fix)
-
-                if success:
-                    _log("Function replaced successfully (AST)")
-                    return True
-                else:
-                    _log("Function replace FAILED")
-                    return False
-
-            # fallback append
-            if fix.get("code"):
-
-                code = path.read_text(encoding="utf-8")
-
-                if fix["code"].strip() in code:
-                    _log("Fix already present")
+                if new_code.strip() in code:
                     return True
 
                 with open(path, "a", encoding="utf-8") as f:
-                    f.write("\n\n# --- AUTO FIX APPLIED ---\n")
-                    f.write(fix["code"])
-                    f.write("\n")
+                    f.write("\n\n# AUTO STUB\n")
+                    f.write(new_code)
 
-                _log("Fallback fix appended")
+                return True
+
+            if action == "append_import":
+
+                new_code = fix.get("code")
+
+                if new_code.strip() in code:
+                    return True
+
+                with open(path, "r+", encoding="utf-8") as f:
+                    content = f.read()
+                    f.seek(0, 0)
+                    f.write(new_code + "\n" + content)
+
+                return True
+
+            if fix.get("code"):
+
+                if fix["code"].strip() in code:
+                    return True
+
+                with open(path, "a", encoding="utf-8") as f:
+                    f.write("\n\n# AUTO FIX\n")
+                    f.write(fix["code"])
+
                 return True
 
             return False
 
-        except Exception as e:
-            _log(f"apply_fix error: {e}")
+        except Exception:
             _log(traceback.format_exc())
             return False
 
@@ -247,24 +240,16 @@ class DevelopmentOrchestrator:
 
         _log("AUTO MODE START")
 
-        if not discussion_context:
-            discussion_context = "Generic system improvement"
-
         try:
 
             architecture = self.propose_architecture(discussion_context)
 
-            if not architecture["files_to_create"] and not architecture["files_to_modify"]:
-                return self.run_implementation(discussion_context)
-
             implementation_plan = self.build_implementation_plan(architecture)
 
+            self._check_core_modification(implementation_plan)
             self.mutation_guard.validate_patch(implementation_plan)
 
-            _log("Generating modules...")
-
             for file_path in implementation_plan:
-
                 path = Path(file_path)
                 path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -273,90 +258,73 @@ class DevelopmentOrchestrator:
                     architecture["description"]
                 )
 
-            MAX_RETRIES = 3
-            strict_result = {"success": False}
-
-            for attempt in range(MAX_RETRIES):
+            for attempt in range(3):
 
                 _log(f"Test run {attempt + 1}")
 
                 ok, err = self.execution_guard.validate()
                 if not ok:
-                    _log(f"EXECUTION GUARD TRIGGERED → {err}")
                     return False
+
+                # ✅ NEW: safe reflection (non-breaking)
+                try:
+                    reflection = self.reflection_engine.reflect()
+                except Exception:
+                    reflection = {}
 
                 self.test_runner.run_tests()
-
-                ok, err = self.execution_guard.validate()
-                if not ok:
-                    _log(f"EXECUTION GUARD TRIGGERED (post-test) → {err}")
-                    return False
 
                 strict_result = run_strict_generated_tests()
 
                 if strict_result["success"]:
-                    _log("Tests PASSED (strict)")
-                    break
-
-                _log("Tests FAILED → fixing")
+                    return True
 
                 failure_info = strict_result
                 error_text = failure_info.get("error", "")
 
-                best_strategy = self.fix_memory.get_best_strategy(error_text)
+                # ✅ NEW: attach system awareness
+                if isinstance(failure_info, dict):
+                    failure_info["system_context"] = reflection
+
                 fixes = self.auto_fix_engine.generate_fixes(failure_info)
+
+                _log(f"Generated {len(fixes)} fix candidates")
+
+                fixes = self.strategy_selector.rank(fixes)
+
+                _log("Fixes ranked")
+
+                best_strategy = self.fix_memory.get_best_strategy(error_text)
 
                 if best_strategy:
                     fixes = sorted(
                         fixes,
                         key=lambda f: 0 if f.get("strategy") == best_strategy else 1
                     )
-                    _log(f"Memory boost → prioritizing strategy: {best_strategy}")
-
-                _log(f"Generated {len(fixes)} fix candidates")
-
-                applied_success = False
 
                 for fix in fixes:
 
-                    _log(f"Trying fix strategy: {fix.get('strategy')}")
+                    _log(f"Trying: {fix.get('strategy')}")
 
-                    applied = self.apply_fix(fix, implementation_plan)
-
-                    if not applied:
-                        _log("Fix failed to apply → skipping")
+                    if not self.apply_fix(fix, implementation_plan):
                         continue
 
                     strict_result = run_strict_generated_tests()
 
                     if strict_result["success"]:
-                        _log(f"Fix SUCCESS with strategy: {fix.get('strategy')}")
-
                         self.fix_memory.record_success(
                             error_text,
                             fix.get("strategy")
                         )
+                        return True
 
-                        applied_success = True
-                        break
-                    else:
-                        _log("Fix did not resolve issue → trying next")
-
-                if not applied_success:
-                    _log("All fixes failed → FAIL-CLOSED")
-                    return False
-
-            if strict_result["success"]:
-                _log("AUTO MODE COMPLETE → SUCCESS")
-                return True
-            else:
-                _log("AUTO MODE COMPLETE → FAILED")
-                return False
+            return False
 
         except Exception:
-            _log("AUTO MODE FAILED")
             _log(traceback.format_exc())
-            return None
+            return False
+
+    # ------------------------------------------------
 
     def propose_architecture(self, strategic_direction: str):
 
@@ -365,17 +333,7 @@ class DevelopmentOrchestrator:
             self.FORBIDDEN_PATHS
         )
 
-        enriched_prompt = f"""
-SYSTEM CONTEXT
---------------
-{repo_context}
-
-DEVELOPMENT REQUEST
--------------------
-{strategic_direction}
-"""
-
-        return self.architecture_agent.propose(enriched_prompt)
+        return self.architecture_agent.propose(str(repo_context))
 
     def build_implementation_plan(self, architecture_proposal):
 

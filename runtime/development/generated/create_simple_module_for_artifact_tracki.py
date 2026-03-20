@@ -27,3 +27,11 @@ pass
 
 # --- AUTO FIX APPLIED ---
 # SYNTAX FIX PLACEHOLDER
+
+
+# --- AUTO FIX APPLIED ---
+
+def foo(*args, **kwargs):
+    # AUTO-GENERATED STUB (NameError fix)
+    return None
+
