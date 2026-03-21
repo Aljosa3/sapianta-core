@@ -99,11 +99,10 @@ class DevAutonomousLoop:
 
         # simulate development code
 
-        code = """
-print("development sandbox test")
-"""
+        code = "raise Exception('test failure')"
 
         result = self.sandbox.run_code(code)
+
 
         # --- AUTO REPAIR HOOK ---
         try:
@@ -135,6 +134,7 @@ print("development sandbox test")
                 "task": task
             }
 
+        self.registry.reject_task(task)   # 🔑 KLJUČNO
         self.memory.record_failed(task)
 
         execution_time = time.time() - start
