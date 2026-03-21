@@ -7,6 +7,18 @@ from runtime.development.idea_detector import detect_idea
 from . import dev_add_task
 
 
+# ---------------------------------------------------------
+# 1. DETERMINISTIC LLM STUB (NO EXTERNAL DEPENDENCY)
+# ---------------------------------------------------------
+
+def ask_llm(prompt: str) -> str:
+    return "[MOCK] " + prompt
+
+
+# ---------------------------------------------------------
+# 2. IDEA PARSER
+# ---------------------------------------------------------
+
 class IdeaParser:
 
     @staticmethod
@@ -21,11 +33,16 @@ class IdeaParser:
         return idea
 
 
+# ---------------------------------------------------------
+# 3. TASK GENERATORS
+# ---------------------------------------------------------
+
 class TaskProposalGenerator:
 
     @staticmethod
     def generate(idea: dict):
 
+        # legacy format (for UI / orchestrator)
         task = {
             "task_id": str(uuid.uuid4()),
             "title": idea["description"],
@@ -37,7 +54,75 @@ class TaskProposalGenerator:
         return task
 
 
+class DeterministicTaskBuilder:
+
+    @staticmethod
+    def build(user_input: str):
+
+        return {
+            "goal": user_input.strip(),
+            "priority": 1
+        }
+
+
+# ---------------------------------------------------------
+# 4. CLI ENTRYPOINT
+# ---------------------------------------------------------
+
 def run(args):
+
+    # =====================================================
+    # CLI MODE (non-interactive)
+    # =====================================================
+    if args:
+
+        user_input = " ".join(args).strip()
+
+        if not user_input:
+            print("[DISCUSS] Empty input")
+            return
+
+        print("\n[DISCUSS INPUT]")
+        print("----------------")
+        print(user_input)
+
+        llm_output = ask_llm(user_input)
+
+        print("\n[LLM OUTPUT]")
+        print("----------------")
+        print(llm_output)
+
+        task = DeterministicTaskBuilder.build(user_input)
+
+        print("\n[GENERATED TASK]")
+        print("----------------")
+        print(task)
+
+        try:
+            from runtime.development.dev_autonomous_loop import DevAutonomousLoop
+        except Exception as e:
+            print("\n[ERROR] Failed to import DevAutonomousLoop")
+            print(str(e))
+            return
+
+        loop = DevAutonomousLoop()
+
+        try:
+            result = loop.submit_task(task)
+        except Exception as e:
+            print("\n[ERROR] Task submission failed")
+            print(str(e))
+            return
+
+        print("\n[SUBMISSION RESULT]")
+        print("----------------")
+        print(result)
+
+        return
+
+    # =====================================================
+    # INTERACTIVE MODE (existing system)
+    # =====================================================
 
     print("\nSAPIANTA Discussion Mode")
     print("------------------------")
@@ -64,7 +149,7 @@ def run(args):
             continue
 
         # ------------------------------------------------
-        # IMPLEMENT MODE (manual)
+        # IMPLEMENT MODE
         # ------------------------------------------------
         if user_input.lower() == "implement":
 
@@ -122,13 +207,10 @@ def run(args):
             if confirm.lower() == "y":
 
                 context = task["description"]
-
                 orchestrator.run_implementation(context)
-
                 implement_mode = True
 
             else:
-
                 print("Task discarded.")
 
             continue
@@ -141,23 +223,35 @@ def run(args):
         print("\nSAPIANTA:", response)
 
         # ------------------------------------------------
-        # AUTO IDEA DETECTION → AUTO IMPLEMENT
+        # AUTO IDEA DETECTION → DUAL PIPELINE
         # ------------------------------------------------
         if detect_idea(user_input):
 
             print("\n[AI] Development idea detected.")
 
-            args = [user_input]
+            # 1️⃣ LEGACY (registry)
+            dev_add_task.run([user_input])
 
-            dev_add_task.run(args)
+            print("[AI] Task added to registry.")
 
-            print("[AI] Task automatically added to registry.")
+            # 2️⃣ NEW (deterministic loop)
+            try:
+                from runtime.development.dev_autonomous_loop import DevAutonomousLoop
 
+                loop = DevAutonomousLoop()
+                task = DeterministicTaskBuilder.build(user_input)
+
+                result = loop.submit_task(task)
+
+                print("[AI] Autonomous loop submission:", result)
+
+            except Exception as e:
+                print(f"[AI] Autonomous submission failed: {e}")
+
+            # 3️⃣ AUTO IMPLEMENT (existing)
             print("[AI] Starting automatic implementation...")
 
             try:
-                # 🔥 KLJUČNI POPRAVEK
                 orchestrator.run_auto(user_input)
-
             except Exception as e:
                 print(f"[AI] Auto implementation failed: {e}")
