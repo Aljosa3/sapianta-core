@@ -36,13 +36,11 @@ class DevAutonomousLoop:
         Submit new development task with proper duplicate detection.
         """
 
-        # hitro preverjanje (hash index)
         if self.hash_index.has_task(task):
             return "duplicate"
 
         self.hash_index.add_task(task)
 
-        # robustno preverjanje (registry stanje)
         before = len(self.registry.get_active_tasks())
         self.registry.add_task(task)
         after = len(self.registry.get_active_tasks())
@@ -69,7 +67,6 @@ class DevAutonomousLoop:
             return {"status": "no_tasks"}
 
         ordered = self.planner.prioritize(tasks)
-
         task = ordered[0]
 
         decision = self.gate.evaluate(task)
@@ -80,68 +77,70 @@ class DevAutonomousLoop:
             self.memory.record_blocked(task)
 
             execution_time = time.time() - start
-            self.metrics.record_cycle("blocked", execution_time, task=task)  # ✅ UPDATED
+            self.metrics.record_cycle("blocked", execution_time, task=task)
 
-            return {
-                "status": "blocked",
-                "task": task
-            }
+            return {"status": "blocked", "task": task}
 
         if decision == DevGovernanceGate.REVIEW:
 
             execution_time = time.time() - start
-            self.metrics.record_cycle("review", execution_time, task=task)  # ✅ UPDATED
+            self.metrics.record_cycle("review", execution_time, task=task)
 
-            return {
-                "status": "needs_review",
-                "task": task
-            }
+            return {"status": "needs_review", "task": task}
 
-        # simulate development code
+        # ---------------------------------------------------------
+        # REAL EXECUTION VIA ORCHESTRATOR
+        # ---------------------------------------------------------
 
-        code = "raise Exception('test failure')"
+        from runtime.development.dev_orchestrator import DevelopmentOrchestrator
 
-        result = self.sandbox.run_code(code)
+        orchestrator = DevelopmentOrchestrator()
 
-
-        # --- AUTO REPAIR HOOK ---
         try:
-            failed = False
+            success = orchestrator.run_auto(task.get("goal", ""))
+        except Exception as e:
+            print("[LOOP] Orchestrator execution failed:", str(e))
+            success = False
 
-            if isinstance(result, dict):
-                failed = result.get("status") == "failed"
-            elif result is False:
-                failed = True
+        # ---------------------------------------------------------
+        # AUTO REPAIR HOOK (fallback safety)
+        # ---------------------------------------------------------
 
-            if failed:
+        try:
+            if not success:
                 print("[AUTO-REPAIR] Triggering repair...")
                 from runtime.development.repair_orchestrator import main as repair_main
                 repair_main()
-
         except Exception as e:
             print("[AUTO-REPAIR] Error:", str(e))
 
-        if result["status"] == "success":
+        # ---------------------------------------------------------
+        # RESULT HANDLING
+        # ---------------------------------------------------------
+
+        if success:
 
             self.registry.complete_task(task)
             self.memory.record_completed(task)
 
             execution_time = time.time() - start
-            self.metrics.record_cycle("completed", execution_time, task=task)  # ✅ UPDATED
+            self.metrics.record_cycle("completed", execution_time, task=task)
 
             return {
                 "status": "completed",
                 "task": task
             }
 
-        self.registry.reject_task(task)   # 🔑 KLJUČNO
+        # FAILED PATH
+
+        self.registry.reject_task(task)
         self.memory.record_failed(task)
 
         execution_time = time.time() - start
-        self.metrics.record_cycle("failed", execution_time, task=task)  # ✅ UPDATED
+        self.metrics.record_cycle("failed", execution_time, task=task)
 
         return {
             "status": "failed",
             "task": task,
-            "error": result
+            "error": "orchestrator_failed"
         }

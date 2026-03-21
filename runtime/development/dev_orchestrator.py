@@ -35,7 +35,6 @@ from runtime.development.execution_guard import ExecutionGuard
 
 from runtime.development.ast_function_patcher import ASTFunctionPatcher
 
-# ✅ NEW: self-awareness engine
 from runtime.system.system_reflection_engine import SystemReflectionEngine
 
 
@@ -47,6 +46,53 @@ def _log(msg):
     print(f"[DEV_ORCH] {msg}")
 
 
+# ---------------------------------------------------------
+# SANITIZE
+# ---------------------------------------------------------
+
+def sanitize_filename(filename: str) -> str:
+
+    if not isinstance(filename, str):
+        return ""
+
+    filename = filename.replace("\n", "").replace("\r", "")
+    filename = filename.strip()
+    filename = "_".join(filename.split())
+
+    return filename
+
+
+# ---------------------------------------------------------
+# VALIDATION
+# ---------------------------------------------------------
+
+def is_valid_generated_file(filename: str) -> bool:
+
+    if not isinstance(filename, str):
+        return False
+
+    if "\n" in filename or "\r" in filename:
+        return False
+
+    if not filename.endswith(".py"):
+        return False
+
+    if ":" in filename:
+        return False
+
+    if " " in filename:
+        return False
+
+    if filename.strip() == "":
+        return False
+
+    return True
+
+
+# ---------------------------------------------------------
+# 🔥 STRICT TEST VALIDATION (PATCH #3 COMPLETE)
+# ---------------------------------------------------------
+
 def run_strict_generated_tests():
 
     _log("STRICT TEST MODE → validating generated modules")
@@ -54,25 +100,67 @@ def run_strict_generated_tests():
     runner = TestRunner(project_root=".", timeout=10)
     diagnostics = runner.run_tests()
 
+    raw_output = diagnostics.raw_output or ""
+    raw_error = diagnostics.raw_error or ""
+    combined_output = raw_output + raw_error
+
+    # 🔥 CRITICAL ERROR DETECTION
+    critical_errors = [
+        "ImportError",
+        "ModuleNotFoundError",
+        "SyntaxError"
+    ]
+
+    has_critical_error = any(err in combined_output for err in critical_errors)
+
+    if has_critical_error:
+        _log("CRITICAL ERROR DETECTED → FORCE FAIL")
+
+    # 🔥 NEW: CODEGEN FAILURE DETECTION
+    has_codegen_failure = (
+        "[CODEGEN] Module test result" in combined_output
+        and "'status': 'FAILED'" in combined_output
+    )
+
+    if has_codegen_failure:
+        _log("CODEGEN TEST FAILURE DETECTED → FORCE FAIL")
+
+    # 🔥 STRICT SUCCESS LOGIC
     no_tests_collected = diagnostics.tests_total == 0
-    success = diagnostics.success and not no_tests_collected
+
+    success = (
+        diagnostics.success
+        and diagnostics.tests_total > 0
+        and not has_critical_error
+        and not has_codegen_failure   # 🔥 CRITICAL FIX
+    )
 
     if no_tests_collected:
         _log("STRICT TEST FAILED → no tests collected")
 
+    if has_critical_error:
+        _log("STRICT TEST FAILED → critical runtime/import error")
+
+    if has_codegen_failure:
+        _log("STRICT TEST FAILED → codegen test failure")
+
     if not success:
         _log("STRICT TEST FAILED")
-        _log(diagnostics.raw_output)
-        _log(diagnostics.raw_error)
+        _log(raw_output)
+        _log(raw_error)
     else:
         _log("STRICT TEST PASSED")
 
     return {
         "success": success,
-        "error": diagnostics.raw_output + diagnostics.raw_error,
-        "output": diagnostics.raw_output
+        "error": combined_output,
+        "output": raw_output
     }
 
+
+# =========================================================
+# ORCHESTRATOR
+# =========================================================
 
 class DevelopmentOrchestrator:
 
@@ -122,18 +210,9 @@ class DevelopmentOrchestrator:
             max_runtime=30
         )
 
-        # ✅ NEW: initialize reflection engine (safe, no side effects)
         self.reflection_engine = SystemReflectionEngine(root=".")
 
-    # =================================================
-    # CORE MUTATION GUARD (FIX FOR TEST + GOVERNANCE)
-    # =================================================
-
     def _check_core_modification(self, plan: list):
-        """
-        Prevent modification of protected core paths.
-        Uses FORBIDDEN_PATHS → no hardcoding.
-        """
 
         for path in plan:
             for forbidden in self.FORBIDDEN_PATHS:
@@ -142,10 +221,6 @@ class DevelopmentOrchestrator:
                         f"Mutation forbidden: core system modification detected ({path})"
                     )
 
-    # =================================================
-    # AST FUNCTION REPLACE
-    # =================================================
-
     def _apply_replace_function(self, fix: dict):
 
         return ASTFunctionPatcher.replace_function(
@@ -153,10 +228,6 @@ class DevelopmentOrchestrator:
             fix.get("function"),
             fix.get("code")
         )
-
-    # ------------------------------------------------
-    # APPLY FIX
-    # ------------------------------------------------
 
     def apply_fix(self, fix, implementation_plan):
 
@@ -232,10 +303,6 @@ class DevelopmentOrchestrator:
             _log(traceback.format_exc())
             return False
 
-    # ------------------------------------------------
-    # AUTO MODE
-    # ------------------------------------------------
-
     def run_auto(self, discussion_context=None):
 
         _log("AUTO MODE START")
@@ -245,6 +312,16 @@ class DevelopmentOrchestrator:
             architecture = self.propose_architecture(discussion_context)
 
             implementation_plan = self.build_implementation_plan(architecture)
+
+            implementation_plan = [
+                sanitize_filename(f)
+                for f in implementation_plan
+                if is_valid_generated_file(sanitize_filename(f))
+            ]
+
+            if not implementation_plan:
+                _log("No valid files to generate after filtering")
+                return False
 
             self._check_core_modification(implementation_plan)
             self.mutation_guard.validate_patch(implementation_plan)
@@ -266,7 +343,6 @@ class DevelopmentOrchestrator:
                 if not ok:
                     return False
 
-                # ✅ NEW: safe reflection (non-breaking)
                 try:
                     reflection = self.reflection_engine.reflect()
                 except Exception:
@@ -282,7 +358,6 @@ class DevelopmentOrchestrator:
                 failure_info = strict_result
                 error_text = failure_info.get("error", "")
 
-                # ✅ NEW: attach system awareness
                 if isinstance(failure_info, dict):
                     failure_info["system_context"] = reflection
 
@@ -324,8 +399,6 @@ class DevelopmentOrchestrator:
             _log(traceback.format_exc())
             return False
 
-    # ------------------------------------------------
-
     def propose_architecture(self, strategic_direction: str):
 
         repo_context = self.repo_context.summarize(
@@ -333,7 +406,17 @@ class DevelopmentOrchestrator:
             self.FORBIDDEN_PATHS
         )
 
-        return self.architecture_agent.propose(str(repo_context))
+        full_context = f"""
+DEVELOPMENT REQUEST
+-------------------
+{strategic_direction}
+
+REPOSITORY CONTEXT
+------------------
+{repo_context}
+"""
+
+        return self.architecture_agent.propose(full_context)
 
     def build_implementation_plan(self, architecture_proposal):
 
