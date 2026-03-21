@@ -85,21 +85,35 @@ class DevTaskRegistry:
 
     def complete_task(self, task: Dict) -> None:
         """
-        Mark task as completed.
+        Mark task as completed and remove it from active queue.
         """
-        if task in self.active_tasks:
+
+        # vedno poskusi odstraniti (deterministično)
+        try:
             self.active_tasks.remove(task)
+        except ValueError:
+            pass
+
+        # prepreči duplikate v completed
+        if task not in self.completed_tasks:
             self.completed_tasks.append(task)
-            self._persist()
+
+        self._persist()
 
     def reject_task(self, task: Dict) -> None:
         """
         Mark task as rejected.
         """
-        if task in self.active_tasks:
+
+        try:
             self.active_tasks.remove(task)
+        except ValueError:
+            pass
+
+        if task not in self.rejected_tasks:
             self.rejected_tasks.append(task)
-            self._persist()
+
+        self._persist()
 
     def get_active_tasks(self) -> List[Dict]:
         return list(self.active_tasks)

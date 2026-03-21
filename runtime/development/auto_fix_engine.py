@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import List, Dict, Optional
 
 from runtime.development.function_registry import FunctionRegistry
+from runtime.development.integrity_validator import IntegrityValidator
 
 
 class AutoFixEngine:
@@ -25,6 +26,7 @@ class AutoFixEngine:
 
     def __init__(self):
         self.registry = FunctionRegistry(self.PROJECT_ROOT)
+        self.validator = IntegrityValidator()
         try:
             self.registry.build()
         except Exception:
@@ -230,7 +232,15 @@ class AutoFixEngine:
         if context_fixes:
             fixes = context_fixes + fixes
 
-        return self._deduplicate_fixes(fixes)
+        validated = []
+        for fix in fixes:
+            try:
+                fix = self.validator.validate_fix(fix)
+                validated.append(fix)
+            except Exception:
+                continue
+
+        return self._deduplicate_fixes(validated)
 
     # ================================================================
     # FALLBACK SEARCH (KEPT FOR SAFETY)

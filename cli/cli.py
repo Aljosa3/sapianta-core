@@ -1,35 +1,46 @@
+import importlib
 import sys
 
 from cli.errors import InvalidCommandError
-from cli.commands import (
-    init,
-    input as input_cmd,
-    confirm,
-    show,
-    list as list_cmd,
-    inspect,
-    sswa,      # ← že obstoječe
-    discuss,   # ← DODANO
-)
 
-# Kanonični command surface (LOCKED)
+
+# Kanonični command surface (LOCKED + lazy loading)
 COMMANDS = {
-    "init": init,
-    "input": input_cmd,
-    "confirm": confirm,
-    "show": show,
-    "list": list_cmd,
-    "inspect": inspect,
-    "sswa": sswa,      # ← že obstoječe
-    "discuss": discuss # ← DODANO
+    # --- CORE ---
+    "init": "cli.commands.init",
+    "input": "cli.commands.input",
+    "confirm": "cli.commands.confirm",
+    "show": "cli.commands.show",
+    "list": "cli.commands.list",
+    "inspect": "cli.commands.inspect",
+    "sswa": "cli.commands.sswa",
+    "discuss": "cli.commands.discuss",
+
+    # --- DEV ---
+    "dev_run": "cli.commands.dev_run",
+    "dev_loop": "cli.commands.dev_loop",
+    "dev_run_auto": "cli.commands.dev_run_auto",
+    "dev_metrics": "cli.commands.dev_metrics",
+    "dev_status": "cli.commands.dev_status",
+    "dev_history": "cli.commands.dev_history",
+    "dev_list": "cli.commands.dev_list",
+    "dev_add_task": "cli.commands.dev_add_task",
+    "dev_reconcile": "cli.commands.dev_reconcile",
+    "dev_learn": "cli.commands.dev_learn",
+
+    # --- TASK ---
+    "add_task": "cli.commands.add_task",
+
+    # --- REPAIR ---
+    "fix": "cli.commands.fix",
 }
 
 
 def main(argv=None):
     """
     Minimal, stateless CLI router.
+    - Lazy command loading
     - No lifecycle logic
-    - No execution
     - No writes
     """
     if argv is None:
@@ -44,5 +55,16 @@ def main(argv=None):
     if command_name not in COMMANDS:
         raise InvalidCommandError(f"Unknown command: {command_name}")
 
-    COMMANDS[command_name].run(args)
-    
+    command_path = COMMANDS[command_name]
+
+    try:
+        module = importlib.import_module(command_path)
+    except Exception as e:
+        raise InvalidCommandError(
+            f"Failed to load command '{command_name}': {str(e)}"
+        )
+
+    if hasattr(module, "run"):
+        module.run(args)
+    else:
+        raise InvalidCommandError(f"Command '{command_name}' has no run()")

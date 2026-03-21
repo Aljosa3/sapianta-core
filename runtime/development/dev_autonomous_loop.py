@@ -97,6 +97,23 @@ print("development sandbox test")
 
         result = self.sandbox.run_code(code)
 
+        # --- AUTO REPAIR HOOK ---
+        try:
+            failed = False
+
+            if isinstance(result, dict):
+                failed = result.get("status") == "failed"
+            elif result is False:
+                failed = True
+
+            if failed:
+                print("[AUTO-REPAIR] Triggering repair...")
+                from runtime.development.repair_orchestrator import main as repair_main
+                repair_main()
+
+        except Exception as e:
+            print("[AUTO-REPAIR] Error:", str(e))
+
         if result["status"] == "success":
 
             self.registry.complete_task(task)

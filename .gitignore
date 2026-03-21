@@ -160,3 +160,5 @@ tests/**/*.pyc
 # ------------------------------------------------------------
 *.pyc
 *.pyo
+runtime/development/task_registry.json
+runtime/development/dev_metrics.json
