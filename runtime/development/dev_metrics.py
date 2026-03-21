@@ -23,7 +23,7 @@ class DevMetrics:
         with open(METRICS_FILE, "r") as f:
             self.data = json.load(f)
 
-        # ✅ NEW: deterministic schema reconciliation
+        # ✅ deterministic schema reconciliation
         self._ensure_schema()
 
     # ------------------------------------------------
@@ -39,7 +39,8 @@ class DevMetrics:
                 "tasks_completed": 0,
                 "tasks_failed": 0,
                 "tasks_blocked": 0,
-                "total_execution_time": 0.0
+                "total_execution_time": 0.0,
+                "execution_log": []  # ✅ NEW
             }
 
             with open(METRICS_FILE, "w") as f:
@@ -59,7 +60,8 @@ class DevMetrics:
             "tasks_completed": 0,
             "tasks_failed": 0,
             "tasks_blocked": 0,
-            "total_execution_time": 0.0
+            "total_execution_time": 0.0,
+            "execution_log": []  # ✅ NEW
         }
 
         updated = False
@@ -85,7 +87,10 @@ class DevMetrics:
     # Record cycle
     # ------------------------------------------------
 
-    def record_cycle(self, status: str, execution_time: float):
+    def record_cycle(self, status: str, execution_time: float, task: dict = None):
+        """
+        Records execution cycle + optional per-task history.
+        """
 
         # ✅ SAFE access (deterministic)
         self.data.setdefault("tasks_processed", 0)
@@ -105,6 +110,20 @@ class DevMetrics:
         elif status == "blocked":
             self.data.setdefault("tasks_blocked", 0)
             self.data["tasks_blocked"] += 1
+
+        # ✅ NEW: execution history log
+        if task:
+            import time
+
+            self.data.setdefault("execution_log", [])
+
+            self.data["execution_log"].append({
+                "task_id": task.get("id"),
+                "goal": task.get("goal"),
+                "status": status,
+                "execution_time": execution_time,
+                "timestamp": time.time()
+            })
 
         self._persist()
 

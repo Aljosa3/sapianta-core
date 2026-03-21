@@ -80,7 +80,7 @@ class DevAutonomousLoop:
             self.memory.record_blocked(task)
 
             execution_time = time.time() - start
-            self.metrics.record_cycle("blocked", execution_time)
+            self.metrics.record_cycle("blocked", execution_time, task=task)  # ✅ UPDATED
 
             return {
                 "status": "blocked",
@@ -90,7 +90,7 @@ class DevAutonomousLoop:
         if decision == DevGovernanceGate.REVIEW:
 
             execution_time = time.time() - start
-            self.metrics.record_cycle("review", execution_time)
+            self.metrics.record_cycle("review", execution_time, task=task)  # ✅ UPDATED
 
             return {
                 "status": "needs_review",
@@ -128,7 +128,7 @@ print("development sandbox test")
             self.memory.record_completed(task)
 
             execution_time = time.time() - start
-            self.metrics.record_cycle("completed", execution_time)
+            self.metrics.record_cycle("completed", execution_time, task=task)  # ✅ UPDATED
 
             return {
                 "status": "completed",
@@ -138,7 +138,7 @@ print("development sandbox test")
         self.memory.record_failed(task)
 
         execution_time = time.time() - start
-        self.metrics.record_cycle("failed", execution_time)
+        self.metrics.record_cycle("failed", execution_time, task=task)  # ✅ UPDATED
 
         return {
             "status": "failed",
