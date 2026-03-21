@@ -22,7 +22,7 @@ COMMANDS = {
     "dev_run_auto": "cli.commands.dev_run_auto",
     "dev_metrics": "cli.commands.dev_metrics",
     "dev_status": "cli.commands.dev_status",
-    "dev_history": "cli.commands.dev_history",
+    "dev_history": "cli.commands.dev_history",  # ✅ ključna registracija
     "dev_list": "cli.commands.dev_list",
     "dev_add_task": "cli.commands.dev_add_task",
     "dev_reconcile": "cli.commands.dev_reconcile",
@@ -64,7 +64,10 @@ def main(argv=None):
             f"Failed to load command '{command_name}': {str(e)}"
         )
 
-    if hasattr(module, "run"):
+    # ✅ robust execution contract
+    if hasattr(module, "run") and callable(module.run):
         module.run(args)
     else:
-        raise InvalidCommandError(f"Command '{command_name}' has no run()")
+        raise InvalidCommandError(
+            f"Command '{command_name}' does not implement callable run(args)"
+        )
