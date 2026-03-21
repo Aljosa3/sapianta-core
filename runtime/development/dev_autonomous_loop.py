@@ -33,14 +33,22 @@ class DevAutonomousLoop:
 
     def submit_task(self, task: dict) -> str:
         """
-        Submit new development task.
+        Submit new development task with proper duplicate detection.
         """
 
+        # hitro preverjanje (hash index)
         if self.hash_index.has_task(task):
             return "duplicate"
 
         self.hash_index.add_task(task)
+
+        # robustno preverjanje (registry stanje)
+        before = len(self.registry.get_active_tasks())
         self.registry.add_task(task)
+        after = len(self.registry.get_active_tasks())
+
+        if after == before:
+            return "duplicate"
 
         return "registered"
 

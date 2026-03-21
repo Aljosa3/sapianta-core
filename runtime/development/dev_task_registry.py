@@ -16,6 +16,7 @@ survive across CLI processes.
 
 import json
 import os
+import hashlib
 from typing import List, Dict
 
 
@@ -76,10 +77,30 @@ class DevTaskRegistry:
         with open(REGISTRY_FILE, "w") as f:
             json.dump(data, f, indent=2)
 
+    # 🔑 determinističen ID
+    def _generate_task_id(self, task: Dict) -> str:
+        """
+        Generate deterministic task ID based on content.
+        """
+        base = f"{task.get('goal','')}|{task.get('priority',0)}"
+        return hashlib.sha256(base.encode()).hexdigest()
+
     def add_task(self, task: Dict) -> None:
         """
-        Register a new development task.
+        Register a new development task (with deduplication).
         """
+
+        task_id = self._generate_task_id(task)
+
+        # dedup check (works for both new + legacy tasks)
+        for existing in self.active_tasks:
+            existing_id = existing.get("id") or self._generate_task_id(existing)
+            if existing_id == task_id:
+                return
+
+        # assign ID
+        task["id"] = task_id
+
         self.active_tasks.append(task)
         self._persist()
 
@@ -88,13 +109,15 @@ class DevTaskRegistry:
         Mark task as completed and remove it from active queue.
         """
 
-        # vedno poskusi odstraniti (deterministično)
-        try:
-            self.active_tasks.remove(task)
-        except ValueError:
-            pass
+        task_id = task.get("id")
 
-        # prepreči duplikate v completed
+        # remove by ID (robust)
+        self.active_tasks = [
+            t for t in self.active_tasks
+            if t.get("id") != task_id
+        ]
+
+        # prevent duplicates
         if task not in self.completed_tasks:
             self.completed_tasks.append(task)
 
@@ -105,10 +128,12 @@ class DevTaskRegistry:
         Mark task as rejected.
         """
 
-        try:
-            self.active_tasks.remove(task)
-        except ValueError:
-            pass
+        task_id = task.get("id")
+
+        self.active_tasks = [
+            t for t in self.active_tasks
+            if t.get("id") != task_id
+        ]
 
         if task not in self.rejected_tasks:
             self.rejected_tasks.append(task)
