@@ -46,11 +46,7 @@ def _log(msg):
     print(f"[DEV_ORCH] {msg}")
 
 
-# ---------------------------------------------------------
-# SANITIZE
-# ---------------------------------------------------------
-
-def sanitize_filename(filename: str) -> str:
+def sanitize_filename(filename: str):
 
     if not isinstance(filename, str):
         return ""
@@ -62,11 +58,7 @@ def sanitize_filename(filename: str) -> str:
     return filename
 
 
-# ---------------------------------------------------------
-# VALIDATION
-# ---------------------------------------------------------
-
-def is_valid_generated_file(filename: str) -> bool:
+def is_valid_generated_file(filename: str):
 
     if not isinstance(filename, str):
         return False
@@ -89,10 +81,6 @@ def is_valid_generated_file(filename: str) -> bool:
     return True
 
 
-# ---------------------------------------------------------
-# 🔥 STRICT TEST VALIDATION (PATCH #3 COMPLETE)
-# ---------------------------------------------------------
-
 def run_strict_generated_tests():
 
     _log("STRICT TEST MODE → validating generated modules")
@@ -104,7 +92,6 @@ def run_strict_generated_tests():
     raw_error = diagnostics.raw_error or ""
     combined_output = raw_output + raw_error
 
-    # 🔥 CRITICAL ERROR DETECTION
     critical_errors = [
         "ImportError",
         "ModuleNotFoundError",
@@ -116,7 +103,6 @@ def run_strict_generated_tests():
     if has_critical_error:
         _log("CRITICAL ERROR DETECTED → FORCE FAIL")
 
-    # 🔥 NEW: CODEGEN FAILURE DETECTION
     has_codegen_failure = (
         "[CODEGEN] Module test result" in combined_output
         and "'status': 'FAILED'" in combined_output
@@ -125,14 +111,13 @@ def run_strict_generated_tests():
     if has_codegen_failure:
         _log("CODEGEN TEST FAILURE DETECTED → FORCE FAIL")
 
-    # 🔥 STRICT SUCCESS LOGIC
     no_tests_collected = diagnostics.tests_total == 0
 
     success = (
         diagnostics.success
         and diagnostics.tests_total > 0
         and not has_critical_error
-        and not has_codegen_failure   # 🔥 CRITICAL FIX
+        and not has_codegen_failure
     )
 
     if no_tests_collected:
@@ -157,10 +142,6 @@ def run_strict_generated_tests():
         "output": raw_output
     }
 
-
-# =========================================================
-# ORCHESTRATOR
-# =========================================================
 
 class DevelopmentOrchestrator:
 
@@ -319,9 +300,13 @@ class DevelopmentOrchestrator:
                 if is_valid_generated_file(sanitize_filename(f))
             ]
 
+            # 🔥 FIXED CONTRACT
             if not implementation_plan:
                 _log("No valid files to generate after filtering")
-                return False
+                return {
+                    "success": False,
+                    "reason": "no_valid_files"
+                }
 
             self._check_core_modification(implementation_plan)
             self.mutation_guard.validate_patch(implementation_plan)

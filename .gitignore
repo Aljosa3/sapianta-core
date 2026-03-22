@@ -1,5 +1,5 @@
 # ============================================================
-# SAPIANTA — Canonical .gitignore (UPDATED)
+# SAPIANTA — Canonical .gitignore (UPDATED v2)
 # ============================================================
 
 # ------------------------------------------------------------
@@ -103,7 +103,7 @@ temp/
 tmp/
 
 # ------------------------------------------------------------
-# Jupyter (if ever used in domain experiments)
+# Jupyter
 # ------------------------------------------------------------
 .ipynb_checkpoints/
 
@@ -123,17 +123,18 @@ coverage.xml
 *.dll
 *.exe
 
-# ------------------------------------------------------------
-# 🔥 SAPIANTA RUNTIME (CRITICAL ADDITION)
-# ------------------------------------------------------------
+# ============================================================
+# 🔥 SAPIANTA RUNTIME (CRITICAL)
+# ============================================================
+
+# IGNORE generated runtime artefacts
 runtime/development/generated/
-runtime/development/generated_module.py
 runtime/development/dev_outcomes.jsonl
 runtime/development/*.json
 runtime/history/*.jsonl
 
 # ------------------------------------------------------------
-# Explicit NON-ignore (canonical domains — safety net)
+# Explicit NON-ignore (canonical domains)
 # ------------------------------------------------------------
 !governance/**
 !runtime/**
@@ -144,7 +145,15 @@ runtime/history/*.jsonl
 !src/**
 
 # ------------------------------------------------------------
-# Enforce runtime cleanliness (override NON-ignore)
+# 🔥 RE-OVERRIDE (CRITICAL FIX)
+# ------------------------------------------------------------
+
+# ponovno ignoriraj generated (ker !runtime/** override-a)
+runtime/development/generated/
+runtime/development/generated/**
+
+# ------------------------------------------------------------
+# Enforce runtime cleanliness
 # ------------------------------------------------------------
 runtime/**/__pycache__/
 runtime/**/*.pyc
@@ -160,5 +169,9 @@ tests/**/*.pyc
 # ------------------------------------------------------------
 *.pyc
 *.pyo
+
+# ------------------------------------------------------------
+# Specific runtime files
+# ------------------------------------------------------------
 runtime/development/task_registry.json
 runtime/development/dev_metrics.json

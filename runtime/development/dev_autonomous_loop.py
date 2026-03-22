@@ -97,17 +97,37 @@ class DevAutonomousLoop:
         orchestrator = DevelopmentOrchestrator()
 
         try:
-            success = orchestrator.run_auto(task.get("goal", ""))
+            result = orchestrator.run_auto(task.get("goal", ""))
+
+            # 🔥 CRITICAL FIX: normalize result
+            if result is False:
+                success = False
+                reason = "orchestrator_failed"
+
+            elif isinstance(result, dict):
+                success = result.get("success", False)
+
+                # 🔥 HANDLE EMPTY GENERATION CASE
+                if not success and result.get("reason") == "no_valid_files":
+                    success = None  # special state
+
+                reason = result.get("reason")
+
+            else:
+                success = bool(result)
+                reason = None
+
         except Exception as e:
             print("[LOOP] Orchestrator execution failed:", str(e))
             success = False
+            reason = str(e)
 
         # ---------------------------------------------------------
         # AUTO REPAIR HOOK (fallback safety)
         # ---------------------------------------------------------
 
         try:
-            if not success:
+            if success is False:
                 print("[AUTO-REPAIR] Triggering repair...")
                 from runtime.development.repair_orchestrator import main as repair_main
                 repair_main()
@@ -118,7 +138,7 @@ class DevAutonomousLoop:
         # RESULT HANDLING
         # ---------------------------------------------------------
 
-        if success:
+        if success is True:
 
             self.registry.complete_task(task)
             self.memory.record_completed(task)
@@ -129,6 +149,19 @@ class DevAutonomousLoop:
             return {
                 "status": "completed",
                 "task": task
+            }
+
+        # 🔥 NEW: EMPTY / NO GENERATION → REVIEW (NOT FAILURE)
+
+        if success is None:
+
+            execution_time = time.time() - start
+            self.metrics.record_cycle("needs_review", execution_time, task=task)
+
+            return {
+                "status": "needs_review",
+                "task": task,
+                "reason": "no_valid_files_generated"
             }
 
         # FAILED PATH
@@ -142,5 +175,5 @@ class DevAutonomousLoop:
         return {
             "status": "failed",
             "task": task,
-            "error": "orchestrator_failed"
+            "error": reason or "orchestrator_failed"
         }

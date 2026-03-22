@@ -12,18 +12,18 @@ generated module
 ↓
 import module
 ↓
-find runnable class
+find runnable class OR test functions
 ↓
-instantiate class
-↓
-call run()
+execute
 ↓
 success / failure
 """
 
 import importlib
+import sys
 import traceback
 import inspect
+import re
 from pathlib import Path
 
 
@@ -37,35 +37,84 @@ class ModuleTestRunner:
             self.project_root = Path(__file__).resolve().parents[2]
 
     # ---------------------------------------------------------
-    # Module path → python import path
+    # NORMALIZE PATH → IMPORT PATH
     # ---------------------------------------------------------
 
-    def _to_import_path(self, file_path: str):
+    def _normalize_module_path(self, module_path: str):
 
-        path = Path(file_path)
+        if module_path.endswith(".py"):
+            module_path = module_path[:-3]
 
-        if path.suffix == ".py":
-            path = path.with_suffix("")
+        module_path = module_path.replace("/", ".").replace("\\", ".")
 
-        parts = list(path.parts)
+        if module_path.startswith("."):
+            module_path = module_path[1:]
 
-        return ".".join(parts)
+        return module_path
 
     # ---------------------------------------------------------
-    # Find runnable class (any class with run())
+    # ENSURE GENERATED PATH ON sys.path
+    # ---------------------------------------------------------
+
+    def _ensure_generated_on_path(self, file_path: str):
+
+        path = Path(file_path).resolve().parent
+
+        if str(path) not in sys.path:
+            sys.path.insert(0, str(path))
+
+    # ---------------------------------------------------------
+    # ERROR → SYSTEM CONTEXT EXTRACTION
+    # ---------------------------------------------------------
+
+    def _extract_system_context(self, error: str) -> dict:
+
+        context = {
+            "missing_functions": [],
+            "missing_imports": []
+        }
+
+        if not error:
+            return context
+
+        match = re.search(r"name '(.+?)' is not defined", error)
+        if match:
+            context["missing_functions"].append(match.group(1))
+
+        match = re.search(r"No module named '(.+?)'", error)
+        if match:
+            context["missing_imports"].append(match.group(1))
+
+        return context
+
+    # ---------------------------------------------------------
+    # Find runnable class
     # ---------------------------------------------------------
 
     def _find_runnable_class(self, module):
 
-        for name, obj in inspect.getmembers(module, inspect.isclass):
-
+        for _, obj in inspect.getmembers(module, inspect.isclass):
             if hasattr(obj, "run"):
                 return obj
 
         return None
 
     # ---------------------------------------------------------
-    # Test single module
+    # 🔥 CRITICAL FIX: FORCE RELOAD (NO CACHE)
+    # ---------------------------------------------------------
+
+    def _import_module(self, module_path: str):
+        """
+        Force reload module to reflect file changes
+        """
+
+        if module_path in sys.modules:
+            del sys.modules[module_path]
+
+        return importlib.import_module(module_path)
+
+    # ---------------------------------------------------------
+    # MAIN TEST METHOD
     # ---------------------------------------------------------
 
     def test_module(self, file_path: str):
@@ -73,41 +122,94 @@ class ModuleTestRunner:
         result = {
             "file": file_path,
             "status": "UNKNOWN",
-            "error": None
+            "success": False,
+            "error": None,
+            "output": None,
+            "system_context": {}
         }
 
         try:
 
-            module_path = self._to_import_path(file_path)
+            # allow local imports
+            self._ensure_generated_on_path(file_path)
 
-            module = importlib.import_module(module_path)
+            module_path = self._normalize_module_path(file_path)
+
+            # 🔥 now always fresh import
+            module = self._import_module(module_path)
+
+            # --------------------------------------------------
+            # 1️⃣ RUNNABLE CLASS
+            # --------------------------------------------------
 
             runnable_class = self._find_runnable_class(module)
 
-            if runnable_class is None:
+            if runnable_class is not None:
 
-                result["status"] = "FAILED"
-                result["error"] = "No runnable class with run() method found"
+                instance = runnable_class()
+
+                try:
+                    instance.run({})
+                except NotImplementedError:
+                    pass
+                except Exception as e:
+
+                    error_str = str(e)
+
+                    result["status"] = "FAILED"
+                    result["error"] = error_str
+                    result["system_context"] = self._extract_system_context(error_str)
+
+                    return result
+
+                result["status"] = "PASSED"
+                result["success"] = True
                 return result
 
-            instance = runnable_class()
+            # --------------------------------------------------
+            # 2️⃣ TEST FUNCTIONS
+            # --------------------------------------------------
 
-            try:
-                instance.run({})
-            except NotImplementedError:
-                pass
-            except Exception as e:
+            test_functions = []
 
-                result["status"] = "FAILED"
-                result["error"] = str(e)
+            for name, obj in inspect.getmembers(module, inspect.isfunction):
+                if name.startswith("test_"):
+                    test_functions.append(obj)
+
+            if test_functions:
+
+                for test_func in test_functions:
+                    try:
+                        test_func()
+                    except Exception as e:
+
+                        error_str = str(e)
+
+                        result["status"] = "FAILED"
+                        result["error"] = error_str
+                        result["system_context"] = self._extract_system_context(error_str)
+
+                        return result
+
+                result["status"] = "PASSED"
+                result["success"] = True
                 return result
 
-            result["status"] = "PASSED"
+            # --------------------------------------------------
+            # 3️⃣ NOTHING FOUND
+            # --------------------------------------------------
+
+            result["status"] = "FAILED"
+            result["error"] = "No runnable class or test functions found"
+            return result
 
         except Exception:
 
+            error_str = traceback.format_exc()
+
             result["status"] = "FAILED"
-            result["error"] = traceback.format_exc()
+            result["error"] = error_str
+            result["system_context"] = self._extract_system_context(error_str)
 
         return result
 
@@ -120,9 +222,7 @@ class ModuleTestRunner:
         results = []
 
         for f in files:
-
             r = self.test_module(f)
-
             results.append(r)
 
         return results
@@ -137,5 +237,4 @@ if __name__ == "__main__":
     )
 
     print("\nModule Test Result\n")
-
     print(result)
