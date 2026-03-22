@@ -15,6 +15,9 @@ from runtime.development.dev_sandbox_runner import DevSandboxRunner
 from runtime.development.dev_memory import DevMemory
 from runtime.development.dev_metrics import DevMetrics
 
+# 🔥 NEW: Promotion Gate
+from runtime.governance.promotion_gate import classify_change, requires_approval
+
 
 class DevAutonomousLoop:
     """
@@ -71,6 +74,34 @@ class DevAutonomousLoop:
 
         decision = self.gate.evaluate(task)
 
+        # ---------------------------------------------------------
+        # 🔥 PROMOTION GATE ENFORCEMENT (NEW)
+        # ---------------------------------------------------------
+
+        # trenutno minimal heuristic (SAFE MODE)
+        affected_files = ["runtime/development/"]
+
+        level = classify_change(affected_files)
+        needs_approval = requires_approval(level)
+
+        print(f"[GATE] Level: {level} | Approval required: {needs_approval}")
+
+        if needs_approval:
+            self.memory.record_blocked(task)
+
+            execution_time = time.time() - start
+            self.metrics.record_cycle("needs_review", execution_time, task=task)
+
+            return {
+                "status": "needs_review",
+                "task": task,
+                "reason": f"approval_required_{level}"
+            }
+
+        # ---------------------------------------------------------
+        # EXISTING GOVERNANCE GATE
+        # ---------------------------------------------------------
+
         if decision == DevGovernanceGate.BLOCK:
 
             self.registry.reject_task(task)
@@ -99,7 +130,8 @@ class DevAutonomousLoop:
         try:
             result = orchestrator.run_auto(task.get("goal", ""))
 
-            # 🔥 CRITICAL FIX: normalize result
+            # 🔥 NORMALIZATION LAYER
+
             if result is False:
                 success = False
                 reason = "orchestrator_failed"
@@ -107,9 +139,9 @@ class DevAutonomousLoop:
             elif isinstance(result, dict):
                 success = result.get("success", False)
 
-                # 🔥 HANDLE EMPTY GENERATION CASE
+                # 🔥 EMPTY GENERATION → REVIEW
                 if not success and result.get("reason") == "no_valid_files":
-                    success = None  # special state
+                    success = None
 
                 reason = result.get("reason")
 
@@ -123,7 +155,7 @@ class DevAutonomousLoop:
             reason = str(e)
 
         # ---------------------------------------------------------
-        # AUTO REPAIR HOOK (fallback safety)
+        # AUTO REPAIR HOOK
         # ---------------------------------------------------------
 
         try:
@@ -151,7 +183,7 @@ class DevAutonomousLoop:
                 "task": task
             }
 
-        # 🔥 NEW: EMPTY / NO GENERATION → REVIEW (NOT FAILURE)
+        # 🔥 EMPTY CASE → REVIEW
 
         if success is None:
 
