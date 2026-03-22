@@ -23,24 +23,53 @@ PARAMETRIC_PATHS = [
 ]
 
 
-def classify_change(file_list):
+# =========================================================
+# 🔥 NEW: DIFF ANALYSIS
+# =========================================================
+
+def contains_return_change(diff_text: str) -> bool:
+
+    if not diff_text:
+        return False
+
+    lines = diff_text.splitlines()
+
+    for line in lines:
+        if line.startswith("+") or line.startswith("-"):
+            if "return" in line:
+                return True
+
+    return False
+
+
+# =========================================================
+# CLASSIFICATION
+# =========================================================
+
+def classify_change(file_list, diff_text=None):
+
+    # 🔥 PRIORITY RULE: LOGIC CHANGE
+    if diff_text and contains_return_change(diff_text):
+        return "PARAMETRIC"
 
     level = "COSMETIC"
 
     for path in file_list:
 
         for structural in STRUCTURAL_PATHS:
-
             if path.startswith(structural):
                 return "STRUCTURAL"
 
         for param in PARAMETRIC_PATHS:
-
             if path.startswith(param):
                 level = "PARAMETRIC"
 
     return level
 
+
+# =========================================================
+# APPROVAL LOGIC
+# =========================================================
 
 def requires_approval(level):
 
