@@ -1,5 +1,6 @@
 {
   "============================= test session starts ==============================": {
-    "replace_function": 1
+    "replace_function": 1,
+    "intent_add_function": 2
   }
 }

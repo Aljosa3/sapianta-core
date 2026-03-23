@@ -36,7 +36,7 @@ class StrategySelector:
         return "standard"
 
     # ================================================================
-    # NEW: FIX RANKING ENGINE
+    # UPDATED: FIX RANKING ENGINE (MINIMAL PATCH)
     # ================================================================
 
     def rank(self, fixes: List[Dict]) -> List[Dict]:
@@ -44,13 +44,17 @@ class StrategySelector:
         Deterministic ranking of fixes.
 
         Priority:
-        1. confidence (descending)
-        2. strategy priority (tie-breaker)
+        1. intent/semantic fixes (highest)
+        2. confidence (descending)
+        3. strategy priority (tie-breaker)
         """
 
         return sorted(
             fixes,
             key=lambda f: (
+                0 if str(f.get("strategy", "")).startswith("intent_") or
+                     str(f.get("strategy", "")).startswith("semantic_")
+                else 1,
                 -f.get("confidence", 0),
                 self._strategy_priority(f.get("strategy"))
             )

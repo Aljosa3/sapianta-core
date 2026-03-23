@@ -12,6 +12,7 @@ import re
 from runtime.development.test_runner import TestRunner
 from runtime.development.auto_fix_engine import AutoFixEngine
 from runtime.development.dev_governance_gate import DevGovernanceGate
+from runtime.development.fix_orchestrator import FixOrchestrator  # 🔥 MINIMAL ADD
 
 
 # ================================================================
@@ -118,6 +119,7 @@ def main():
     # 2. Initialize components
     fixer = AutoFixEngine()
     gate = DevGovernanceGate()
+    fix_applicator = FixOrchestrator()  # 🔥 MINIMAL ADD
 
     # 3. Process failures
     for i, failure in enumerate(failures, start=1):
@@ -135,7 +137,7 @@ def main():
         except Exception as e:
             print(f"⚠️ Context build failed: {e}")
 
-        # 3.1 Generate fixes (UPDATED)
+        # 3.1 Generate fixes
         try:
             fixes = fixer.generate_fixes(failure)
         except Exception as e:
@@ -163,13 +165,34 @@ def main():
                 print("🚫 Fix rejected by governance.")
                 continue
 
-            # Apply fix (if implemented)
+            # 🔥 MINIMAL FIX: fallback target_file + test → source
             try:
-                if hasattr(fixer, "apply_fix"):
-                    fixer.apply_fix(fix)
-                    print("✅ Fix applied.")
+                target_file = fix.get("file")
+
+                if not target_file:
+                    module = failure.get("module")
+
+                    if module:
+                        module = module.replace("FAILED ", "").strip()
+
+                        target_file = module.replace(".", "/") + ".py"
+
+                        # 🔥 KLJUČNI FIX (2 vrstici)
+                        if "test_" in target_file:
+                            target_file = target_file.replace("test_", "")
+
+                        fix["file"] = target_file
+
+                if not target_file:
+                    print("⚠️ No target file specified in fix")
+                    continue
+
+                success = fix_applicator._apply_fix(target_file, fix)
+
+                if success:
+                    print(f"✅ Fix applied to {target_file}")
                 else:
-                    print("ℹ️ apply_fix not implemented (safe mode).")
+                    print(f"⚠️ Fix application failed for {target_file}")
 
             except Exception as e:
                 print(f"⚠️ Failed to apply fix: {e}")
