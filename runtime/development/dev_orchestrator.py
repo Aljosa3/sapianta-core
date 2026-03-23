@@ -117,16 +117,32 @@ def run_strict_generated_tests():
     if has_codegen_failure:
         _log("CODEGEN TEST FAILURE DETECTED → FORCE FAIL")
 
-    no_tests_collected = diagnostics.tests_total == 0
+    # ✅ STRICT TEST ENFORCEMENT (minimal fix)
+    tests_detected = "collected 0 items" not in combined_output
+
+    no_tests_collected = not tests_detected
+
+    if no_tests_collected:
+        _log("STRICT TEST FAILED → no tests collected")
+
+    output_lower = combined_output.lower()
+
+    has_pass = "passed" in output_lower
+    has_fail = "failed" in output_lower
+
+    tests_passed = has_pass and not has_fail
+
+    tests_ok = tests_detected and tests_passed
+
+    if no_tests_collected:
+        _log("STRICT TEST FAILED → no tests collected")
 
     success = (
         diagnostics.success
+        and tests_ok
         and not has_critical_error
         and not has_codegen_failure
     )
-
-    if no_tests_collected:
-        _log("STRICT TEST WARNING → no tests collected")
 
     if has_critical_error:
         _log("STRICT TEST FAILED → critical runtime/import error")
