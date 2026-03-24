@@ -268,9 +268,11 @@ class DevelopmentOrchestrator:
 
             validation = self.guardian.validate(str(path), fix_code)
 
-            if not validation["success"]:
+            if not validation.get("success", False):
                 _log(f"[GUARDIAN BLOCK FIX] {validation.get('error')}")
                 return False
+
+            _log(f"[GUARDIAN PASS FIX] {path}")
 
             if action == "replace_file":
                 path.write_text(fix.get("code", ""), encoding="utf-8")
@@ -349,6 +351,18 @@ class DevelopmentOrchestrator:
 
                 fallback_code = "def auto_fallback():\n    return \"ok\"\n"
 
+                validation = self.guardian.validate(fallback_file, fallback_code)
+
+                if not validation.get("success", False):
+                    return {
+                        "status": "blocked",
+                        "stage": "architecture_guardian",
+                        "reason": "fallback_blocked",
+                        "error": validation.get("error"),
+                    }
+
+                _log(f"[GUARDIAN PASS FALLBACK] {fallback_file}")
+
                 try:
                     path.write_text(fallback_code, encoding="utf-8")
                     _log(f"[FALLBACK] Generated: {fallback_file}")
@@ -387,14 +401,18 @@ class DevelopmentOrchestrator:
 
                 validation = self.guardian.validate(file_path, code)
 
-                if not validation["success"]:
+                if not validation.get("success", False):
                     _log(f"[GUARDIAN BLOCK GENERATED] {validation.get('error')}")
 
                     return {
-                        "status": "failed",
-                        "reason": "architecture_guardian_block",
+                        "status": "blocked",
+                        "stage": "architecture_guardian",
+                        "reason": "unsafe_or_invalid_code",
                         "error": validation.get("error"),
+                        "file": file_path
                     }
+
+                _log(f"[GUARDIAN PASS] {file_path}")
 
             for attempt in range(3):
 
@@ -465,10 +483,20 @@ class DevelopmentOrchestrator:
                     path = Path(file_path)
                     if path.exists():
                         safe_code = """def safe_fallback():
-    return "ok"
-"""
+                                        return "ok"
+                                    """
+
+                        validation = self.guardian.validate(file_path, safe_code)
+
+                        if not validation.get("success", False):
+                            _log("[GUARDIAN BLOCK SAFE FALLBACK]")
+                            continue
+
+                        _log(f"[GUARDIAN PASS SAFE FALLBACK] {file_path}")
+
                         path.write_text(safe_code, encoding="utf-8")
                         _log(f"[SAFE FALLBACK APPLIED] {file_path}")
+
             except Exception:
                 _log("[SAFE FALLBACK ERROR]")
 
