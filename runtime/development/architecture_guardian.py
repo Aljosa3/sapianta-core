@@ -16,6 +16,7 @@ Fail-closed design.
 
 import ast
 import os
+import re
 from typing import Dict, Any
 
 
@@ -29,7 +30,16 @@ class ArchitectureGuardian:
             "sapianta_system/constitution",
         ]
 
-        # 🚫 forbidden patterns
+        # 🔥 MINIMAL ADD: runtime protection (critical for your system)
+        self.runtime_protected_paths = [
+            "runtime/governance",
+            "runtime/system",
+            "runtime/ledger",
+            "runtime/safety",
+            "runtime/layer2",
+        ]
+
+        # 🚫 forbidden patterns (simple)
         self.forbidden_patterns = [
             "os.system",
             "subprocess",
@@ -38,15 +48,30 @@ class ArchitectureGuardian:
             "__import__",
         ]
 
+        # 🔥 MINIMAL ADD: regex patterns (more robust detection)
+        self.forbidden_regex = [
+            r"\beval\s*\(",
+            r"\bexec\s*\(",
+            r"os\.system\s*\(",
+            r"subprocess\.",
+            r"__import__\s*\(",
+        ]
+
     # ==========================================================
     # MAIN ENTRY
     # ==========================================================
     def validate(self, file_path: str, code: str) -> Dict[str, Any]:
         try:
+            # 🔥 FAIL-SAFE INPUT CHECK
+            if not isinstance(file_path, str) or not isinstance(code, str):
+                raise Exception("[GUARDIAN BLOCK] Invalid input types")
+
             self._check_protected_path(file_path)
+            self._check_runtime_protected_path(file_path)  # 🔥 NEW
             self._check_syntax(code)
             self._check_indentation(code)
             self._check_forbidden_patterns(code)
+            self._check_forbidden_regex(code)  # 🔥 NEW
 
             return {
                 "status": "VALID",
@@ -69,6 +94,14 @@ class ArchitectureGuardian:
             if protected in file_path:
                 raise Exception(
                     f"[GUARDIAN BLOCK] Attempt to modify protected path: {protected}"
+                )
+
+    # 🔥 MINIMAL ADD
+    def _check_runtime_protected_path(self, file_path: str):
+        for protected in self.runtime_protected_paths:
+            if file_path.startswith(protected):
+                raise Exception(
+                    f"[GUARDIAN BLOCK] Runtime protected path: {protected}"
                 )
 
     def _check_syntax(self, code: str):
@@ -99,4 +132,12 @@ class ArchitectureGuardian:
             if pattern in code:
                 raise Exception(
                     f"[SECURITY BLOCK] Forbidden pattern detected: {pattern}"
+                )
+
+    # 🔥 MINIMAL ADD
+    def _check_forbidden_regex(self, code: str):
+        for pattern in self.forbidden_regex:
+            if re.search(pattern, code):
+                raise Exception(
+                    f"[SECURITY BLOCK] Forbidden pattern detected (regex): {pattern}"
                 )
