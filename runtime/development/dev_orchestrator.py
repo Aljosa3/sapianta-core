@@ -12,6 +12,9 @@ import os
 import traceback
 import json
 
+# DEV MODE FLAG (default: OFF)
+DEV_MODE = os.getenv("SAPIANTA_DEV_MODE", "0") == "1"
+
 from runtime.development.mutation_validator import MutationValidator
 from runtime.development.code_generator import CodeGenerator
 from runtime.development.mutation_guard import MutationGuard
@@ -461,9 +464,15 @@ class DevelopmentOrchestrator:
                         _log("[DEV_ORCH] Task already approved → continuing")
                         return True
 
-                    if requires_human_approval(approval):
+                    approval_required = requires_human_approval(approval)
 
-                        # 🔥 samo če NI approved
+                    # AUTO-APPROVE override (DEV MODE ONLY)
+                    if DEV_MODE:
+                        _log("[DEV_MODE] AUTO-APPROVE ENABLED → skipping approval")
+                        approval_required = False
+
+                    if approval_required:
+
                         if isinstance(discussion_context, dict):
                             discussion_context["state"] = "waiting_approval"
 
@@ -473,6 +482,9 @@ class DevelopmentOrchestrator:
                             "status": "waiting_for_approval",
                             "approval": approval
                         }
+
+                    _log("[AUTO-APPROVED]")
+                    return True
 
                     _log("[AUTO-APPROVED]")
                     return True
@@ -532,7 +544,14 @@ class DevelopmentOrchestrator:
                             _log("Task already approved → continuing")
                             return True
 
-                        if requires_human_approval(approval):
+                        approval_required = requires_human_approval(approval)
+
+                        # AUTO-APPROVE override (DEV MODE ONLY)
+                        if DEV_MODE:
+                            _log("[DEV_MODE] AUTO-APPROVE ENABLED → skipping approval")
+                            approval_required = False
+
+                        if approval_required:
                             _log(f"[APPROVAL REQUIRED AFTER FIX] {approval}")
                             return {
                                 "status": "waiting_for_approval",

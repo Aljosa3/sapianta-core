@@ -7,6 +7,11 @@ into a controlled autonomous development cycle.
 
 import time
 
+import os
+
+# DEV MODE FLAG (default: OFF)
+DEV_MODE = os.getenv("SAPIANTA_DEV_MODE", "0") == "1"
+
 from runtime.development.dev_task_registry import DevTaskRegistry
 from runtime.development.dev_task_registry_hash_index import DevTaskRegistryHashIndex
 from runtime.development.dev_task_planner import DevTaskPlanner
@@ -62,15 +67,24 @@ class DevAutonomousLoop:
         ]
 
         if waiting_tasks:
-            print("[DEV_LOOP] STOP — waiting for approval (registry-based)")
 
-            execution_time = time.time() - start
-            self.metrics.record_cycle("waiting_for_approval", execution_time)
+            if DEV_MODE:
+                print("[DEV_MODE] AUTO-APPROVE ALL WAITING TASKS")
 
-            return {
-                "status": "waiting_for_approval",
-                "tasks": waiting_tasks
-            }
+                for t in waiting_tasks:
+                    t["state"] = "approved"
+                    t["approved"] = True
+
+            else:
+                print("[DEV_LOOP] STOP — waiting for approval (registry-based)")
+
+                execution_time = time.time() - start
+                self.metrics.record_cycle("waiting_for_approval", execution_time)
+
+                return {
+                    "status": "waiting_for_approval",
+                    "tasks": waiting_tasks
+                }
 
         # ---------------------------------------------------------
         # TASK SELECTION
@@ -151,7 +165,16 @@ class DevAutonomousLoop:
 
             if isinstance(result, dict) and result.get("status") == "waiting_for_approval":
 
-                if task.get("approved"):
+                if DEV_MODE:
+                    print("[DEV_MODE] AUTO-APPROVE (orchestrator result)")
+
+                    task["state"] = "approved"
+                    task["approved"] = True
+
+                    success = True
+                    reason = None
+
+                elif task.get("approved"):
                     print("[DEV_LOOP] Ignoring approval — already approved")
                     success = True
                     reason = None
