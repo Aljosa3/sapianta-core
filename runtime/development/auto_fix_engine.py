@@ -89,7 +89,7 @@ class AutoFixEngine:
                 semantic_fix = self.semantic_parser.generate_fix(parsed)
 
                 if semantic_fix:
-                    fixes.append({
+                    fixes.insert(0, {  # 🔥 ključna sprememba (prioriteta)
                         "fixed": False,
                         "strategy": semantic_fix["strategy"],
                         "confidence": 0.99,

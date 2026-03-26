@@ -20,9 +20,10 @@ COMMANDS = {
     "dev_run": "cli.commands.dev_run",
     "dev_loop": "cli.commands.dev_loop",
     "dev_run_auto": "cli.commands.dev_run_auto",
+    "dev_auto": "cli.commands.dev_auto",  # 🔥 DODANO
     "dev_metrics": "cli.commands.dev_metrics",
     "dev_status": "cli.commands.dev_status",
-    "dev_history": "cli.commands.dev_history",  # ✅ ključna registracija
+    "dev_history": "cli.commands.dev_history",
     "dev_list": "cli.commands.dev_list",
     "dev_add_task": "cli.commands.dev_add_task",
     "dev_reconcile": "cli.commands.dev_reconcile",
@@ -33,6 +34,13 @@ COMMANDS = {
 
     # --- REPAIR ---
     "fix": "cli.commands.fix",
+
+    # --- APPROVAL ---
+    "approve": "runtime.cli.approve",
+    "reject": "runtime.cli.approve",
+
+    # --- STATUS ---
+    "status": "runtime.cli.status",
 }
 
 
@@ -66,7 +74,7 @@ def main(argv=None):
 
     # ✅ robust execution contract
     if hasattr(module, "run") and callable(module.run):
-        module.run(args)
+        module.run(args)  # 🔥 FIX: NE dodajaj command_name
     else:
         raise InvalidCommandError(
             f"Command '{command_name}' does not implement callable run(args)"

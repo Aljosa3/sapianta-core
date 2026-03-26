@@ -95,9 +95,17 @@ class TestRunner:
 
             diagnostics = self.collect_results(output)
             diagnostics.execution_time = round(end - start, 3)
-            diagnostics.success = process.returncode == 0
             diagnostics.raw_output = output
             diagnostics.return_code = process.returncode
+
+            # 🔥 FIX: proper success evaluation
+            if process.returncode != 0:
+                diagnostics.success = False
+            elif diagnostics.tests_total == 0:
+                diagnostics.success = False
+                diagnostics.raw_error = "No tests were executed"
+            else:
+                diagnostics.success = True
 
             return diagnostics
 
@@ -169,6 +177,10 @@ class TestRunner:
         result.failed_modules = self.detect_failed_modules(stdout)
         result.test_files = self.count_test_files()
         result.coverage_potential = self.estimate_coverage(result)
+
+        # 🔥 BONUS FIX (točno tukaj)
+        if result.tests_total == 0 and "no tests ran" in stdout.lower():
+            result.tests_total = 0
 
         return result
 

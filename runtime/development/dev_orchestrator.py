@@ -10,6 +10,7 @@ from datetime import datetime, UTC
 from pathlib import Path
 import os
 import traceback
+import json
 
 from runtime.development.mutation_validator import MutationValidator
 from runtime.development.code_generator import CodeGenerator
@@ -42,6 +43,11 @@ from runtime.development.architecture_guardian import ArchitectureGuardian
 
 # 🔥 MINIMAL FIX IMPORT
 from runtime.development.code_generator import sanitize_module_name
+
+from runtime.governance.approval_gate import (
+    build_approval_request,
+    requires_human_approval,
+)
 
 
 def is_running_under_pytest():
@@ -331,7 +337,13 @@ class DevelopmentOrchestrator:
 
         try:
 
-            architecture = self.propose_architecture(discussion_context)
+            # 🔥 SUPPORT dict OR string
+            if isinstance(discussion_context, dict):
+                goal = discussion_context.get("goal", "")
+            else:
+                goal = discussion_context
+
+            architecture = self.propose_architecture(goal)
 
             implementation_plan = self.build_implementation_plan(architecture)
 
@@ -432,6 +444,37 @@ class DevelopmentOrchestrator:
                 strict_result = run_strict_generated_tests()
 
                 if strict_result["success"]:
+
+                    if isinstance(discussion_context, dict):
+                        task_for_approval = discussion_context
+                    else:
+                        task_for_approval = {"goal": discussion_context}
+
+                    approval = build_approval_request(
+                        task=task_for_approval,
+                        files=implementation_plan,
+                        status="success"
+                    )
+
+                    # 🔥 KLJUČNI FIX: preveri ali je že approved
+                    if isinstance(discussion_context, dict) and discussion_context.get("state") == "approved":
+                        _log("[DEV_ORCH] Task already approved → continuing")
+                        return True
+
+                    if requires_human_approval(approval):
+
+                        # 🔥 samo če NI approved
+                        if isinstance(discussion_context, dict):
+                            discussion_context["state"] = "waiting_approval"
+
+                        _log("[APPROVAL REQUIRED - stored in registry]")
+
+                        return {
+                            "status": "waiting_for_approval",
+                            "approval": approval
+                        }
+
+                    _log("[AUTO-APPROVED]")
                     return True
 
                 failure_info = strict_result
@@ -472,10 +515,31 @@ class DevelopmentOrchestrator:
                     strict_result = run_strict_generated_tests()
 
                     if strict_result["success"]:
+
                         self.fix_memory.record_success(
                             error_text,
                             fix.get("strategy")
                         )
+
+                        approval = build_approval_request(
+                            task={"goal": discussion_context},
+                            files=implementation_plan,
+                            status="fixed"
+                        )
+
+                        # 🔥 KLJUČNI FIX: če je že approved → nadaljuj
+                        if isinstance(discussion_context, dict) and discussion_context.get("state") == "approved":
+                            _log("Task already approved → continuing")
+                            return True
+
+                        if requires_human_approval(approval):
+                            _log(f"[APPROVAL REQUIRED AFTER FIX] {approval}")
+                            return {
+                                "status": "waiting_for_approval",
+                                "approval": approval
+                            }
+
+                        _log("[AUTO-APPROVED AFTER FIX]")
                         return True
 
             try:
@@ -483,8 +547,8 @@ class DevelopmentOrchestrator:
                     path = Path(file_path)
                     if path.exists():
                         safe_code = """def safe_fallback():
-                                        return "ok"
-                                    """
+                            return "ok"
+                        """
 
                         validation = self.guardian.validate(file_path, safe_code)
 

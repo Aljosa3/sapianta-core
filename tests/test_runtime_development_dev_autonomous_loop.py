@@ -17,4 +17,4 @@ def test_autonomous_loop_basic():
 
     result = loop.run_once()
 
-    assert result["status"] in ["completed", "needs_review"]
+    assert result["status"] in ["completed", "needs_review", "waiting_for_approval"]

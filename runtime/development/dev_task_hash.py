@@ -15,15 +15,16 @@ import json
 def normalize_task(task: dict) -> dict:
     """
     Normalize task structure for deterministic hashing.
+    Supports current SAPIANTA schema (goal + priority).
+    Backward compatible with legacy fields (idea).
     """
 
-    normalized = {
-        "task_type": task.get("task_type", ""),
-        "idea": task.get("idea", "").strip().lower(),
-        "source": task.get("source", ""),
-    }
+    goal = task.get("goal") or task.get("idea", "")
 
-    return normalized
+    return {
+        "goal": goal.strip().lower() if isinstance(goal, str) else "",
+        "priority": task.get("priority", 0)
+    }
 
 
 def compute_task_hash(task: dict) -> str:
@@ -33,9 +34,9 @@ def compute_task_hash(task: dict) -> str:
 
     normalized = normalize_task(task)
 
-    encoded = json.dumps(normalized, sort_keys=True)
+    encoded = json.dumps(normalized, sort_keys=True, separators=(",", ":"))
 
-    return hashlib.sha256(encoded.encode()).hexdigest()
+    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 
 
 def is_duplicate(task: dict, existing_hashes: set) -> bool:

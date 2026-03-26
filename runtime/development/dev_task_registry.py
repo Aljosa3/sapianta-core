@@ -25,6 +25,17 @@ REGISTRY_FILE = os.path.join(
     "task_registry.json"
 )
 
+# 🔥 Explicit task states
+TASK_STATES = {
+    "queued",
+    "running",
+    "waiting_approval",
+    "approved",
+    "completed",
+    "failed",
+    "blocked"
+}
+
 
 class DevTaskRegistry:
     """
@@ -35,7 +46,6 @@ class DevTaskRegistry:
 
         self._ensure_file()
 
-        # deterministic reset mode for tests
         if reset:
             data = {
                 "active_tasks": [],
@@ -77,47 +87,65 @@ class DevTaskRegistry:
         with open(REGISTRY_FILE, "w") as f:
             json.dump(data, f, indent=2)
 
-    # 🔑 determinističen ID
+    # 🔑 deterministic ID
     def _generate_task_id(self, task: Dict) -> str:
-        """
-        Generate deterministic task ID based on content.
-        """
         base = f"{task.get('goal','')}|{task.get('priority',0)}"
         return hashlib.sha256(base.encode()).hexdigest()
 
+    def _ensure_state(self, task: Dict) -> None:
+        state = task.get("state")
+
+        if state not in TASK_STATES:
+            task["state"] = "queued"
+
     def add_task(self, task: Dict) -> None:
-        """
-        Register a new development task (with deduplication).
-        """
 
         task_id = self._generate_task_id(task)
 
-        # dedup check (works for both new + legacy tasks)
+        # dedup
         for existing in self.active_tasks:
             existing_id = existing.get("id") or self._generate_task_id(existing)
             if existing_id == task_id:
                 return
 
-        # assign ID
         task["id"] = task_id
+        self._ensure_state(task)
 
         self.active_tasks.append(task)
         self._persist()
 
+    def update_task_state(self, task: Dict, new_state: str) -> None:
+        """
+        Update task state deterministically.
+        """
+
+        if new_state not in TASK_STATES:
+            return
+
+        task_id = task.get("id")
+
+        for t in self.active_tasks:
+            if t.get("id") == task_id:
+                t["state"] = new_state
+                task["state"] = new_state  # sync reference
+                break
+
+        self._persist()
+
     def complete_task(self, task: Dict) -> None:
         """
-        Mark task as completed and remove it from active queue.
+        Move task to completed (terminal state).
         """
 
         task_id = task.get("id")
 
-        # remove by ID (robust)
         self.active_tasks = [
             t for t in self.active_tasks
             if t.get("id") != task_id
         ]
 
-        # prevent duplicates
+        task["state"] = "completed"
+
         if task not in self.completed_tasks:
             self.completed_tasks.append(task)
 
@@ -125,7 +153,7 @@ class DevTaskRegistry:
 
     def reject_task(self, task: Dict) -> None:
         """
-        Mark task as rejected.
+        Move task to failed (terminal state).
         """
 
         task_id = task.get("id")
@@ -134,6 +162,8 @@ class DevTaskRegistry:
             t for t in self.active_tasks
             if t.get("id") != task_id
         ]
+
+        task["state"] = "failed"
 
         if task not in self.rejected_tasks:
             self.rejected_tasks.append(task)
@@ -148,3 +178,23 @@ class DevTaskRegistry:
 
     def get_rejected_tasks(self) -> List[Dict]:
         return list(self.rejected_tasks)
+
+    # 🔥 FIXED QUERY LAYER
+    def get_tasks_by_state(self, state: str) -> List[Dict]:
+
+        if state == "completed":
+            return [
+                t for t in self.completed_tasks
+                if t.get("state") == state
+            ]
+
+        if state == "failed":
+            return [
+                t for t in self.rejected_tasks
+                if t.get("state") == state
+            ]
+
+        return [
+            t for t in self.active_tasks
+            if t.get("state") == state
+        ]

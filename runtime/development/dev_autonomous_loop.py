@@ -15,7 +15,6 @@ from runtime.development.dev_sandbox_runner import DevSandboxRunner
 from runtime.development.dev_memory import DevMemory
 from runtime.development.dev_metrics import DevMetrics
 
-# 🔥 NEW: Promotion Gate
 from runtime.governance.promotion_gate import classify_change, requires_approval
 
 
@@ -25,7 +24,6 @@ class DevAutonomousLoop:
     """
 
     def __init__(self):
-
         self.registry = DevTaskRegistry()
         self.hash_index = DevTaskRegistryHashIndex()
         self.planner = DevTaskPlanner()
@@ -35,9 +33,6 @@ class DevAutonomousLoop:
         self.metrics = DevMetrics()
 
     def submit_task(self, task: dict) -> str:
-        """
-        Submit new development task with proper duplicate detection.
-        """
 
         if self.hash_index.has_task(task):
             return "duplicate"
@@ -54,19 +49,43 @@ class DevAutonomousLoop:
         return "registered"
 
     def run_once(self):
-        """
-        Execute one development cycle.
-        """
 
         start = time.time()
 
-        tasks = self.registry.get_active_tasks()
+        # ---------------------------------------------------------
+        # STOP if non-approved waiting tasks exist
+        # ---------------------------------------------------------
 
-        if not tasks:
+        waiting_tasks = [
+            t for t in self.registry.get_tasks_by_state("waiting_approval")
+            if not t.get("approved")
+        ]
+
+        if waiting_tasks:
+            print("[DEV_LOOP] STOP — waiting for approval (registry-based)")
 
             execution_time = time.time() - start
-            self.metrics.record_cycle("no_tasks", execution_time)
+            self.metrics.record_cycle("waiting_for_approval", execution_time)
 
+            return {
+                "status": "waiting_for_approval",
+                "tasks": waiting_tasks
+            }
+
+        # ---------------------------------------------------------
+        # TASK SELECTION
+        # ---------------------------------------------------------
+
+        tasks = self.registry.get_active_tasks()
+
+        approved_tasks = [t for t in tasks if t.get("state") == "approved"]
+        queued_tasks = [t for t in tasks if t.get("state") == "queued"]
+
+        tasks = approved_tasks + queued_tasks
+
+        if not tasks:
+            execution_time = time.time() - start
+            self.metrics.record_cycle("no_tasks", execution_time)
             return {"status": "no_tasks"}
 
         ordered = self.planner.prioritize(tasks)
@@ -75,14 +94,16 @@ class DevAutonomousLoop:
         decision = self.gate.evaluate(task)
 
         # ---------------------------------------------------------
-        # 🔥 PROMOTION GATE ENFORCEMENT (NEW)
+        # PROMOTION GATE
         # ---------------------------------------------------------
 
-        # trenutno minimal heuristic (SAFE MODE)
         affected_files = ["runtime/development/"]
-
         level = classify_change(affected_files)
-        needs_approval = requires_approval(level)
+
+        if level == "COSMETIC":
+            needs_approval = False
+        else:
+            needs_approval = False if task.get("approved") else requires_approval(level)
 
         print(f"[GATE] Level: {level} | Approval required: {needs_approval}")
 
@@ -99,28 +120,20 @@ class DevAutonomousLoop:
             }
 
         # ---------------------------------------------------------
-        # EXISTING GOVERNANCE GATE
+        # GOVERNANCE
         # ---------------------------------------------------------
 
         if decision == DevGovernanceGate.BLOCK:
-
             self.registry.reject_task(task)
             self.memory.record_blocked(task)
-
-            execution_time = time.time() - start
-            self.metrics.record_cycle("blocked", execution_time, task=task)
 
             return {"status": "blocked", "task": task}
 
         if decision == DevGovernanceGate.REVIEW:
-
-            execution_time = time.time() - start
-            self.metrics.record_cycle("review", execution_time, task=task)
-
             return {"status": "needs_review", "task": task}
 
         # ---------------------------------------------------------
-        # REAL EXECUTION VIA ORCHESTRATOR
+        # EXECUTION
         # ---------------------------------------------------------
 
         from runtime.development.dev_orchestrator import DevelopmentOrchestrator
@@ -128,9 +141,38 @@ class DevAutonomousLoop:
         orchestrator = DevelopmentOrchestrator()
 
         try:
-            result = orchestrator.run_auto(task.get("goal", ""))
+            if task.get("approved"):
+                print("[DEV_LOOP] Resuming approved task...")
+            result = orchestrator.run_auto(task)
 
-            # 🔥 NORMALIZATION LAYER
+            # -----------------------------------------------------
+            # 🔥 CLEAN APPROVAL HANDLING (FIXED)
+            # -----------------------------------------------------
+
+            if isinstance(result, dict) and result.get("status") == "waiting_for_approval":
+
+                if task.get("approved"):
+                    print("[DEV_LOOP] Ignoring approval — already approved")
+                    success = True
+                    reason = None
+
+                else:
+                    print("[DEV_LOOP] Waiting for human approval...")
+
+                    self.registry.update_task_state(task, "waiting_approval")
+                    self.memory.record_blocked(task)
+
+                    execution_time = time.time() - start
+                    self.metrics.record_cycle("waiting_for_approval", execution_time, task=task)
+
+                    return {
+                        "status": "waiting_for_approval",
+                        "task": task
+                    }
+
+            # -----------------------------------------------------
+            # NORMALIZATION
+            # -----------------------------------------------------
 
             if result is False:
                 success = False
@@ -138,11 +180,6 @@ class DevAutonomousLoop:
 
             elif isinstance(result, dict):
                 success = result.get("success", False)
-
-                # 🔥 EMPTY GENERATION → REVIEW
-                if not success and result.get("reason") == "no_valid_files":
-                    success = None
-
                 reason = result.get("reason")
 
             else:
@@ -155,54 +192,29 @@ class DevAutonomousLoop:
             reason = str(e)
 
         # ---------------------------------------------------------
-        # AUTO REPAIR HOOK
-        # ---------------------------------------------------------
-
-        try:
-            if success is False:
-                print("[AUTO-REPAIR] Triggering repair...")
-                from runtime.development.repair_orchestrator import main as repair_main
-                repair_main()
-        except Exception as e:
-            print("[AUTO-REPAIR] Error:", str(e))
-
-        # ---------------------------------------------------------
-        # RESULT HANDLING
+        # RETRY LOOP
         # ---------------------------------------------------------
 
         if success is True:
-
             self.registry.complete_task(task)
             self.memory.record_completed(task)
 
-            execution_time = time.time() - start
-            self.metrics.record_cycle("completed", execution_time, task=task)
+            return {"status": "completed", "task": task}
+
+        task["retry_count"] = task.get("retry_count", 0) + 1
+
+        if task["retry_count"] < 3:
+            print(f"[DEV_LOOP] RETRY ({task['retry_count']})")
+
+            self.registry.update_task_state(task, "queued")
 
             return {
-                "status": "completed",
+                "status": "retrying",
                 "task": task
             }
 
-        # 🔥 EMPTY CASE → REVIEW
-
-        if success is None:
-
-            execution_time = time.time() - start
-            self.metrics.record_cycle("needs_review", execution_time, task=task)
-
-            return {
-                "status": "needs_review",
-                "task": task,
-                "reason": "no_valid_files_generated"
-            }
-
-        # FAILED PATH
-
         self.registry.reject_task(task)
         self.memory.record_failed(task)
-
-        execution_time = time.time() - start
-        self.metrics.record_cycle("failed", execution_time, task=task)
 
         return {
             "status": "failed",

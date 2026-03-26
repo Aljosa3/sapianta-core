@@ -29,8 +29,25 @@ def run(args=None):
 
             print("cycle result:", result)
 
-            # --- SMART IDLE BACKOFF ---
-            if result.get("status") == "no_tasks":
+            status = result.get("status")
+
+            # -------------------------------------------------
+            # 🔥 HARD STOP CONDITIONS (CRITICAL FIX)
+            # -------------------------------------------------
+
+            if status in ["waiting_for_approval", "needs_review"]:
+                print(f"[DEV_LOOP] STOP (status={status})")
+                break
+
+            if status in ["completed", "failed", "blocked"]:
+                print(f"[DEV_LOOP] END (status={status})")
+                break
+
+            # -------------------------------------------------
+            # SMART IDLE BACKOFF
+            # -------------------------------------------------
+
+            if status == "no_tasks":
 
                 idle_cycles += 1
                 sleep_time = min(10, 1 + idle_cycles)
