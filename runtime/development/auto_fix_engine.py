@@ -89,7 +89,7 @@ class AutoFixEngine:
                 semantic_fix = self.semantic_parser.generate_fix(parsed)
 
                 if semantic_fix:
-                    fixes.insert(0, {  # 🔥 ključna sprememba (prioriteta)
+                    fixes.insert(0, {
                         "fixed": False,
                         "strategy": semantic_fix["strategy"],
                         "confidence": 0.99,
@@ -100,6 +100,20 @@ class AutoFixEngine:
                     })
         except Exception:
             pass
+
+        # =====================================================
+        # 🔥 NEW: CLASS-AWARE STRATEGY DISPATCH
+        # =====================================================
+
+        if error_type == "NameError":
+            name_fix = self._fix_name_error(message, file_path)
+            if name_fix:
+                fixes.append(name_fix)
+
+        if error_type in ["ImportError", "ModuleNotFoundError"]:
+            import_fix = self._fix_import_error(message, file_path)
+            if import_fix:
+                fixes.append(import_fix)
 
         # =====================================================
         # 🔥 INTENT-AWARE FIX (OBSTOJEČ)
@@ -151,7 +165,7 @@ class AutoFixEngine:
             })
 
         # =====================================================
-        # DIRECT ERROR FIXES
+        # 🔥 LEGACY DIRECT ERROR FIXES (kept for compatibility)
         # =====================================================
 
         if error_type == "NameError":
@@ -159,8 +173,8 @@ class AutoFixEngine:
             if match:
                 fixes.append({
                     "fixed": False,
-                    "strategy": "name_error_stub",
-                    "confidence": 0.9,
+                    "strategy": "name_error_stub_legacy",
+                    "confidence": 0.6,
                     "file": file_path,
                     "action": "append_stub",
                     "function": match.group(1),
@@ -172,8 +186,8 @@ class AutoFixEngine:
             if match:
                 fixes.append({
                     "fixed": False,
-                    "strategy": "import_fix",
-                    "confidence": 0.8,
+                    "strategy": "import_fix_legacy",
+                    "confidence": 0.5,
                     "file": file_path,
                     "action": "prepend_import",
                     "code": f"import {match.group(1)}\n"
@@ -237,6 +251,44 @@ class AutoFixEngine:
             }]
 
         return self._deduplicate_fixes(validated)
+
+    # ================================================================
+    # 🔥 NEW STRATEGIES
+    # ================================================================
+
+    def _fix_name_error(self, message: str, file_path: str) -> Optional[Dict]:
+
+        match = re.search(r"name '(.+?)' is not defined", message)
+        if not match:
+            return None
+
+        var_name = match.group(1)
+
+        return {
+            "fixed": False,
+            "strategy": "name_error_variable_stub",
+            "confidence": 0.95,
+            "file": file_path,
+            "action": "append",
+            "code": f"{var_name} = 0\n"
+        }
+
+    def _fix_import_error(self, message: str, file_path: str) -> Optional[Dict]:
+
+        match = re.search(r"No module named '(.+?)'", message)
+        if not match:
+            return None
+
+        module_name = match.group(1)
+
+        return {
+            "fixed": False,
+            "strategy": "import_error_stub",
+            "confidence": 0.9,
+            "file": file_path,
+            "action": "prepend_import",
+            "code": f"{module_name} = None\n"
+        }
 
     # ================================================================
     # ERROR PARSER
