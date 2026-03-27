@@ -6,11 +6,15 @@ into a controlled autonomous development cycle.
 """
 
 import time
-
 import os
 
 # DEV MODE FLAG (default: OFF)
 DEV_MODE = os.getenv("SAPIANTA_DEV_MODE", "0") == "1"
+
+# SAFE AUTONOMOUS MODE CONFIG
+MAX_CYCLES = int(os.getenv("SAPIANTA_MAX_CYCLES", "10"))
+MAX_RUNTIME = int(os.getenv("SAPIANTA_MAX_RUNTIME", "60"))  # seconds
+SLEEP_INTERVAL = float(os.getenv("SAPIANTA_SLEEP", "0.5"))
 
 from runtime.development.dev_task_registry import DevTaskRegistry
 from runtime.development.dev_task_registry_hash_index import DevTaskRegistryHashIndex
@@ -36,6 +40,13 @@ class DevAutonomousLoop:
         self.sandbox = DevSandboxRunner()
         self.memory = DevMemory()
         self.metrics = DevMetrics()
+        self._cycle_count = 0
+        self._start_time = None
+
+    # 🔥 KLJUČNI FIX (manjkajoča metoda)
+    def _sleep_if_dev(self):
+        if DEV_MODE:
+            time.sleep(SLEEP_INTERVAL)
 
     def submit_task(self, task: dict) -> str:
 
@@ -56,6 +67,23 @@ class DevAutonomousLoop:
     def run_once(self):
 
         start = time.time()
+
+        # INIT SAFE MODE TIMER
+        if self._start_time is None:
+            self._start_time = start
+
+        self._cycle_count += 1
+
+        # MAX CYCLES GUARD
+        if DEV_MODE and self._cycle_count > MAX_CYCLES:
+            print(f"[SAFE_MODE] STOP → max cycles reached ({MAX_CYCLES})")
+            return {"status": "stopped_max_cycles"}
+
+        # MAX RUNTIME GUARD
+        elapsed = start - self._start_time
+        if DEV_MODE and elapsed > MAX_RUNTIME:
+            print(f"[SAFE_MODE] STOP → max runtime exceeded ({MAX_RUNTIME}s)")
+            return {"status": "stopped_timeout"}
 
         # ---------------------------------------------------------
         # STOP if non-approved waiting tasks exist
@@ -159,10 +187,6 @@ class DevAutonomousLoop:
                 print("[DEV_LOOP] Resuming approved task...")
             result = orchestrator.run_auto(task)
 
-            # -----------------------------------------------------
-            # 🔥 CLEAN APPROVAL HANDLING (FIXED)
-            # -----------------------------------------------------
-
             if isinstance(result, dict) and result.get("status") == "waiting_for_approval":
 
                 if DEV_MODE:
@@ -175,13 +199,10 @@ class DevAutonomousLoop:
                     reason = None
 
                 elif task.get("approved"):
-                    print("[DEV_LOOP] Ignoring approval — already approved")
                     success = True
                     reason = None
 
                 else:
-                    print("[DEV_LOOP] Waiting for human approval...")
-
                     self.registry.update_task_state(task, "waiting_approval")
                     self.memory.record_blocked(task)
 
@@ -192,10 +213,6 @@ class DevAutonomousLoop:
                         "status": "waiting_for_approval",
                         "task": task
                     }
-
-            # -----------------------------------------------------
-            # NORMALIZATION
-            # -----------------------------------------------------
 
             if result is False:
                 success = False
@@ -222,6 +239,7 @@ class DevAutonomousLoop:
             self.registry.complete_task(task)
             self.memory.record_completed(task)
 
+            self._sleep_if_dev()
             return {"status": "completed", "task": task}
 
         task["retry_count"] = task.get("retry_count", 0) + 1
@@ -231,14 +249,13 @@ class DevAutonomousLoop:
 
             self.registry.update_task_state(task, "queued")
 
-            return {
-                "status": "retrying",
-                "task": task
-            }
+            self._sleep_if_dev()
+            return {"status": "retrying", "task": task}
 
         self.registry.reject_task(task)
         self.memory.record_failed(task)
 
+        self._sleep_if_dev()
         return {
             "status": "failed",
             "task": task,

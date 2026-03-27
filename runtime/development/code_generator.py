@@ -1,5 +1,5 @@
 """
-SAPIANTA Code Generator v1.0 (SIGNAL FIX)
+SAPIANTA Code Generator v1.1 (FILE_HINT SUPPORT)
 
 CRITICAL FIX:
 - FAIL → FAIL (no false positives)
@@ -7,9 +7,8 @@ CRITICAL FIX:
 - Structured result return
 - Deterministic validation signal
 
-ENHANCEMENTS:
-- Identifier sanitization (prevents invalid Python)
-- Function generation support (no invalid class generation)
+NEW:
+- file_hint support (multi-file generation)
 """
 
 import os
@@ -24,7 +23,10 @@ from runtime.development.module_test_runner import ModuleTestRunner
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
+# ------------------------------------------------
 # 🔒 identifier sanitization
+# ------------------------------------------------
+
 def sanitize_identifier(name: str) -> str:
     if not isinstance(name, str):
         return "GeneratedModule"
@@ -38,7 +40,6 @@ def sanitize_identifier(name: str) -> str:
     return name
 
 
-# 🔒 module-safe name
 def sanitize_module_name(name: str) -> str:
     if not isinstance(name, str):
         return "generated_module"
@@ -51,6 +52,10 @@ def sanitize_module_name(name: str) -> str:
 
     return name
 
+
+# ========================================================
+# MAIN GENERATOR
+# ========================================================
 
 class CodeGenerator:
 
@@ -65,13 +70,21 @@ class CodeGenerator:
 
     # ------------------------------------------------
 
-    def generate_module(self, file_path: str, description: str) -> dict:
+    def generate_module(self, file_path: str, description: str, task: dict = None) -> dict:
 
-        full_path = self.project_root / file_path
+        # ------------------------------------------------
+        # 🔥 FILE_HINT SUPPORT (KLJUČNI POPRAVEK)
+        # ------------------------------------------------
 
-        # 🔥 CRITICAL FIX: consistent naming
-        safe_module_name = sanitize_module_name(full_path.stem)
-        safe_file_path = full_path.parent / f"{safe_module_name}.py"
+        if task and task.get("file_hint"):
+            safe_module_name = sanitize_module_name(task["file_hint"])
+            safe_file_path = self.project_root / f"runtime/development/generated/{safe_module_name}.py"
+        else:
+            full_path = self.project_root / file_path
+            safe_module_name = sanitize_module_name(full_path.stem)
+            safe_file_path = full_path.parent / f"{safe_module_name}.py"
+
+        # ------------------------------------------------
 
         if safe_file_path.exists():
             print(f"[CODEGEN] File already exists: {safe_file_path}")
@@ -83,10 +96,10 @@ class CodeGenerator:
 
         os.makedirs(safe_file_path.parent, exist_ok=True)
 
-        template = self._generate_template(file_path, description)
+        template = self._generate_template(safe_file_path.name, description)
         template = self.sanitizer.sanitize(template)
 
-        # 🔥 MINIMAL CONTRACT FIX (guarantee test compatibility)
+        # 🔥 MINIMAL CONTRACT FIX
         if "def generated_function" not in template:
             template += "\n\n\ndef generated_function():\n    return \"ok\"\n"
 
@@ -122,11 +135,10 @@ def test_{function_name}_execution():
 '''
 
         else:
-            class_name = self._infer_class_name(file_path)
+            class_name = self._infer_class_name(safe_file_path.name)
 
             test_code = f'''"""
 Auto-generated functional test for {class_name}
-FAIL → FAIL guaranteed
 """
 
 def test_{safe_module_name}_imports():
@@ -153,7 +165,7 @@ def test_{safe_module_name}_execution():
         print(f"[CODEGEN] Test file created: {test_file_path}")
 
         # ------------------------------------------------
-        # 🔥 CRITICAL FIX: convert to module import path
+        # MODULE IMPORT PATH
         # ------------------------------------------------
 
         module_import_path = safe_file_path.relative_to(self.project_root) \
@@ -197,7 +209,7 @@ def test_{safe_module_name}_execution():
 
     # ------------------------------------------------
 
-    def _generate_template(self, file_path: str, description: str):
+    def _generate_template(self, file_name: str, description: str):
 
         if self._is_function_task(description):
             function_name = self._infer_function_name(description)
@@ -227,7 +239,7 @@ def {function_name}(a, b):
     return a + b
 '''
 
-        class_name = self._infer_class_name(file_path)
+        class_name = self._infer_class_name(file_name)
 
         if self.force_failure:
             return f'''"""
@@ -266,9 +278,9 @@ class {class_name}:
 
     # ------------------------------------------------
 
-    def _infer_class_name(self, file_path: str):
+    def _infer_class_name(self, file_name: str):
 
-        name = Path(file_path).stem
+        name = Path(file_name).stem
         name = sanitize_identifier(name)
         parts = name.split("_")
 
@@ -295,6 +307,4 @@ class {class_name}:
         if not isinstance(description, str):
             return False
 
-        description = description.lower()
-
-        return "function" in description
+        return "function" in description.lower()

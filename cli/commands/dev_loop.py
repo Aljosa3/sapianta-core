@@ -7,16 +7,18 @@ Runs the autonomous development loop continuously.
 import time
 
 from runtime.development.dev_autonomous_loop import DevAutonomousLoop
-from runtime.development.capability_gap_detector import CapabilityGapDetector
+from runtime.development.plan_engine import PlanEngine
 
 
-# 🔥 NOVO: GLOBAL GOAL
+# 🔥 GLOBAL GOAL
 GOAL = "build basic software utility system"
 
 
 def run(args=None):
 
     loop = DevAutonomousLoop()
+    plan_engine = PlanEngine()
+    current_plan = []
 
     print()
     print("SAPIANTA Development Loop")
@@ -31,52 +33,32 @@ def run(args=None):
         while True:
 
             # -------------------------------------------------
-            # 🧠 AUTO TASK GENERATION (GOAL-DRIVEN)
+            # 🧠 PLAN + FEEDBACK LOOP
             # -------------------------------------------------
 
             tasks = loop.registry.get_active_tasks()
 
-            all_tasks = (
-                loop.registry.get_tasks_by_state("completed") +
-                loop.registry.get_tasks_by_state("approved") +
-                loop.registry.get_tasks_by_state("queued") +
-                loop.registry.get_tasks_by_state("waiting_approval")
-            )
-
             if not tasks:
 
-                existing_goals = {t.get("goal") for t in all_tasks}
+                # 🔥 FEEDBACK LOOP: če plan ne obstaja ali je prazen
+                if not current_plan:
 
-                print("[AUTO] No active tasks → generating new task")
+                    print("[PLAN] Plan exhausted")
 
-                detector = CapabilityGapDetector()
-                gaps = detector.detect()
+                    GOAL_DYNAMIC = f"{GOAL} - iteration {loop._cycle_count}"
 
-                if gaps:
-                    goal = gaps[0]
-                else:
-                    # 🔥 GOAL-DRIVEN FALLBACK
-                    fallback_goals = [
-                        f"{GOAL} - logging module",
-                        f"{GOAL} - config system",
-                        f"{GOAL} - validation module",
-                        f"{GOAL} - error handling",
-                        f"{GOAL} - file processing"
-                    ]
+                    print(f"[PLAN] New goal: {GOAL_DYNAMIC}")
 
-                    goal = next(
-                        (g for g in fallback_goals if g not in existing_goals),
-                        f"{GOAL} - helper module"
-                    )
+                    current_plan = plan_engine.generate_plan(GOAL_DYNAMIC)
 
-                new_task = {
-                    "goal": goal,
-                    "priority": 1
-                }
+                    print(f"[PLAN] Generated {len(current_plan)} tasks")
 
-                print(f"[AUTO] New task generated: {new_task}")
+                # vzamemo naslednji task iz plana
+                next_task = current_plan.pop(0)
 
-                loop.submit_task(new_task)
+                print(f"[PLAN] Next task: {next_task}")
+
+                loop.submit_task(next_task)
 
             # -------------------------------------------------
             # RUN LOOP
@@ -110,7 +92,7 @@ def run(args=None):
 
             # 🔥 CONTINUOUS MODE
             if status == "completed":
-                print("[DEV_LOOP] Task completed → continuing (AUTO MODE)")
+                print("[DEV_LOOP] Task completed → continuing (PLAN MODE)")
 
             # -------------------------------------------------
             # SMART IDLE BACKOFF
