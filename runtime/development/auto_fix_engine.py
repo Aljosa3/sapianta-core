@@ -117,6 +117,13 @@ class AutoFixEngine:
         # 🔥 NEW: CLASS-AWARE STRATEGY DISPATCH
         # =====================================================
 
+        # 🔥 TypeError (NEW - pravilno ločen)
+        if error_type == "TypeError":
+            type_fix = self._fix_type_error(message, file_path)
+            if type_fix:
+                fixes.insert(0, type_fix)
+
+        # existing
         if error_type == "NameError":
             name_fix = self._fix_name_error(message, file_path)
             if name_fix:
@@ -303,6 +310,206 @@ class AutoFixEngine:
             "code": f"try:\n    import {module_name}\nexcept:\n    {module_name} = None\n"
         }
 
+    def _fix_type_error(self, message: str, file_path: str) -> Optional[Dict]:
+
+        if not file_path or not Path(file_path).exists():
+            return None
+
+        code = Path(file_path).read_text(encoding="utf-8")
+
+        # =====================================================
+        # PARSE FUNCTION NAME
+        # =====================================================
+
+        func_match = re.search(r"TypeError:\s+(\w+)\(\)", message)
+        if not func_match:
+            return None
+
+        function_name = func_match.group(1)
+
+        # =====================================================
+        # EXTRACT FUNCTION BLOCK
+        # =====================================================
+
+        pattern = rf"def\s+{function_name}\s*\((.*?)\):([\s\S]*?)(?=\n\s*def\s|\Z)"
+        match = re.search(pattern, code)
+
+        if not match:
+            return None
+
+        signature = match.group(1)
+        body = match.group(2)
+
+        params = [p.strip() for p in signature.split(",") if p.strip()]
+
+        # =====================================================
+        # CASE 1: takes X but Y were given
+        # =====================================================
+
+        takes_match = re.search(
+            r"takes\s+(\d+)\s+positional argument[s]?\s+but\s+(\d+)\s+were given",
+            message
+        )
+
+        if takes_match:
+            expected = int(takes_match.group(1))
+            given = int(takes_match.group(2))
+
+            if given > expected:
+                diff = given - expected
+
+                new_params = params[:]
+
+                base_index = len(new_params) + 1
+
+                for i in range(diff):
+                    new_params.append(f"arg{base_index + i}")
+
+                new_signature = ", ".join(new_params)
+
+                new_code = f"def {function_name}({new_signature}):\n{body}"
+
+                return {
+                    "fixed": False,
+                    "strategy": "type_error_signature_fix",
+                    "confidence": 0.95,
+                    "file": file_path,
+                    "action": "replace_function",
+                    "function": function_name,
+                    "code": new_code
+                }
+
+        # =====================================================
+        # CASE 2: missing required positional argument
+        # =====================================================
+
+        missing_match = re.search(
+            r"missing\s+(\d+)\s+required positional argument[s]?:\s+(.+)",
+            message
+        )
+
+        if missing_match:
+
+            missing_part = missing_match.group(2)
+            missing_args = re.findall(r"'(\w+)'", missing_part)
+
+            if not missing_args:
+                return None
+
+            new_params = []
+            make_optional = False
+
+            for p in params:
+
+                name = p.split("=")[0].strip()
+
+                if name in missing_args:
+                    make_optional = True
+                    new_params.append(f"{name}=None")
+                elif make_optional:
+                    if "=" not in p:
+                        new_params.append(f"{name}=None")
+                    else:
+                        new_params.append(p)
+                else:
+                    new_params.append(p)
+
+            new_signature = ", ".join(new_params)
+
+            new_code = f"def {function_name}({new_signature}):\n{body}"
+
+            return {
+                "fixed": False,
+                "strategy": "type_error_signature_fix",
+                "confidence": 0.95,
+                "file": file_path,
+                "action": "replace_function",
+                "function": function_name,
+                "code": new_code
+            }
+
+        # =====================================================
+        # CASE 3: unexpected keyword argument
+        # =====================================================
+
+        kw_match = re.search(
+            r"got an unexpected keyword argument '(\w+)'",
+            message
+        )
+
+        if kw_match:
+
+            kw_arg = kw_match.group(1)
+
+            # če že obstaja → nič ne delaj
+            param_names = [p.split("=")[0].strip() for p in params]
+
+            if kw_arg in param_names:
+                return None
+
+            new_params = params[:]
+            new_params.append(f"{kw_arg}=None")
+
+            new_signature = ", ".join(new_params)
+
+            new_code = f"def {function_name}({new_signature}):\n{body}"
+
+            return {
+                "fixed": False,
+                "strategy": "type_error_keyword_fix",
+                "confidence": 0.95,
+                "file": file_path,
+                "action": "replace_function",
+                "function": function_name,
+                "code": new_code
+            }
+
+        # =====================================================
+        # CASE 4: multiple values for argument
+        # =====================================================
+
+        multi_match = re.search(
+            r"got multiple values for argument '(\w+)'",
+            message
+        )
+
+        if multi_match:
+
+            arg_name = multi_match.group(1)
+
+            # če argument ne obstaja → nič ne delaj
+            param_names = [p.split("=")[0].strip() for p in params]
+
+            if arg_name not in param_names:
+                return None
+
+            # 🔥 strategija: naredi parameter optional
+            new_params = []
+
+            for p in params:
+                name = p.split("=")[0].strip()
+
+                if name == arg_name:
+                    new_params.append(f"{name}=None")
+                else:
+                    new_params.append(p)
+
+            new_signature = ", ".join(new_params)
+
+            new_code = f"def {function_name}({new_signature}):\n{body}"
+
+            return {
+                "fixed": False,
+                "strategy": "type_error_multiple_values_fix",
+                "confidence": 0.95,
+                "file": file_path,
+                "action": "replace_function",
+                "function": function_name,
+                "code": new_code
+            }
+
+        return None
+
     # ================================================================
     # ERROR PARSER
     # ================================================================
@@ -319,6 +526,9 @@ class AutoFixEngine:
 
         if "ImportError" in error_text:
             return "ImportError", error_text, error_text
+
+        if "TypeError" in error_text:
+            return "TypeError", error_text, error_text
 
         if "SyntaxError" in error_text:
             return "SyntaxError", error_text, error_text
