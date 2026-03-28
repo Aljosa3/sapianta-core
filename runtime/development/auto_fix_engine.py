@@ -72,10 +72,22 @@ class AutoFixEngine:
             fallback = failure_info.get("file")
 
             # 🔥 CRITICAL: test → module mapping
-            if fallback and "test_" in fallback:
-                file_path = fallback.replace("test_", "")
-            else:
-                file_path = fallback
+            if fallback:
+                fallback_path = Path(fallback)
+
+                # 🔥 only remap if original path DOES NOT exist
+                if not fallback_path.exists() and fallback_path.name.startswith("test_"):
+                    candidate = fallback_path.with_name(
+                        fallback_path.name.replace("test_", "", 1)
+                    )
+
+                    # 🔥 only use candidate if it actually exists
+                    if candidate.exists():
+                        file_path = str(candidate)
+                    else:
+                        file_path = fallback
+                else:
+                    file_path = fallback
 
         error_type, message, _ = self._parse_error(failure_info)
 
@@ -283,11 +295,12 @@ class AutoFixEngine:
 
         return {
             "fixed": False,
-            "strategy": "import_error_stub",
-            "confidence": 0.9,
+            "strategy": "import_error_try_wrapper",
+            "confidence": 0.95,
             "file": file_path,
-            "action": "prepend_import",
-            "code": f"{module_name} = None\n"
+            "action": "replace_import",
+            "module": module_name,
+            "code": f"try:\n    import {module_name}\nexcept:\n    {module_name} = None\n"
         }
 
     # ================================================================

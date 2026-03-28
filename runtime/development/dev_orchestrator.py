@@ -424,6 +424,24 @@ class DevelopmentOrchestrator:
 
                 return path.read_text(encoding="utf-8") != original_content
 
+            if action == "replace_import":
+
+                module = fix.get("module")
+                code = fix.get("code")
+
+                lines = path.read_text().splitlines()
+
+                new_lines = []
+                for line in lines:
+                    if line.strip().startswith(f"import {module}"):
+                        new_lines.append(code.strip())
+                    else:
+                        new_lines.append(line)
+
+                path.write_text("\n".join(new_lines) + "\n")
+
+                return True
+
             if fix.get("code"):
 
                 if fix["code"].strip() in path.read_text(encoding="utf-8"):

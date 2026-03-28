@@ -36,6 +36,6 @@ def test_import_error_repair():
     assert len(fixes) > 0
 
     assert any(
-        fix["strategy"] == "import_error_stub"
+        fix["strategy"] == "import_error_try_wrapper"
         for fix in fixes
     )
