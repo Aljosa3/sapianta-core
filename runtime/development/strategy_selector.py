@@ -36,18 +36,32 @@ class StrategySelector:
         return "standard"
 
     # ================================================================
-    # UPDATED: FIX RANKING ENGINE (MINIMAL PATCH)
+    # UPDATED: FIX RANKING ENGINE (ADAPTIVE PATCH)
     # ================================================================
 
     def rank(self, fixes: List[Dict]) -> List[Dict]:
         """
-        Deterministic ranking of fixes.
+        Deterministic + adaptive ranking of fixes.
 
         Priority:
         1. intent/semantic fixes (highest)
-        2. confidence (descending)
+        2. adaptive score (confidence + heuristics)
         3. strategy priority (tie-breaker)
         """
+
+        def adaptive_score(f):
+            base = f.get("confidence", 0)
+            strategy = str(f.get("strategy", ""))
+
+            # 🔥 heuristic boost
+            if "callsite" in strategy:
+                base += 0.05
+
+            # 🔥 penalize fallback
+            if "fallback" in strategy:
+                base -= 0.2
+
+            return base
 
         return sorted(
             fixes,
@@ -55,7 +69,7 @@ class StrategySelector:
                 0 if str(f.get("strategy", "")).startswith("intent_") or
                      str(f.get("strategy", "")).startswith("semantic_")
                 else 1,
-                -f.get("confidence", 0),
+                -adaptive_score(f),
                 self._strategy_priority(f.get("strategy"))
             )
         )
@@ -77,6 +91,14 @@ class StrategySelector:
             "missing_attribute": 4,
             "type_mismatch": 5,
             "assertion_failure": 6,
+
+            # 🔥 NEW semantic strategies
+            "type_error_signature_fix": 2,
+            "type_error_keyword_fix": 2,
+            "type_error_multiple_values_fix_function": 2,
+            "type_error_multiple_values_fix_callsite": 1,  # slightly preferred
+            "type_error_multiple_values_fix_function_fallback": 3,
+
             "safe_fallback": 10,
             "regen_stub": 20,
         }

@@ -646,15 +646,19 @@ class DevelopmentOrchestrator:
 
                 fixes = self.strategy_selector.rank(fixes)
 
-                _log("Fixes ranked")
-
                 best_strategy = self.fix_memory.get_best_strategy(error_text)
+
+                _log(f"Best strategy from memory: {best_strategy}")
 
                 if best_strategy:
                     fixes = sorted(
                         fixes,
                         key=lambda f: 0 if f.get("strategy") == best_strategy else 1
                     )
+
+                _log("Fixes ranked")
+
+                _log(f"Fix order: {[f.get('strategy') for f in fixes]}")
 
                 for fix in fixes:
 

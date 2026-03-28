@@ -483,32 +483,119 @@ class AutoFixEngine:
             if arg_name not in param_names:
                 return None
 
-            # 🔥 strategija: naredi parameter optional
-            new_params = []
+            # 🔥 decision layer
+            is_test_file = "test_" in Path(file_path).name
 
-            for p in params:
-                name = p.split("=")[0].strip()
+            if is_test_file:
+                # popravi funkcijo
+                new_params = []
 
-                if name == arg_name:
-                    new_params.append(f"{name}=None")
-                else:
-                    new_params.append(p)
+                for p in params:
+                    name = p.split("=")[0].strip()
 
-            new_signature = ", ".join(new_params)
+                    if name == arg_name:
+                        new_params.append(f"{name}=None")
+                    else:
+                        new_params.append(p)
 
-            new_code = f"def {function_name}({new_signature}):\n{body}"
+                new_signature = ", ".join(new_params)
 
-            return {
-                "fixed": False,
-                "strategy": "type_error_multiple_values_fix",
-                "confidence": 0.95,
-                "file": file_path,
-                "action": "replace_function",
-                "function": function_name,
-                "code": new_code
-            }
+                new_code = f"def {function_name}({new_signature}):\n{body}"
+
+                return {
+                    "fixed": False,
+                    "strategy": "type_error_multiple_values_fix_function",
+                    "confidence": 0.95,
+                    "file": file_path,
+                    "action": "replace_function",
+                    "function": function_name,
+                    "code": new_code
+                }
+
+            else:
+                # 🔥 najprej poskusi call-site fix
+                callsite_fix = self._fix_multiple_values_callsite(
+                    message, file_path, function_name, arg_name
+                )
+
+                if callsite_fix:
+                    return callsite_fix
+
+                # 🔥 fallback → function fix
+                new_params = []
+
+                for p in params:
+                    name = p.split("=")[0].strip()
+
+                    if name == arg_name:
+                        new_params.append(f"{name}=None")
+                    else:
+                        new_params.append(p)
+
+                new_signature = ", ".join(new_params)
+
+                new_code = f"def {function_name}({new_signature}):\n{body}"
+
+                return {
+                    "fixed": False,
+                    "strategy": "type_error_multiple_values_fix_function_fallback",
+                    "confidence": 0.9,
+                    "file": file_path,
+                    "action": "replace_function",
+                    "function": function_name,
+                    "code": new_code
+                }
 
         return None
+
+    def _fix_multiple_values_callsite(
+        self,
+        message: str,
+        file_path: str,
+        function_name: str,
+        arg_name: str
+    ) -> Optional[Dict]:
+
+        if not Path(file_path).exists():
+            return None
+
+        code = Path(file_path).read_text(encoding="utf-8")
+
+        # poišči klic funkcije
+        pattern = rf"{function_name}\((.*?)\)"
+
+        matches = list(re.finditer(pattern, code))
+
+        if not matches:
+            return None
+
+        new_code = code
+
+        for match in matches:
+            call_args = match.group(1)
+
+            # odstrani keyword argument
+            new_args = re.sub(
+                rf"{arg_name}\s*=\s*[^,]+,?",
+                "",
+                call_args
+            )
+
+            # očisti trailing vejice
+            new_args = re.sub(r",\s*,", ",", new_args).strip(", ")
+
+            new_call = f"{function_name}({new_args})"
+
+            new_code = new_code.replace(match.group(0), new_call)
+
+        return {
+            "fixed": False,
+            "strategy": "type_error_multiple_values_fix_callsite",
+            "confidence": 0.9,
+            "file": file_path,
+            "action": "replace_file",
+            "code": new_code
+        }
 
     # ================================================================
     # ERROR PARSER
