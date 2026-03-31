@@ -60,13 +60,12 @@ class TestRunner:
             diagnostics.return_code = -3
             return diagnostics
 
-        # 🔥 KLJUČNA SPREMEMBA → ciljamo generated teste
         cmd = [
             sys.executable,
             "-m",
             "pytest",
             self.generated_test_path,
-            "-v",                         # 👈 boljši output za parsing
+            "-v",
             "--maxfail=1",
             "--disable-warnings",
             "--tb=short",
@@ -77,11 +76,16 @@ class TestRunner:
         env = os.environ.copy()
         env["SAPIANTA_TEST_RUNNER"] = "1"
 
+        generated_abs = str(Path(self.project_root).resolve() / self.generated_test_path)
+        existing_pythonpath = env.get("PYTHONPATH", "")
+        env["PYTHONPATH"] = generated_abs + (os.pathsep + existing_pythonpath if existing_pythonpath else "")
+
+        # ✅ KLJUČNI FIX: ločen capture stdout + stderr
         process = subprocess.Popen(
             cmd,
             cwd=self.project_root,
             stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
+            stderr=subprocess.PIPE,   # 🔥 PREJ JE BIL STDOUT → napačno
             text=True,
             preexec_fn=os.setsid,
             env=env
@@ -90,15 +94,26 @@ class TestRunner:
         diagnostics = TestRunResult()
 
         try:
-            output, _ = process.communicate(timeout=self.timeout)
+            stdout, stderr = process.communicate(timeout=self.timeout)
             end = time.time()
 
-            diagnostics = self.collect_results(output)
+            # 🔥 DEBUG (KRITIČNO)
+            print("\n[DEBUG SUBPROCESS STDOUT]")
+            print(stdout)
+
+            print("\n[DEBUG SUBPROCESS STDERR]")
+            print(stderr)
+
+            combined_output = (stdout or "") + "\n" + (stderr or "")
+
+            diagnostics = self.collect_results(combined_output)
             diagnostics.execution_time = round(end - start, 3)
-            diagnostics.raw_output = output
+
+            diagnostics.raw_output = stdout
+            diagnostics.raw_error = stderr
             diagnostics.return_code = process.returncode
 
-            # 🔥 FIX: proper success evaluation
+            # 🔥 izboljšana success logika
             if process.returncode != 0:
                 diagnostics.success = False
             elif diagnostics.tests_total == 0:
@@ -156,7 +171,6 @@ class TestRunner:
 
         result = TestRunResult()
 
-        # 🔥 izboljšan parsing
         for line in stdout.splitlines():
 
             if "collected" in line:
@@ -178,7 +192,6 @@ class TestRunner:
         result.test_files = self.count_test_files()
         result.coverage_potential = self.estimate_coverage(result)
 
-        # 🔥 BONUS FIX (točno tukaj)
         if result.tests_total == 0 and "no tests ran" in stdout.lower():
             result.tests_total = 0
 
@@ -239,7 +252,7 @@ class TestRunner:
             "coverage_potential": diagnostics.coverage_potential,
             "timeout": diagnostics.timeout,
             "return_code": diagnostics.return_code,
-            "raw_error": diagnostics.raw_error[:300]
+            "raw_error": (diagnostics.raw_error or "")[:300]
         }
 
     def print_summary(self, diagnostics):

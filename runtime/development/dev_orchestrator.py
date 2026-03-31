@@ -109,6 +109,15 @@ def run_strict_generated_tests():
     raw_error = diagnostics.raw_error or ""
     combined_output = raw_output + raw_error
 
+    print("\n[DEBUG COMBINED OUTPUT]")
+    print(combined_output)
+
+    print("\n[DEBUG RAW OUTPUT]")
+    print(raw_output)
+
+    print("\n[DEBUG RAW ERROR]")
+    print(raw_error)
+
     critical_errors = [
         "ImportError",
         "ModuleNotFoundError",
@@ -119,6 +128,28 @@ def run_strict_generated_tests():
 
     if has_critical_error:
         _log("CRITICAL ERROR DETECTED → FORCE FAIL")
+
+    # =====================================================
+    # 🔥 FALLBACK TRACEBACK (CRITICAL FIX)
+    # =====================================================
+    import traceback
+
+    if not combined_output.strip():
+        try:
+            generated_dir = Path("runtime/development/generated")
+
+            for file in generated_dir.glob("*.py"):
+                try:
+                    code = file.read_text(encoding="utf-8")
+                    compile(code, str(file), "exec")
+                except SyntaxError:
+                    combined_output = traceback.format_exc()
+                    break
+
+        except Exception:
+            pass
+
+    # =====================================================
 
     global LAST_CODEGEN_RESULT
 
@@ -186,7 +217,8 @@ def run_strict_generated_tests():
     return {
         "success": success,
         "error": combined_output,
-        "output": raw_output
+        "output": raw_output,
+        "test_output": combined_output
     }
 
 
@@ -475,10 +507,16 @@ class DevelopmentOrchestrator:
 
             implementation_plan = self.build_implementation_plan(architecture)
 
+            # 🔥 FIX: canonical file naming (MUST match CodeGenerator)
             implementation_plan = [
-                sanitize_filename(f)
+                f"runtime/development/generated/{sanitize_module_name(Path(f).stem)}.py"
                 for f in implementation_plan
-                if is_valid_generated_file(sanitize_filename(f))
+            ]
+
+            # 🔥 FIX: preserve full path + validate only
+            implementation_plan = [
+                f for f in implementation_plan
+                if is_valid_generated_file(Path(f).name)
             ]
 
             if not implementation_plan:
@@ -632,7 +670,10 @@ class DevelopmentOrchestrator:
                         }
 
                     _log("[AUTO-APPROVED]")
-                    return True
+                    return {
+                        "success": True,
+                        "reason": "execution_completed"
+                    }
 
                 failure_info = strict_result
                 error_text = failure_info.get("error", "")
@@ -715,7 +756,10 @@ class DevelopmentOrchestrator:
                             }
 
                         _log("[AUTO-APPROVED AFTER FIX]")
-                        return True
+                        return {
+                            "success": True,
+                            "reason": "execution_completed_after_fix"
+                        }
 
             try:
                 for file_path in implementation_plan:
@@ -756,7 +800,10 @@ class DevelopmentOrchestrator:
             except Exception:
                 _log("[RETEST AFTER REPAIR FAILED]")
 
-            return False
+            return {
+                "success": False,
+                "reason": "execution_failed"
+            }
 
         except Exception:
             _log(traceback.format_exc())
@@ -824,25 +871,38 @@ class DevOrchestrator:
         except Exception:
             return False
     def repair(self, file_path):
+
+        # =====================================================
+        # 🔥 RUN TESTS FIRST (CRITICAL)
+        # =====================================================
+        strict_result = run_strict_generated_tests()
+
         failure_info = {
             "success": False,
-            "error": "SyntaxError",
-            "output": "",
+            "error": strict_result.get("error", ""),
+            "test_output": strict_result.get("test_output", ""),
+            "output": strict_result.get("output", ""),
+            "file": str(file_path)
         }
 
+        # =====================================================
+        # 🔧 REPAIR PIPELINE
+        # =====================================================
         implementation_plan = [str(file_path)]
 
         fixes = self.auto_fix_engine.generate_fixes(failure_info)
 
         for fix in fixes:
+
             if not self.apply_fix(fix, implementation_plan):
                 continue
 
             # 🔥 STOP CONDITION (CRITICAL)
             try:
                 code = Path(file_path).read_text(encoding="utf-8")
-                compile(code, file_path, "exec")
+                compile(code, str(file_path), "exec")
                 return {"success": True}
+
             except Exception:
                 continue
 
