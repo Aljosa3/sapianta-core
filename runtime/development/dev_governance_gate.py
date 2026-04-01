@@ -29,7 +29,9 @@ class DevGovernanceGate:
         idea = task.get("idea", "").lower()
         task_type = task.get("task_type", "")
 
-        # dangerous keywords
+        # ---------------------------------------------------------
+        # 🔥 HARD BLOCK (CRITICAL OPERATIONS)
+        # ---------------------------------------------------------
 
         dangerous = [
             "delete",
@@ -42,7 +44,9 @@ class DevGovernanceGate:
             if word in idea:
                 return self.BLOCK
 
-        # sensitive areas
+        # ---------------------------------------------------------
+        # 🔥 SENSITIVE AREAS (REQUIRE REVIEW)
+        # ---------------------------------------------------------
 
         sensitive = [
             "governance",
@@ -55,10 +59,25 @@ class DevGovernanceGate:
             if word in idea:
                 return self.REVIEW
 
-        # bugfix always allowed
+        # ---------------------------------------------------------
+        # 🔥 TASK TYPE POLICY (CRITICAL FIX)
+        # ---------------------------------------------------------
 
+        # bugfix = safe → allow direct execution
         if task_type == "bugfix":
             return self.ALLOW
+
+        # implementation = NEW CODE → MUST be reviewed
+        if task_type == "implementation":
+            return self.REVIEW
+
+        # unknown / future types → conservative default
+        if not task_type:
+            return self.REVIEW
+
+        # ---------------------------------------------------------
+        # DEFAULT (SAFE FALLBACK)
+        # ---------------------------------------------------------
 
         return self.ALLOW
 

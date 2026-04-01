@@ -7,6 +7,7 @@ Purpose:
 - prevent infinite loops
 """
 
+import re
 from typing import Dict, List
 
 from runtime.development.auto_fix_engine import AutoFixEngine
@@ -81,9 +82,9 @@ class FixOrchestrator:
             print("[FIX TARGET]", target_file)
 
             # --------------------------------------------------------
-            # 🔥 GOVERNANCE BYPASS (temporary stabilization)
+            # GOVERNANCE (temporary bypass)
             # --------------------------------------------------------
-            approved = True  # namesto governance_gate.request_approval(...)
+            approved = True
 
             if not approved:
                 return {
@@ -155,6 +156,55 @@ class FixOrchestrator:
 
             if not action or not code:
                 return False
+
+            # --------------------------------------------------------
+            # 🔥 REPLACE FUNCTION (CRITICAL FIX)
+            # --------------------------------------------------------
+            if action == "replace_function":
+
+                function_name = fix.get("function")
+
+                if not function_name:
+                    return False
+
+                with open(module_path, "r", encoding="utf-8") as f:
+                    original_code = f.read()
+
+                # 🔥 najdi funkcijo
+                pattern = rf"def\s+{function_name}\s*\(.*?\):([\s\S]*?)(?=\n\s*def\s|\Z)"
+
+                match = re.search(pattern, original_code)
+
+                if not match:
+                    print("[FIX FALLBACK] function not found → appending:", function_name)
+
+                    updated_code = (
+                        original_code
+                        + "\n\n"
+                        + code
+                        + "\n"
+                    )
+
+                    with open(module_path, "w", encoding="utf-8") as f:
+                        f.write(updated_code)
+
+                    return True
+
+                start, end = match.span()
+
+                # 🔥 zamenjava
+                updated_code = (
+                    original_code[:start]
+                    + code
+                    + "\n"
+                    + original_code[end:]
+                )
+
+                with open(module_path, "w", encoding="utf-8") as f:
+                    f.write(updated_code)
+
+                print("[FIX APPLIED] replace_function:", function_name)
+                return True
 
             # --------------------------------------------------------
             # STUB → INSERT AFTER IMPORTS

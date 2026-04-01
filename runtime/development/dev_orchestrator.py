@@ -675,7 +675,13 @@ class DevelopmentOrchestrator:
                         "reason": "execution_completed"
                     }
 
-                failure_info = strict_result
+                failure_info = {
+                    "error": strict_result.get("error") or strict_result.get("output"),
+                    "test_output": strict_result.get("test_output") or strict_result.get("output"),
+                    "output": strict_result.get("output"),
+                    "file": implementation_plan[0] if implementation_plan else None,
+                }
+
                 error_text = failure_info.get("error", "")
 
                 if isinstance(failure_info, dict):
@@ -685,7 +691,17 @@ class DevelopmentOrchestrator:
 
                 _log(f"Generated {len(fixes)} fix candidates")
 
-                fixes = self.strategy_selector.rank(fixes)
+                ranked = self.strategy_selector.rank(fixes)
+
+                if not ranked:
+                    _log("[DEV_ORCH] Ranking failed → using raw fixes")
+                    ranked = fixes or []
+
+                fixes = ranked
+
+                if not fixes:
+                    _log("[DEV_ORCH] No fixes available → stopping repair")
+                    break
 
                 best_strategy = self.fix_memory.get_best_strategy(error_text)
 
@@ -890,23 +906,108 @@ class DevOrchestrator:
         # =====================================================
         implementation_plan = [str(file_path)]
 
-        fixes = self.auto_fix_engine.generate_fixes(failure_info)
+        # =====================================================
+        # 🔁 ITERATIVE REPAIR LOOP (CRITICAL UPGRADE)
+        # =====================================================
 
-        for fix in fixes:
+        MAX_ITERATIONS = 5
+        current_failure = failure_info
+        success = False
+        
+        for iteration in range(MAX_ITERATIONS):
 
-            if not self.apply_fix(fix, implementation_plan):
-                continue
+            seen_strategies = set()
 
-            # 🔥 STOP CONDITION (CRITICAL)
-            try:
-                code = Path(file_path).read_text(encoding="utf-8")
-                compile(code, str(file_path), "exec")
-                return {"success": True}
+            _log(f"[REPAIR][ITER] {iteration+1}/{MAX_ITERATIONS}")
+            if not current_failure.get("error"):
+                _log("[REPAIR] Missing error → skipping iteration")
+                break
 
-            except Exception:
-                continue
+            fixes = self.auto_fix_engine.generate_fixes(current_failure)
 
-        return {"success": False}
+            # 🔒 SAFEGUARD: fallback če ranking odpove
+            ranked = self._impl.strategy_selector.rank(fixes)
+
+            if not ranked:
+                _log("[REPAIR] Ranking failed or empty → using raw fixes")
+                ranked = fixes or []
+
+            fixes = ranked
+
+            if not fixes:
+                _log("[REPAIR] No fixes available → stopping")
+                break
+
+            applied = False
+
+            for fix in fixes:
+
+                strategy = fix.get("strategy")
+
+                # 🔒 SAFEGUARD (invalid strategy)
+                if not strategy:
+                    _log("[REPAIR] Invalid strategy → skipping")
+                    continue
+
+                # 🔒 PREPREČI PONAVLJANJE ISTE STRATEGIJE
+                if strategy in seen_strategies:
+                    _log(f"[REPAIR] Skipping already tried strategy: {strategy}")
+                    continue
+
+                _log(f"[REPAIR] Trying: {strategy}")
+
+                if not self.apply_fix(fix, implementation_plan):
+                    _log(f"[REPAIR] Fix not applied → skipping strategy: {strategy}")
+                    continue
+
+                # ✅ dodaj šele po uspešni aplikaciji
+                seen_strategies.add(strategy)
+
+                applied = True
+
+                # -------------------------------------------------
+                # 🔥 CLEAR MODULE CACHE (CRITICAL)
+                # -------------------------------------------------
+                import sys
+                for m in list(sys.modules.keys()):
+                    if "runtime.development.generated" in m:
+                        del sys.modules[m]
+
+                # -------------------------------------------------
+                # 🔥 RE-RUN STRICT TESTS (KEY CHANGE)
+                # -------------------------------------------------
+                test_result = run_strict_generated_tests()
+
+                if test_result.get("success"):
+                    _log("[REPAIR] ✅ TESTS PASSED → repair complete")
+                    success = True
+                    break
+
+                # -------------------------------------------------
+                # 🔁 UPDATE FAILURE STATE
+                # -------------------------------------------------
+                current_failure = {
+                    "success": False,
+                    "error": test_result.get("error") or test_result.get("output"),
+                    "test_output": test_result.get("test_output") or test_result.get("output"),
+                    "output": test_result.get("output"),
+                    "file": str(file_path),
+                }
+
+                _log("[REPAIR] ❌ Still failing → next iteration")
+
+            if success:
+                break
+
+            if not applied:
+                _log("[REPAIR] No fix applied → stopping")
+                break
+
+        # =====================================================
+        # FINAL RESULT
+        # =====================================================
+
+        return {"success": success}
 
     def run(self):
 

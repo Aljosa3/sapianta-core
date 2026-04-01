@@ -33,8 +33,29 @@ class DevAutonomousLoop:
     """
 
     def __init__(self):
-        self.registry = DevTaskRegistry()
-        self.hash_index = DevTaskRegistryHashIndex()
+
+        # ---------------------------------------------------------
+        # 🔥 HARD RESET (CRITICAL – TEST ISOLATION)
+        # ---------------------------------------------------------
+        try:
+            # vedno nova instanca → brez state leakage
+            self.registry = DevTaskRegistry()
+            self.hash_index = DevTaskRegistryHashIndex()
+
+            # dodatno čiščenje, če implementirano
+            if hasattr(self.registry, "clear"):
+                self.registry.clear()
+
+            if hasattr(self.hash_index, "clear"):
+                self.hash_index.clear()
+
+        except Exception:
+            # fallback (nikoli ne sme crashat)
+            self.registry = DevTaskRegistry()
+            self.hash_index = DevTaskRegistryHashIndex()
+
+        # ---------------------------------------------------------
+
         self.planner = DevTaskPlanner()
         self.gate = DevGovernanceGate()
         self.sandbox = DevSandboxRunner()
@@ -50,13 +71,28 @@ class DevAutonomousLoop:
 
     def submit_task(self, task: dict) -> str:
 
-        if self.hash_index.has_task(task):
-            return "duplicate"
+        # ---------------------------------------------------------
+        # 🔥 PRIMARY SOURCE OF TRUTH → REGISTRY
+        # ---------------------------------------------------------
+        existing_tasks = self.registry.get_active_tasks()
 
-        self.hash_index.add_task(task)
+        for t in existing_tasks:
+            if t == task:
+                return "duplicate"
 
-        before = len(self.registry.get_active_tasks())
+        # ---------------------------------------------------------
+        # hash_index je sekundaren (ne blokira flow)
+        # ---------------------------------------------------------
+        try:
+            if hasattr(self.hash_index, "add_task"):
+                self.hash_index.add_task(task)
+        except Exception:
+            pass
+
+        before = len(existing_tasks)
+
         self.registry.add_task(task)
+
         after = len(self.registry.get_active_tasks())
 
         if after == before:
@@ -185,7 +221,12 @@ class DevAutonomousLoop:
         try:
             if task.get("approved"):
                 print("[DEV_LOOP] Resuming approved task...")
+
             result = orchestrator.run_auto(task)
+
+            # ---------------------------------------------------------
+            # 🔥 HANDLE WAITING_FOR_APPROVAL (CRITICAL FIX)
+            # ---------------------------------------------------------
 
             if isinstance(result, dict) and result.get("status") == "waiting_for_approval":
 
@@ -195,46 +236,51 @@ class DevAutonomousLoop:
                     task["state"] = "approved"
                     task["approved"] = True
 
-                    success = True
-                    reason = None
+                    success = False
+                    reason = "approval_auto_handled"
 
                 elif task.get("approved"):
-                    success = True
-                    reason = None
+                    success = False
+                    reason = "approval_already_granted"
 
                 else:
-                    self.registry.update_task_state(task, "waiting_approval")
-                    self.memory.record_blocked(task)
+                    print("[DEV_LOOP] Approval required → continuing for retry loop")
 
-                    execution_time = time.time() - start
-                    self.metrics.record_cycle("waiting_for_approval", execution_time, task=task)
+                    success = False
+                    reason = "approval_required"
 
-                    return {
-                        "status": "waiting_for_approval",
-                        "task": task
-                    }
+            # ---------------------------------------------------------
+            # NORMAL RESULT HANDLING
+            # ---------------------------------------------------------
 
-            if result is False:
+            elif result is False:
                 success = False
                 reason = "orchestrator_failed"
 
             elif isinstance(result, dict):
-                success = result.get("success", False)
-                reason = result.get("reason")
+
+                # 🔥 STRICT SUCCESS CRITERIA
+                if result.get("success") is True and task.get("state") == "completed":
+                    success = True
+                    reason = None
+                else:
+                    success = False
+                    reason = result.get("reason") or "incomplete_execution"
 
             else:
-                success = bool(result)
-                reason = None
+                success = False
+                reason = "invalid_result_type"
 
         except Exception as e:
             print("[LOOP] Orchestrator execution failed:", str(e))
             success = False
             reason = str(e)
 
-        # ---------------------------------------------------------
-        # RETRY LOOP
-        # ---------------------------------------------------------
+            # ---------------------------------------------------------
+            # RETRY LOOP (STABILIZED)
+            # ---------------------------------------------------------
 
+        # 🔥 HARD CONDITION: success must be explicitly True
         if success is True:
             self.registry.complete_task(task)
             self.memory.record_completed(task)
@@ -242,16 +288,22 @@ class DevAutonomousLoop:
             self._sleep_if_dev()
             return {"status": "completed", "task": task}
 
+        # 🔥 EVERYTHING ELSE = FAILURE → RETRY
         task["retry_count"] = task.get("retry_count", 0) + 1
 
-        if task["retry_count"] < 3:
-            print(f"[DEV_LOOP] RETRY ({task['retry_count']})")
+        print(f"[DEV_LOOP] RETRY ({task['retry_count']})")
 
+        if task["retry_count"] < 3:
             self.registry.update_task_state(task, "queued")
 
             self._sleep_if_dev()
-            return {"status": "retrying", "task": task}
+            return {
+                "status": "retrying",
+                "task": task,
+                "reason": reason or "execution_failed"
+            }
 
+        # 🔥 FINAL FAIL
         self.registry.reject_task(task)
         self.memory.record_failed(task)
 

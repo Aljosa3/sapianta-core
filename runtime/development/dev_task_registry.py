@@ -170,6 +170,13 @@ class DevTaskRegistry:
 
         self._persist()
 
+    def clear(self) -> None:
+        """Reset all tasks in memory and on disk."""
+        self.active_tasks = []
+        self.completed_tasks = []
+        self.rejected_tasks = []
+        self._persist()
+
     def get_active_tasks(self) -> List[Dict]:
         return list(self.active_tasks)
 

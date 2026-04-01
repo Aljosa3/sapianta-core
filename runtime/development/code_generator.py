@@ -130,8 +130,7 @@ Auto-generated functional test for {function_name}
 
 def test_{function_name}_execution():
     from {safe_module_name} import {function_name}
-    result = {function_name}(1, 2)
-    assert result is not None
+    assert {function_name}(1, 2) is not None
 '''
 
         else:
@@ -154,9 +153,7 @@ def test_{safe_module_name}_instantiation():
 def test_{safe_module_name}_execution():
     from {safe_module_name} import {class_name}
     instance = {class_name}()
-    result = instance.run({{}}
-)
-    assert result is not None
+    assert instance.run({{}}) is not None
 '''
 
         with open(test_file_path, "w", encoding="utf-8") as f:

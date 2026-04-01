@@ -1,10 +1,9 @@
 """
-SAPIANTA Minimal Repair Orchestrator (v0.3)
+SAPIANTA Minimal Repair Orchestrator (v0.4)
 
-Enhancements:
-- system context builder (v1)
-- compatible with AutoFixEngine.generate_fixes
-- non-breaking changes
+Fixes:
+- correct failure_info structure (test_output)
+- FIXED: correct apply layer (FixOrchestrator)
 """
 
 import re
@@ -12,36 +11,36 @@ import re
 from runtime.development.test_runner import TestRunner
 from runtime.development.auto_fix_engine import AutoFixEngine
 from runtime.development.dev_governance_gate import DevGovernanceGate
-from runtime.development.fix_orchestrator import FixOrchestrator  # 🔥 MINIMAL ADD
+from runtime.development.fix_orchestrator import FixOrchestrator
 
 
 # ================================================================
-# FAILURE EXTRACTION
+# FAILURE EXTRACTION (FIXED)
 # ================================================================
 
 def extract_failures(diagnostics):
-    """
-    Convert TestRunResult into failure list usable by fix engine.
-    """
+
     failures = []
 
     if diagnostics.success:
         return failures
 
+    fi = diagnostics.failure_info if diagnostics.failure_info else {}
+
     for module in diagnostics.failed_modules:
         failures.append({
             "module": module,
-            "raw_output": diagnostics.raw_output,
-            "errors": diagnostics.raw_error,
-            "error": diagnostics.raw_error,   # compatibility
-            "output": diagnostics.raw_output  # compatibility
+            "error": fi.get("error") or diagnostics.raw_output or "",
+            "test_output": fi.get("test_output") or diagnostics.raw_output or "",
+            "file": fi.get("file"),
+            "system_context": {}
         })
 
     return failures
 
 
 # ================================================================
-# 🧠 SYSTEM CONTEXT BUILDER (SAFE v1)
+# SYSTEM CONTEXT
 # ================================================================
 
 def _build_system_context(failure_info: dict) -> dict:
@@ -52,44 +51,21 @@ def _build_system_context(failure_info: dict) -> dict:
         "missing_functions": []
     }
 
-    error_text = failure_info.get("error", "") or ""
-    output = failure_info.get("output", "") or ""
+    combined = (failure_info.get("error", "") or "") + "\n" + (failure_info.get("test_output", "") or "")
 
-    combined = error_text + "\n" + output
-
-    # ------------------------------------------------
-    # 🔌 MISSING IMPORTS
-    # ------------------------------------------------
-    import_matches = re.findall(
-        r"No module named '([\w\.]+)'",
-        combined
+    context["missing_imports"].extend(
+        re.findall(r"No module named '([\w\.]+)'", combined)
     )
 
-    for mod in import_matches:
-        context["missing_imports"].append(mod)
-
-    # ------------------------------------------------
-    # 🔥 NAME ERROR → missing function
-    # ------------------------------------------------
-    name_matches = re.findall(
-        r"NameError: name '(\w+)' is not defined",
-        combined
+    context["missing_functions"].extend(
+        re.findall(r"NameError: name '(\w+)' is not defined", combined)
     )
 
-    for name in name_matches:
-        context["missing_functions"].append(name)
-
-    # ------------------------------------------------
-    # 🔗 SIMPLE API MISMATCH
-    # ------------------------------------------------
     if "generate_fix" in combined and "generate_fixes" in combined:
         context["missing_connections"].append(
             "generate_fix → generate_fixes mismatch"
         )
 
-    # ------------------------------------------------
-    # CLEAN DUPLICATES
-    # ------------------------------------------------
     for key in context:
         context[key] = sorted(set(context[key]))
 
@@ -101,9 +77,11 @@ def _build_system_context(failure_info: dict) -> dict:
 # ================================================================
 
 def main():
-    print("🔧 SAPIANTA Repair Orchestrator (aligned v0.3)\n")
+    print("🔧 SAPIANTA Repair Orchestrator (v0.4)\n")
 
-    # 1. Run tests
+    # ------------------------------------------------------------
+    # TEST RUN
+    # ------------------------------------------------------------
     print("▶ Running tests...")
     runner = TestRunner(project_root=".", timeout=10)
     diagnostics = runner.run_tests()
@@ -116,17 +94,21 @@ def main():
 
     failures = extract_failures(diagnostics)
 
-    # 2. Initialize components
+    # ------------------------------------------------------------
+    # INIT
+    # ------------------------------------------------------------
     fixer = AutoFixEngine()
     gate = DevGovernanceGate()
-    fix_applicator = FixOrchestrator()  # 🔥 MINIMAL ADD
+    fix_applicator = FixOrchestrator()  # 🔥 KLJUČ
 
-    # 3. Process failures
+    # ------------------------------------------------------------
+    # PROCESS
+    # ------------------------------------------------------------
     for i, failure in enumerate(failures, start=1):
+
         print(f"\n--- Failure {i} ---")
         print(f"Module: {failure['module']}")
 
-        # 🧠 BUILD SYSTEM CONTEXT
         try:
             system_context = _build_system_context(failure)
             failure["system_context"] = system_context
@@ -137,7 +119,9 @@ def main():
         except Exception as e:
             print(f"⚠️ Context build failed: {e}")
 
-        # 3.1 Generate fixes
+        # --------------------------------------------------------
+        # GENERATE FIXES
+        # --------------------------------------------------------
         try:
             fixes = fixer.generate_fixes(failure)
         except Exception as e:
@@ -148,54 +132,67 @@ def main():
             print("⚠️ No fixes generated.")
             continue
 
-        # 3.2 Process multiple fixes
+        # --------------------------------------------------------
+        # APPLY FIXES
+        # --------------------------------------------------------
         for fix in fixes:
 
             print("\n💡 Proposed fix:")
             print(fix)
 
-            # Governance approval
             try:
                 approved = gate.request_approval(fix)
             except Exception as e:
-                print(f"⚠️ Governance gate error: {e}")
+                print(f"⚠️ Governance error: {e}")
                 continue
 
             if not approved:
-                print("🚫 Fix rejected by governance.")
+                print("🚫 Rejected by governance")
                 continue
 
-            # 🔥 MINIMAL FIX: fallback target_file + test → source
-            try:
-                target_file = fix.get("file")
+            # ----------------------------------------------------
+            # TARGET FILE
+            # ----------------------------------------------------
+            target_file = fix.get("file")
 
-                if not target_file:
-                    module = failure.get("module")
+            if not target_file:
+                module = failure.get("module")
+                if module:
+                    module = module.replace("FAILED ", "").strip()
+                    target_file = module.replace(".", "/") + ".py"
 
-                    if module:
-                        module = module.replace("FAILED ", "").strip()
+            if target_file and "test_" in target_file:
+                target_file = target_file.replace("test_", "")
 
-                        target_file = module.replace(".", "/") + ".py"
+            if not target_file:
+                print("⚠️ No target file")
+                continue
 
-                        # 🔥 KLJUČNI FIX (2 vrstici)
-                        if "test_" in target_file:
-                            target_file = target_file.replace("test_", "")
+            fix["file"] = target_file
 
-                        fix["file"] = target_file
+            print("[APPLY TARGET]", target_file)
 
-                if not target_file:
-                    print("⚠️ No target file specified in fix")
-                    continue
+            # ----------------------------------------------------
+            # 🔥 PRAVILEN APPLY
+            # ----------------------------------------------------
+            success = fix_applicator._apply_fix(target_file, fix)
 
-                success = fix_applicator._apply_fix(target_file, fix)
+            if success:
+                print(f"✅ FIX APPLIED → {target_file}")
 
-                if success:
-                    print(f"✅ Fix applied to {target_file}")
+                print("\n🔁 Re-running tests after fix...")
+
+                diagnostics = runner.run_tests()
+
+                if diagnostics.success:
+                    print("🎉 FIX SUCCESSFUL → TESTS PASSED")
+                    return
                 else:
-                    print(f"⚠️ Fix application failed for {target_file}")
+                    print("⚠️ Fix did not resolve issue, continuing...")
 
-            except Exception as e:
-                print(f"⚠️ Failed to apply fix: {e}")
+                break
+            else:
+                print("⚠️ APPLY FAILED")
 
     print("\n🔁 Repair cycle complete.")
 

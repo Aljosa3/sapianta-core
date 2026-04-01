@@ -39,14 +39,15 @@ class TestRunResult:
         self.return_code = 0
         self.timeout = False
 
+        # 🔥 NEW (CRITICAL)
+        self.failure_info = {}
+
 
 class TestRunner:
 
     def __init__(self, project_root=".", timeout=10):
         self.project_root = Path(project_root)
         self.timeout = timeout
-
-        # 🔥 ključna sprememba → eksplicitno test območje
         self.generated_test_path = "runtime/development/generated"
 
     def run_tests(self):
@@ -64,7 +65,8 @@ class TestRunner:
             sys.executable,
             "-m",
             "pytest",
-            self.generated_test_path,
+            "--cache-clear",
+            "--import-mode=importlib",
             "-v",
             "--maxfail=1",
             "--disable-warnings",
@@ -80,12 +82,11 @@ class TestRunner:
         existing_pythonpath = env.get("PYTHONPATH", "")
         env["PYTHONPATH"] = generated_abs + (os.pathsep + existing_pythonpath if existing_pythonpath else "")
 
-        # ✅ KLJUČNI FIX: ločen capture stdout + stderr
         process = subprocess.Popen(
             cmd,
             cwd=self.project_root,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,   # 🔥 PREJ JE BIL STDOUT → napačno
+            stderr=subprocess.PIPE,
             text=True,
             preexec_fn=os.setsid,
             env=env
@@ -97,7 +98,6 @@ class TestRunner:
             stdout, stderr = process.communicate(timeout=self.timeout)
             end = time.time()
 
-            # 🔥 DEBUG (KRITIČNO)
             print("\n[DEBUG SUBPROCESS STDOUT]")
             print(stdout)
 
@@ -113,9 +113,10 @@ class TestRunner:
             diagnostics.raw_error = stderr
             diagnostics.return_code = process.returncode
 
-            # 🔥 izboljšana success logika
+            # 🔥 CRITICAL: build failure_info
             if process.returncode != 0:
                 diagnostics.success = False
+                diagnostics.failure_info = self._build_failure_info(stdout, stderr)
             elif diagnostics.tests_total == 0:
                 diagnostics.success = False
                 diagnostics.raw_error = "No tests were executed"
@@ -167,6 +168,35 @@ class TestRunner:
                 except Exception:
                     pass
 
+    # =====================================================
+    # 🔥 NEW: FAILURE INFO BUILDER (CRITICAL)
+    # =====================================================
+    def _build_failure_info(self, stdout: str, stderr: str):
+
+        combined = (stdout or "") + "\n" + (stderr or "")
+
+        return {
+            "error": combined,
+            "test_output": stdout,
+            "file": self._extract_target_file(combined)
+        }
+
+    # =====================================================
+    # 🔥 NEW: TARGET FILE EXTRACTION
+    # =====================================================
+    def _extract_target_file(self, output: str):
+
+        matches = re.findall(r'([^\s"\']+\.py):\d+:', output)
+
+        for m in matches:
+            p = Path(m)
+            if not p.name.startswith("test_"):
+                return str(p)
+
+        return matches[-1] if matches else None
+
+    # =====================================================
+
     def collect_results(self, stdout):
 
         result = TestRunResult()
@@ -191,9 +221,6 @@ class TestRunner:
         result.failed_modules = self.detect_failed_modules(stdout)
         result.test_files = self.count_test_files()
         result.coverage_potential = self.estimate_coverage(result)
-
-        if result.tests_total == 0 and "no tests ran" in stdout.lower():
-            result.tests_total = 0
 
         return result
 
@@ -232,13 +259,6 @@ class TestRunner:
             result.tests_passed / max(result.tests_total, 1),
             2
         )
-
-    def extract_failures(self, diagnostics):
-
-        return [
-            line for line in diagnostics.raw_output.splitlines()
-            if "FAILED" in line
-        ]
 
     def to_dict(self, diagnostics):
 
