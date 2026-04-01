@@ -104,6 +104,32 @@ class AutoFixEngine:
             if match:
                 target_function = match.group(1)
 
+        # =====================================================
+        # 🔥 FTL SANITIZATION (CRITICAL FIX)
+        # =====================================================
+        INVALID_FUNCTION_NAMES = {
+            "Traceback",
+            "File",
+            "line",
+            "Error",
+            "Exception",
+            "NameError",
+            "TypeError",
+            "ImportError",
+            "ModuleNotFoundError",
+        }
+
+        # basic validation
+        if target_function:
+
+            # ❌ blacklist
+            if target_function in INVALID_FUNCTION_NAMES:
+                target_function = None
+
+            # ❌ invalid pattern (must look like python identifier)
+            elif not re.match(r"^[a-zA-Z_]\w*$", target_function):
+                target_function = None
+
         print(f"[FTL] Target function: {target_function}")
 
         # =====================================================
@@ -478,9 +504,11 @@ class AutoFixEngine:
 
         for fix in fixes:
 
-            # =====================================================
-            # 🔥 FTL v2 ATTACH TARGET (CRITICAL)
-            # =====================================================
+            # 🔥 ensure file always exists
+            if not fix.get("file"):
+                fix["file"] = file_path
+
+            # 🔥 attach target (once only)
             if target_function:
                 fix["target_function"] = target_function
 
@@ -517,7 +545,51 @@ class AutoFixEngine:
         for f in validated:
             print(f["strategy"], f.get("confidence"))
 
-        return self._deduplicate_fixes(validated)
+        # =====================================================
+        # 🔥 STRATEGY-LEVEL DEDUP (CRITICAL FIX)
+        # =====================================================
+        strategy_seen = {}
+        final_fixes = []
+
+        for fix in validated:
+
+            strategy = fix.get("strategy")
+
+            # keep only highest confidence per strategy
+            if strategy not in strategy_seen:
+                strategy_seen[strategy] = fix
+            else:
+                existing = strategy_seen[strategy]
+
+                if fix.get("confidence", 0) > existing.get("confidence", 0):
+                    strategy_seen[strategy] = fix
+
+        # =====================================================
+        # 🔥 FINAL FILTER (BY STRATEGY)
+        # =====================================================
+        used = set()
+        final_fixes = []
+
+        for fix in validated:
+            strategy = fix.get("strategy")
+
+            if strategy in used:
+                continue
+
+            best = strategy_seen.get(strategy)
+
+            if best:
+                final_fixes.append(best)
+                used.add(strategy)
+
+        # =====================================================
+        # 🔥 DEBUG FINAL FIXES (CRITICAL)
+        # =====================================================
+        print("\n[DEBUG FINAL FIXES]:")
+        for f in final_fixes:
+            print(f["strategy"], f.get("confidence"))
+
+        return final_fixes
 
     # ================================================================
     # 🔥 NEW STRATEGIES
@@ -529,15 +601,47 @@ class AutoFixEngine:
         if not match:
             return None
 
-        var_name = match.group(1)
+        name = match.group(1)
 
+        # =====================================================
+        # 🔥 FUNCTION vs VARIABLE DETECTION (CRITICAL)
+        # =====================================================
+        is_function_call = False
+
+        try:
+            code = Path(file_path).read_text(encoding="utf-8")
+
+            # detect usage like foo(...)
+            if re.search(rf"{name}\s*\(", code):
+                is_function_call = True
+
+        except Exception:
+            pass
+
+        # =====================================================
+        # 🔥 FUNCTION STUB
+        # =====================================================
+        if is_function_call:
+            return {
+                "fixed": False,
+                "strategy": "name_error_function_stub",
+                "confidence": 0.96,
+                "file": file_path,
+                "action": "append_stub",
+                "function": name,
+                "code": f"def {name}(*args, **kwargs):\n    return None\n"
+            }
+
+        # =====================================================
+        # 🔥 VARIABLE STUB (DEFAULT)
+        # =====================================================
         return {
             "fixed": False,
             "strategy": "name_error_variable_stub",
             "confidence": 0.95,
             "file": file_path,
             "action": "append",
-            "code": f"{var_name} = 0\n"
+            "code": f"{name} = 0\n"
         }
 
     def _fix_import_error(self, message: str, file_path: str) -> Optional[Dict]:
@@ -1126,7 +1230,48 @@ class AutoFixEngine:
         ]
 
         # 🔥 return LAST occurrence (closest to failure)
-        return module_files[-1] if module_files else target_pool[-1]
+        if module_files:
+            return module_files[-1]
+
+        if target_pool:
+            return target_pool[-1]
+
+        # =====================================================
+        # 🔥 HARD FALLBACK (CRITICAL FIX)
+        # =====================================================
+
+        # fallback parsing (manual, deterministic)
+        candidate_files = []
+
+        for line in error_text.splitlines():
+            line = line.strip()
+
+            if line.startswith('File "'):
+                try:
+                    file_path = line.split('"')[1]
+
+                    # ❌ skip test files
+                    if "test_" in file_path or "/tests/" in file_path:
+                        continue
+
+                    # ❌ skip system files
+                    if self._is_system_file(file_path):
+                        continue
+
+                    if file_path.endswith(".py"):
+                        candidate_files.append(file_path)
+
+                except Exception:
+                    continue
+
+        # take last valid candidate
+        if candidate_files:
+            return candidate_files[-1]
+
+        # =====================================================
+        # FINAL FAIL → NONE (caller handles)
+        # =====================================================
+        return None
 
 
     def _extract_all_files(self, error_text: str) -> List[str]:
@@ -1176,15 +1321,31 @@ def {name}(*args, **kwargs):
         unique = []
 
         for fix in fixes:
+
+            # =====================================================
+            # 🔥 NORMALIZATION (CRITICAL)
+            # =====================================================
+            code = fix.get("code")
+            if code:
+                normalized_code = code.strip()
+                fix["code"] = normalized_code
+            else:
+                normalized_code = None
+
+            # =====================================================
+            # 🔥 STRONG DEDUP KEY
+            # =====================================================
             key = (
                 fix.get("strategy"),
                 fix.get("action"),
                 fix.get("file"),
                 fix.get("function"),
-                fix.get("code"),
+                normalized_code,
             )
+
             if key in seen:
                 continue
+
             seen.add(key)
             unique.append(fix)
 
