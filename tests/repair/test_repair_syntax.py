@@ -7,11 +7,12 @@ from runtime.development.dev_orchestrator import DevOrchestrator
 def run_repair(file_path: Path):
     orch = DevOrchestrator()
 
-    # simulacija minimalnega failure info
+    # 🔥 CRITICAL FIX: vključimo file
     failure_info = {
         "success": False,
         "error": "SyntaxError",
         "output": "",
+        "file": str(file_path),  # ✅ KLJUČNI FIX
     }
 
     implementation_plan = [str(file_path)]
@@ -20,6 +21,12 @@ def run_repair(file_path: Path):
 
     for attempt in range(3):
         for fix in fixes:
+
+            # 🔥 dodatna varnost (preskoči invalid fixes)
+            fix_code = fix.get("code")
+            if not isinstance(fix_code, str) or not fix_code.strip():
+                continue
+
             applied = orch.apply_fix(fix, implementation_plan)
 
             if not applied:
@@ -28,6 +35,9 @@ def run_repair(file_path: Path):
             try:
                 code = file_path.read_text()
                 namespace = {}
+
+                # 🔥 compile check (hitrejši fail)
+                compile(code, str(file_path), "exec")
                 exec(code, namespace)
 
                 if "add" in namespace:
