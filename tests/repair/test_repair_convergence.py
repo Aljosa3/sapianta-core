@@ -9,6 +9,7 @@ def run_repair(file_path: Path):
         "success": False,
         "error": "SyntaxError",
         "output": "",
+        "file": str(file_path),   # 🔥 CRITICAL FIX
     }
 
     implementation_plan = [str(file_path)]

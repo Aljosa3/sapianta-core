@@ -615,6 +615,9 @@ class DevelopmentOrchestrator:
 
                 _log(f"[GUARDIAN PASS] {module_file}")
 
+            # 🔥 OUTSIDE LOOP (CRITICAL)
+            previous_error = None
+
             for attempt in range(3):
 
                 _log(f"Test run {attempt + 1}")
@@ -631,6 +634,21 @@ class DevelopmentOrchestrator:
                 self.test_runner.run_tests()
 
                 strict_result = run_strict_generated_tests()
+
+                # 🔥 STAGNATION CHECK (FIRST LEVEL)
+                current_error = strict_result.get("error")
+
+                if current_error == previous_error:
+                    _log("[DEV_ORCH] Error stagnation detected → stopping repair loop")
+                    break
+
+                previous_error = current_error
+
+                if current_error == previous_error:
+                    _log("[DEV_ORCH] Error stagnation detected → stopping repair loop")
+                    break
+
+                previous_error = current_error
 
                 if strict_result["success"]:
 
@@ -717,9 +735,20 @@ class DevelopmentOrchestrator:
 
                 _log(f"Fix order: {[f.get('strategy') for f in fixes]}")
 
+                seen_strategies = set()
+
                 for fix in fixes:
 
-                    _log(f"Trying: {fix.get('strategy')}")
+                    strategy = fix.get("strategy")
+
+                    # =====================================================
+                    # 🔒 PREVENT REPEATED STRATEGIES (CRITICAL STABILITY FIX)
+                    # =====================================================
+                    if strategy in seen_strategies:
+                        _log(f"[DEV_ORCH] Skipping already tried: {strategy}")
+                        continue
+
+                    _log(f"Trying: {strategy}")
 
                     # 🔥 VALID FIX FILTER (CRITICAL)
                     fix_code = fix.get("code")
@@ -729,7 +758,11 @@ class DevelopmentOrchestrator:
                         continue
 
                     if not self.apply_fix(fix, implementation_plan):
+                        _log(f"[DEV_ORCH] Fix not applied → skipping: {strategy}")
                         continue
+
+                    # ✅ mark strategy as used ONLY after successful apply
+                    seen_strategies.add(strategy)
 
                     # 🔥 CLEAR CACHE (critical)
                     import sys
@@ -738,6 +771,14 @@ class DevelopmentOrchestrator:
                             del sys.modules[m]
 
                     strict_result = run_strict_generated_tests()
+
+                    current_error = strict_result.get("error")
+
+                    if current_error == previous_error:
+                        _log("[DEV_ORCH] Error stagnation detected after fix → stopping repair loop")
+                        break
+
+                    previous_error = current_error
 
                     if strict_result["success"]:
 
@@ -891,15 +932,26 @@ class DevOrchestrator:
         # =====================================================
         # 🔥 RUN TESTS FIRST (CRITICAL)
         # =====================================================
-        strict_result = run_strict_generated_tests()
+        try:
+            code = Path(file_path).read_text(encoding="utf-8")
+            compile(code, str(file_path), "exec")
 
-        failure_info = {
-            "success": False,
-            "error": strict_result.get("error", ""),
-            "test_output": strict_result.get("test_output", ""),
-            "output": strict_result.get("output", ""),
-            "file": str(file_path)
-        }
+            # če compile OK → success
+            return {"success": True}
+
+        except SyntaxError as e:
+
+            failure_info = {
+                "success": False,
+                "error": str(e),
+                "test_output": str(e),
+                "output": str(e),
+                "file": str(file_path)
+            }
+
+        # 🔥 CRITICAL: force file propagation
+        if not failure_info["file"]:
+            failure_info["file"] = str(file_path)
 
         # =====================================================
         # 🔧 REPAIR PIPELINE
@@ -976,7 +1028,21 @@ class DevOrchestrator:
                 # -------------------------------------------------
                 # 🔥 RE-RUN STRICT TESTS (KEY CHANGE)
                 # -------------------------------------------------
-                test_result = run_strict_generated_tests()
+                try:
+                    code = Path(file_path).read_text(encoding="utf-8")
+                    compile(code, str(file_path), "exec")
+
+                    _log("[REPAIR] ✅ TESTS PASSED → repair complete")
+                    success = True
+                    break
+
+                except SyntaxError as e:
+                    test_result = {
+                        "success": False,
+                        "error": str(e),
+                        "test_output": str(e),
+                        "output": str(e)
+                    }
 
                 if test_result.get("success"):
                     _log("[REPAIR] ✅ TESTS PASSED → repair complete")

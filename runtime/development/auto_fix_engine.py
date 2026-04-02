@@ -63,6 +63,17 @@ class AutoFixEngine:
 
     def generate_fixes(self, failure_info: Dict) -> List[Dict]:
 
+        # 🔥 DEBUG ENTRY (CRITICAL)
+        print("\n🔥🔥🔥 NEW FILE TARGETING ACTIVE 🔥🔥🔥")
+
+        print("\n[DEBUG FAILURE INFO]")
+        print(failure_info if failure_info else "<EMPTY>")
+
+        # 🔥 HARD SAFETY (če pride None ali napačen tip)
+        if not isinstance(failure_info, dict):
+            print("[ERROR] failure_info is not dict → forcing empty dict")
+            failure_info = {}
+
         fixes: List[Dict] = []
 
         system_context = failure_info.get("system_context") or {}
@@ -131,60 +142,75 @@ class AutoFixEngine:
                 target_function = None
 
         print(f"[FTL] Target function: {target_function}")
+        
+        # =====================================================
+        # 🔥 SYNTAX FUNCTION DETECTION (CRITICAL FIX)
+        # =====================================================
+        if not target_function and "SyntaxError" in error_text:
+
+            file_candidate = failure_info.get("file")
+
+            if file_candidate and Path(file_candidate).exists():
+                try:
+                    code = Path(file_candidate).read_text(encoding="utf-8")
+
+                    lines = code.split("\n")
+
+                    for line in lines:
+                        if "def " in line and not line.strip().endswith(":"):
+                            match = re.search(r"def\s+(\w+)\s*\(", line)
+                            if match:
+                                target_function = match.group(1)
+                                print(f"[FTL] SyntaxError function detected → {target_function}")
+                                break
+
+                except Exception:
+                    pass
 
         # =====================================================
-        # 🔥 FILE TARGETING (ZDAJ PRAVILNO)
+        # 🔥 FILE TARGETING (FINAL FIX - SIMPLE & BULLETPROOF)
         # =====================================================
 
-        file_path = None
-
-        # 1. PRIMARY: resolve real implementation file
-        if target_function:
-            try:
-                resolved = self._resolve_file_from_test(error_text, target_function)
-                if resolved:
-                    file_path = resolved
-                    print(f"[FTL] Resolved implementation file → {file_path}")
-            except Exception:
-                pass
-
-        # 2. FALLBACK: traceback parsing
-        if not file_path:
-            file_path = self._extract_file_from_traceback(error_text)
-
-        # 3. FALLBACK: failure_info file
         fallback_file = failure_info.get("file")
 
-        if not file_path and fallback_file:
-            fallback_path = Path(fallback_file)
-
-            if fallback_path.name.startswith("test_"):
-                candidate = fallback_path.with_name(
-                    fallback_path.name.replace("test_", "", 1)
-                )
-
-                if candidate.exists():
-                    file_path = str(candidate)
-                else:
-                    file_path = str(fallback_path)
-            else:
-                file_path = str(fallback_path)
-
-        # 4. FINAL SAFETY
-        if not file_path and fallback_file:
+        if fallback_file:
             file_path = fallback_file
+            print(f"[FTL] USING failure_info file → {file_path}")
+
+        else:
+            print("[ERROR] No failure_info file → using fallback")
+
+            file_path = "runtime/development/generated/fallback.py"
+
+            path_obj = Path(file_path)
+            if not path_obj.exists():
+                path_obj.parent.mkdir(parents=True, exist_ok=True)
+                path_obj.write_text("", encoding="utf-8")
 
         print("\n[DEBUG TARGET FILE]")
-        print(file_path if file_path else "<NONE>")
+        print(file_path)
 
-        # 🔥 HARD SAFETY
+        # =====================================================
+        # 🔥 HARD FIX: ALWAYS USE failure_info FILE FIRST
+        # =====================================================
+
+        fallback_file = failure_info.get("file")
+
+        if fallback_file:
+            file_path = fallback_file
+            print(f"[FTL] FORCED file_path from failure_info → {file_path}")
+
+        # 🔥 šele potem fallback
         if not file_path:
+
             print("[ERROR] No target file resolved → using fallback strategy")
 
-            fallback_file = failure_info.get("file")
+            file_path = "runtime/development/generated/fallback.py"
 
-            # 🔥 fallback target
-            file_path = fallback_file or "runtime/development/generated/fallback.py"
+            path_obj = Path(file_path)
+            if not path_obj.exists():
+                path_obj.parent.mkdir(parents=True, exist_ok=True)
+                path_obj.write_text("", encoding="utf-8")
 
             # 🔥 ensure file exists
             path_obj = Path(file_path)
