@@ -17,7 +17,7 @@ survive across CLI processes.
 import json
 import os
 import hashlib
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 
 REGISTRY_FILE = os.path.join(
@@ -114,10 +114,38 @@ class DevTaskRegistry:
         self.active_tasks.append(task)
         self._persist()
 
+    # 🔥 NEW: check if tasks exist
+    def has_pending_tasks(self) -> bool:
+        return any(t.get("state") == "queued" for t in self.active_tasks)
+
+    # 🔥 NEW: get next task (priority-aware)
+    def get_next_task(self) -> Optional[Dict]:
+
+        queued = [
+            t for t in self.active_tasks
+            if t.get("state") == "queued"
+        ]
+
+        if not queued:
+            return None
+
+        # sort by priority (lower = higher priority)
+        queued.sort(key=lambda t: t.get("priority", 999))
+
+        return queued[0]
+
+    # 🔥 NEW: pop + mark running
+    def pop_next_task(self) -> Optional[Dict]:
+
+        task = self.get_next_task()
+
+        if not task:
+            return None
+
+        self.update_task_state(task, "running")
+        return task
+
     def update_task_state(self, task: Dict, new_state: str) -> None:
-        """
-        Update task state deterministically.
-        """
 
         if new_state not in TASK_STATES:
             return
@@ -127,15 +155,12 @@ class DevTaskRegistry:
         for t in self.active_tasks:
             if t.get("id") == task_id:
                 t["state"] = new_state
-                task["state"] = new_state  # sync reference
+                task["state"] = new_state
                 break
 
         self._persist()
 
     def complete_task(self, task: Dict) -> None:
-        """
-        Move task to completed (terminal state).
-        """
 
         task_id = task.get("id")
 
@@ -152,9 +177,6 @@ class DevTaskRegistry:
         self._persist()
 
     def reject_task(self, task: Dict) -> None:
-        """
-        Move task to failed (terminal state).
-        """
 
         task_id = task.get("id")
 
@@ -171,7 +193,6 @@ class DevTaskRegistry:
         self._persist()
 
     def clear(self) -> None:
-        """Reset all tasks in memory and on disk."""
         self.active_tasks = []
         self.completed_tasks = []
         self.rejected_tasks = []
@@ -186,7 +207,6 @@ class DevTaskRegistry:
     def get_rejected_tasks(self) -> List[Dict]:
         return list(self.rejected_tasks)
 
-    # 🔥 FIXED QUERY LAYER
     def get_tasks_by_state(self, state: str) -> List[Dict]:
 
         if state == "completed":

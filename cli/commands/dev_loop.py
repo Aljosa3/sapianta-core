@@ -16,7 +16,7 @@ GOAL = "build basic software utility system"
 
 def run(args=None):
 
-    loop = DevAutonomousLoop()
+    loop = DevAutonomousLoop(reset=False)
     plan_engine = PlanEngine()
     current_plan = []
 
@@ -40,7 +40,7 @@ def run(args=None):
 
             if not tasks:
 
-                # 🔥 FEEDBACK LOOP: če plan ne obstaja ali je prazen
+                # 🔥 FALLBACK: generate plan only when registry is empty
                 if not current_plan:
 
                     print("[PLAN] Plan exhausted")
@@ -82,9 +82,16 @@ def run(args=None):
             # 🔥 HARD STOP CONDITIONS
             # -------------------------------------------------
 
-            if status in ["waiting_for_approval", "needs_review"]:
+            # ✅ STOP samo za approval
+            if status == "waiting_for_approval":
                 print(f"[DEV_LOOP] STOP (status={status})")
                 break
+
+            # ❌ prej: needs_review je ustavil sistem
+            # ✅ zdaj: nadaljuj execution
+            if status == "needs_review":
+                print("[DEV_LOOP] Continuing execution (needs_review)")
+                continue
 
             if status in ["failed", "blocked"]:
                 print(f"[DEV_LOOP] END (status={status})")

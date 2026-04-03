@@ -18,12 +18,34 @@ class DevMetrics:
 
     def __init__(self):
 
+        # ---------------------------------------------------------
+        # 🔥 FIX: define file_path (missing before)
+        # ---------------------------------------------------------
+        self.file_path = METRICS_FILE
+
         self._ensure_file()
 
-        with open(METRICS_FILE, "r") as f:
-            self.data = json.load(f)
+        # ---------------------------------------------------------
+        # 🔥 FIX: remove duplicate imports + safe load
+        # ---------------------------------------------------------
+        if not os.path.exists(self.file_path):
+            self.data = {}
+        else:
+            try:
+                with open(self.file_path, "r") as f:
+                    self.data = json.load(f)
 
+                # 🔥 FIX: če je slučajno list (stara verzija), reset
+                if not isinstance(self.data, dict):
+                    raise ValueError("Invalid metrics format")
+
+            except Exception:
+                print("[DevMetrics] Corrupted JSON → resetting")
+                self.data = {}
+
+        # ---------------------------------------------------------
         # ✅ deterministic schema reconciliation
+        # ---------------------------------------------------------
         self._ensure_schema()
 
     # ------------------------------------------------
@@ -40,7 +62,7 @@ class DevMetrics:
                 "tasks_failed": 0,
                 "tasks_blocked": 0,
                 "total_execution_time": 0.0,
-                "execution_log": []  # ✅ NEW
+                "execution_log": []
             }
 
             with open(METRICS_FILE, "w") as f:
@@ -61,7 +83,7 @@ class DevMetrics:
             "tasks_failed": 0,
             "tasks_blocked": 0,
             "total_execution_time": 0.0,
-            "execution_log": []  # ✅ NEW
+            "execution_log": []
         }
 
         updated = False
@@ -92,7 +114,6 @@ class DevMetrics:
         Records execution cycle + optional per-task history.
         """
 
-        # ✅ SAFE access (deterministic)
         self.data.setdefault("tasks_processed", 0)
         self.data.setdefault("total_execution_time", 0.0)
 
@@ -111,7 +132,6 @@ class DevMetrics:
             self.data.setdefault("tasks_blocked", 0)
             self.data["tasks_blocked"] += 1
 
-        # ✅ NEW: execution history log
         if task:
             import time
 
@@ -135,13 +155,10 @@ class DevMetrics:
 
         data = dict(self.data)
 
-        # Backward compatibility
         processed = data.get("tasks_processed", data.get("processed", 0))
-
         completed = data.get("tasks_completed", data.get("completed", 0))
         failed = data.get("tasks_failed", data.get("failed", 0))
         blocked = data.get("tasks_blocked", data.get("blocked", 0))
-
         total_execution_time = data.get("total_execution_time", 0)
 
         data["tasks_processed"] = processed

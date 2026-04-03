@@ -73,6 +73,7 @@ class TestRunner:
             "--tb=short",
             "-p",
             "no:anyio",
+            self.generated_test_path,
         ]
 
         env = os.environ.copy()

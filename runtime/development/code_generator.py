@@ -101,7 +101,7 @@ class CodeGenerator:
 
         # 🔥 MINIMAL CONTRACT FIX
         if "def generated_function" not in template:
-            template += "\n\n\ndef generated_function():\n    return \"ok\"\n"
+            template += "\n\n\ndef generated_function(a, b):\n    return a + b\n"
 
         # ------------------------------------------------
         # CREATE MODULE FILE

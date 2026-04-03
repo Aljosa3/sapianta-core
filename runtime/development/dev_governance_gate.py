@@ -11,6 +11,11 @@ REVIEW
 BLOCK
 """
 
+import os
+
+# DEV MODE FLAG (default: OFF)
+DEV_MODE = os.getenv("SAPIANTA_DEV_MODE", "0") == "1"
+
 
 class DevGovernanceGate:
     """
@@ -60,26 +65,42 @@ class DevGovernanceGate:
                 return self.REVIEW
 
         # ---------------------------------------------------------
-        # 🔥 TASK TYPE POLICY (CRITICAL FIX)
+        # 🔥 TASK TYPE POLICY
         # ---------------------------------------------------------
 
-        # bugfix = safe → allow direct execution
         if task_type == "bugfix":
             return self.ALLOW
 
-        # implementation = NEW CODE → MUST be reviewed
         if task_type == "implementation":
             return self.REVIEW
 
-        # unknown / future types → conservative default
         if not task_type:
             return self.REVIEW
 
         # ---------------------------------------------------------
-        # DEFAULT (SAFE FALLBACK)
+        # DEFAULT
         # ---------------------------------------------------------
 
         return self.ALLOW
+
+    # ------------------------------------------------
+    # 🔥 FINAL DECISION WRAPPER (CRITICAL FIX)
+    # ------------------------------------------------
+
+    def final_decision(self, decision: str) -> str:
+        """
+        Applies DEV_MODE override to governance decisions.
+
+        Purpose:
+        - allow full pipeline execution during development
+        - preserve strict governance for production
+        """
+
+        if decision == self.REVIEW and DEV_MODE:
+            print("[DEV_MODE] AUTO-BYPASS REVIEW → continuing execution")
+            return self.ALLOW
+
+        return decision
 
     # ------------------------------------------------
     # 🔥 MINIMAL FIX (NON-BLOCKING APPROVAL)
@@ -88,11 +109,6 @@ class DevGovernanceGate:
     def request_approval(self, change: dict) -> bool:
         """
         Minimal approval stub (NON-BLOCKING)
-
-        Purpose:
-        - unblock AutoFix pipeline
-        - preserve future governance extension
         """
 
-        # 🔒 fail-open (development mode)
         return True

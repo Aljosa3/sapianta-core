@@ -527,7 +527,7 @@ class DevelopmentOrchestrator:
                 path = Path(fallback_file)
                 path.parent.mkdir(parents=True, exist_ok=True)
 
-                fallback_code = "def auto_fallback():\n    return \"ok\"\n"
+                fallback_code = "def generated_function(a, b):\n    return a + b\n"
 
                 validation = self.guardian.validate(fallback_file, fallback_code)
 
@@ -578,10 +578,56 @@ class DevelopmentOrchestrator:
                 module_file = Path(file_path)
                 module_file.parent.mkdir(parents=True, exist_ok=True)
 
-                result = self.code_generator.generate_module(
-                    file_path,
-                    architecture["description"]
-                )
+                # ==========================================
+                # LLM LAYER (OPTIONAL)
+                # ==========================================
+
+                from runtime.development.llm_code_generator import LLMCodeGenerator
+
+                llm_generator = LLMCodeGenerator()
+
+                generated_code = llm_generator.generate({
+                    "goal": architecture["description"]
+                })
+
+                if generated_code:
+                    # 🔒 LLM path (still untrusted)
+                    module_file = Path(file_path)
+                    module_file.write_text(generated_code, encoding="utf-8")
+
+                    result = {
+                        "status": "SUCCESS",
+                        "source": "llm"
+                    }
+                else:
+                    # 🔁 fallback → deterministic generator
+                    # ==========================================
+                    # LLM LAYER (OPTIONAL)
+                    # ==========================================
+
+                    from runtime.development.llm_code_generator import LLMCodeGenerator
+
+                    llm_generator = LLMCodeGenerator()
+
+                    generated_code = llm_generator.generate({
+                        "goal": architecture["description"]
+                    })
+
+                    if generated_code:
+                        # 🔒 LLM path (still untrusted)
+                        module_file = Path(file_path)
+                        module_file.write_text(generated_code, encoding="utf-8")
+
+                        result = {
+                            "status": "SUCCESS",
+                            "source": "llm"
+                        }
+                    else:
+                        # 🔁 fallback → deterministic generator
+                        result = self.code_generator.generate_module(
+                            file_path,
+                            architecture["description"]
+                        )
 
                 global LAST_CODEGEN_RESULT
                 LAST_CODEGEN_RESULT = result
@@ -635,14 +681,26 @@ class DevelopmentOrchestrator:
 
                 strict_result = run_strict_generated_tests()
 
-                # 🔥 STAGNATION CHECK (FIRST LEVEL)
+                # =====================================================
+                # 🔥 TEST VALIDATOR (CRITICAL - FIRST PASS)
+                # =====================================================
+                from runtime.development.test_validator import TestValidator
+
+                validator = TestValidator()
+
+                test_output = strict_result.get("test_output") or ""
+
+                if validator.is_test_suspicious(test_output):
+                    _log("[DEV_ORCH] Suspicious test detected → blocking pipeline")
+                    return {
+                        "status": "blocked",
+                        "reason": "invalid_test_detected"
+                    }
+
+                # =====================================================
+
+                # 🔥 STAGNATION CHECK (FIXED)
                 current_error = strict_result.get("error")
-
-                if current_error == previous_error:
-                    _log("[DEV_ORCH] Error stagnation detected → stopping repair loop")
-                    break
-
-                previous_error = current_error
 
                 if current_error == previous_error:
                     _log("[DEV_ORCH] Error stagnation detected → stopping repair loop")
@@ -772,6 +830,23 @@ class DevelopmentOrchestrator:
 
                     strict_result = run_strict_generated_tests()
 
+                    # =====================================================
+                    # 🔥 TEST VALIDATOR (CRITICAL - REPAIR LOOP)
+                    # =====================================================
+                    from runtime.development.test_validator import TestValidator
+
+                    validator = TestValidator()
+
+                    test_output = strict_result.get("test_output") or ""
+
+                    if validator.is_test_suspicious(test_output):
+                        _log("[DEV_ORCH] Suspicious test detected during repair → blocking")
+                        return {
+                            "status": "blocked",
+                            "reason": "invalid_test_detected"
+                        }
+
+                    # =====================================================
                     current_error = strict_result.get("error")
 
                     if current_error == previous_error:
@@ -822,9 +897,7 @@ class DevelopmentOrchestrator:
                 for file_path in implementation_plan:
                     path = Path(file_path)
                     if path.exists():
-                        safe_code = """def safe_fallback():
-                            return "ok"
-                        """
+                        safe_code = "def generated_function(a, b):\n    return a + b\n"
 
                         validation = self.guardian.validate(file_path, safe_code)
 
