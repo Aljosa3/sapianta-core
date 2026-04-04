@@ -494,7 +494,8 @@ class DevelopmentOrchestrator:
     def run_auto(self, discussion_context=None):
 
         _log("AUTO MODE START")
-        # 🔥 PRE-SCAN EXISTING GENERATED FILES (CRITICAL)
+        _log(f"[GUARDIAN STATS] {self.guardian.stats}")
+
         generated_dir = Path("runtime/development/generated")
 
         try:
