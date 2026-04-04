@@ -10,6 +10,7 @@ import os
 
 # DEV MODE FLAG (default: OFF)
 DEV_MODE = os.getenv("SAPIANTA_DEV_MODE", "0") == "1"
+FAST_TEST = os.getenv("SAPIANTA_FAST_TEST", "0") == "1"
 
 # SAFE AUTONOMOUS MODE CONFIG
 MAX_CYCLES = int(os.getenv("SAPIANTA_MAX_CYCLES", "10"))
@@ -219,18 +220,23 @@ class DevAutonomousLoop:
         orchestrator = DevelopmentOrchestrator()
 
         try:
-            if task.get("approved"):
-                print("[DEV_LOOP] Resuming approved task...")
-
-            # --- TEST ENV DETECTION (CRITICAL FIX) ---
-            in_pytest = "PYTEST_CURRENT_TEST" in os.environ
-
-            if in_pytest:
-                # simulate success → avoid nested pytest execution
+            # --- FAST TEST MODE (CRITICAL SPEED FIX) ---
+            if FAST_TEST:
                 result = {"success": True, "error": None}
             else:
-                result = orchestrator.run_auto(task)
+                if task.get("approved"):
+                    print("[DEV_LOOP] Resuming approved task...")
 
+                # --- TEST ENV DETECTION ---
+                in_pytest = "PYTEST_CURRENT_TEST" in os.environ
+
+                if in_pytest:
+                    # simulate success → avoid nested pytest execution
+                    result = {"success": True, "error": None}
+                else:
+                    result = orchestrator.run_auto(task)
+
+            # --- RESULT INTERPRETATION ---
             if isinstance(result, dict) and result.get("status") == "waiting_for_approval":
 
                 if DEV_MODE:
@@ -255,9 +261,7 @@ class DevAutonomousLoop:
                 reason = "orchestrator_failed"
 
             elif isinstance(result, dict):
-
-                # 🔥 CRITICAL FIX: success must not depend on task state
-                # --- SUCCESS LOGIC FIX (independent of task state) ---
+                # --- SUCCESS LOGIC (FIXED) ---
                 success = result.get("success") is True
                 reason = None if success else (result.get("reason") or "incomplete_execution")
 
@@ -282,6 +286,7 @@ class DevAutonomousLoop:
             return {"status": "completed", "task": task}
 
         task["retry_count"] = task.get("retry_count", 0) + 1
+
         # --- STAGNATION FIX ---
         current_error = reason
 
@@ -303,7 +308,6 @@ class DevAutonomousLoop:
 
             self._sleep_if_dev()
 
-            # 🔥 smarter decision
             if reason == "incomplete_execution":
                 status = "needs_review"
             else:

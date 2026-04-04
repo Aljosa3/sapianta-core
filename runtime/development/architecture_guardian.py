@@ -57,11 +57,21 @@ class ArchitectureGuardian:
             r"__import__\s*\(",
         ]
 
+        # 🔥 OBSERVABILITY (MINIMAL)
+        self.stats = {
+            "validations": 0,
+            "blocks": 0,
+            "last_block_reason": None,
+        }
+
     # ==========================================================
     # MAIN ENTRY
     # ==========================================================
     def validate(self, file_path: str, code: str) -> Dict[str, Any]:
         try:
+            # 🔥 OBSERVABILITY
+            self.stats["validations"] += 1
+
             # 🔥 FAIL-SAFE INPUT CHECK
             if not isinstance(file_path, str) or not isinstance(code, str):
                 raise Exception("[GUARDIAN BLOCK] Invalid input types")
@@ -86,6 +96,10 @@ class ArchitectureGuardian:
             }
 
         except Exception as e:
+            # 🔥 OBSERVABILITY
+            self.stats["blocks"] += 1
+            self.stats["last_block_reason"] = str(e)
+
             return {
                 "status": "INVALID",
                 "success": False,

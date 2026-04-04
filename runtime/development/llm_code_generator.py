@@ -61,21 +61,14 @@ class LLMCodeGenerator:
     # --------------------------------------
 
     def _build_prompt(self, task: dict) -> str:
-        goal = task.get("goal", "")
+        """
+        Delegates prompt construction to deterministic builder.
+        """
 
-        return f"""
-You are a Python code generator.
+        from runtime.development.llm_prompt_builder import LLMPromptBuilder
 
-Rules:
-- return ONLY valid Python code
-- no explanations
-- no comments outside code
-- no imports of dangerous modules
-- no file operations
-
-Task:
-{goal}
-"""
+        builder = LLMPromptBuilder()
+        return builder.build(task)
 
     # --------------------------------------
 
@@ -84,7 +77,7 @@ Task:
         Replace with Claude / API call
         """
 
-        # 🔧 TEMP MOCK (SAFE)
+        # 🔧 TEMP MOCK (SAFE BASELINE)
         return f"""
 def generated_function(a, b):
     return a + b
