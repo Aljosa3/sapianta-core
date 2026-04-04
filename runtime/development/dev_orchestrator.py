@@ -273,6 +273,11 @@ class DevelopmentOrchestrator:
         self.reflection_engine = SystemReflectionEngine(root=".")
 
         self.guardian = ArchitectureGuardian()
+        # 🔥 LLM METRICS (PHASE 2 OBSERVABILITY)
+        self.metrics = {
+            "llm_used": 0,
+            "fallback_used": 0,
+        }
 
     def _check_core_modification(self, plan: list):
 
@@ -495,6 +500,7 @@ class DevelopmentOrchestrator:
 
         _log("AUTO MODE START")
         _log(f"[GUARDIAN STATS] {self.guardian.stats}")
+        _log(f"[LLM METRICS] {self.metrics}")
 
         generated_dir = Path("runtime/development/generated")
 
@@ -612,6 +618,9 @@ class DevelopmentOrchestrator:
                             "file": str(module_file)
                         }
 
+                    # ✅ šteješ samo VALID LLM (ključni popravek)
+                    self.metrics["llm_used"] += 1
+
                     _log("[LLM] passed guardian → using LLM code")
 
                     result = {
@@ -622,6 +631,7 @@ class DevelopmentOrchestrator:
 
                 else:
                     _log("[LLM] fallback → deterministic generator")
+                    self.metrics["fallback_used"] += 1
 
                     result = self.code_generator.generate_module(
                         file_path,
