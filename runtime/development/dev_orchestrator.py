@@ -494,6 +494,27 @@ class DevelopmentOrchestrator:
     def run_auto(self, discussion_context=None):
 
         _log("AUTO MODE START")
+        # 🔥 PRE-SCAN EXISTING GENERATED FILES (CRITICAL)
+        generated_dir = Path("runtime/development/generated")
+
+        dangerous_patterns = ["os.system", "subprocess", "eval(", "exec("]
+
+        if generated_dir.exists():
+            for file in generated_dir.glob("*.py"):
+                try:
+                    code = file.read_text(encoding="utf-8")
+
+                    if any(p in code for p in dangerous_patterns):
+                        _log(f"[DEV_ORCH] dangerous code detected in existing file → blocking: {file}")
+
+                        return {
+                            "status": "blocked",
+                            "reason": "dangerous_existing_code",
+                            "file": str(file)
+                        }
+
+                except Exception:
+                    continue
 
         try:
 
@@ -595,27 +616,38 @@ class DevelopmentOrchestrator:
 
                     code = llm_result["code"]
 
-                    # 🔒 VALIDATE BEFORE WRITE (CRITICAL FIX)
+                    # 🔒 VALIDATION
                     validation = self.guardian.validate(str(module_file), code)
 
                     if not validation.get("success", False):
-                        _log("[LLM] rejected by guardian → fallback")
+                        _log("[LLM] rejected by guardian → blocking")
 
-                        result = self.code_generator.generate_module(
-                            file_path,
-                            architecture["description"]
-                        )
-
-                        code = Path(file_path).read_text(encoding="utf-8")
-
-                    else:
-                        _log("[LLM] passed guardian → using LLM code")
-
-                        result = {
-                            "status": "SUCCESS",
-                            "source": "llm",
-                            "prompt_hash": llm_result.get("prompt_hash")
+                        return {
+                            "status": "blocked",
+                            "reason": "unsafe_llm_code",
+                            "error": validation.get("error"),
+                            "file": str(module_file)
                         }
+
+                    # 🔥 EXTRA SAFETY (defensive layer)
+                    dangerous_patterns = ["os.system", "subprocess", "eval(", "exec("]
+
+                    if any(p in code for p in dangerous_patterns):
+                        _log("[LLM] dangerous pattern detected → blocking")
+
+                        return {
+                            "status": "blocked",
+                            "reason": "dangerous_code_detected",
+                            "file": str(module_file)
+                        }
+
+                    _log("[LLM] passed guardian → using LLM code")
+
+                    result = {
+                        "status": "SUCCESS",
+                        "source": "llm",
+                        "prompt_hash": llm_result.get("prompt_hash")
+                    }
 
                 else:
                     _log("[LLM] fallback → deterministic generator")
@@ -629,6 +661,20 @@ class DevelopmentOrchestrator:
 
 
                 # ✅ WRITE ONLY AFTER VALIDATION / DECISION
+
+                # 🔥 GLOBAL SAFETY CHECK (CRITICAL)
+                dangerous_patterns = ["os.system", "subprocess", "eval(", "exec("]
+
+                if any(p in code for p in dangerous_patterns):
+                    _log("[DEV_ORCH] dangerous code detected → blocking BEFORE write")
+
+                    return {
+                        "status": "blocked",
+                        "reason": "dangerous_code_detected",
+                        "file": str(module_file)
+                    }
+
+                # ✅ SAFE WRITE
                 module_file.write_text(code, encoding="utf-8")
 
                 global LAST_CODEGEN_RESULT
@@ -647,6 +693,17 @@ class DevelopmentOrchestrator:
                     }
 
                 code = module_file.read_text(encoding="utf-8")
+                # 🔥 GLOBAL SAFETY CHECK (CRITICAL)
+                dangerous_patterns = ["os.system", "subprocess", "eval(", "exec("]
+
+                if any(p in code for p in dangerous_patterns):
+                    _log("[DEV_ORCH] dangerous code detected → blocking")
+
+                    return {
+                        "status": "blocked",
+                        "reason": "dangerous_code_detected",
+                        "file": str(module_file)
+                    }
 
                 validation = self.guardian.validate(str(module_file), code)
 
