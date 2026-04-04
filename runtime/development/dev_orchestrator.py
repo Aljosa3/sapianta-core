@@ -497,25 +497,6 @@ class DevelopmentOrchestrator:
         # 🔥 PRE-SCAN EXISTING GENERATED FILES (CRITICAL)
         generated_dir = Path("runtime/development/generated")
 
-        dangerous_patterns = ["os.system", "subprocess", "eval(", "exec("]
-
-        if generated_dir.exists():
-            for file in generated_dir.glob("*.py"):
-                try:
-                    code = file.read_text(encoding="utf-8")
-
-                    if any(p in code for p in dangerous_patterns):
-                        _log(f"[DEV_ORCH] dangerous code detected in existing file → blocking: {file}")
-
-                        return {
-                            "status": "blocked",
-                            "reason": "dangerous_existing_code",
-                            "file": str(file)
-                        }
-
-                except Exception:
-                    continue
-
         try:
 
             # 🔥 SUPPORT dict OR string
@@ -550,6 +531,7 @@ class DevelopmentOrchestrator:
 
                 fallback_code = "def generated_function(a, b):\n    return a + b\n"
 
+                # 🔒 CENTRALIZED VALIDATION
                 validation = self.guardian.validate(fallback_file, fallback_code)
 
                 if not validation.get("success", False):
@@ -616,7 +598,7 @@ class DevelopmentOrchestrator:
 
                     code = llm_result["code"]
 
-                    # 🔒 VALIDATION
+                    # 🔒 CENTRALIZED VALIDATION (LLM OUTPUT)
                     validation = self.guardian.validate(str(module_file), code)
 
                     if not validation.get("success", False):
@@ -626,18 +608,6 @@ class DevelopmentOrchestrator:
                             "status": "blocked",
                             "reason": "unsafe_llm_code",
                             "error": validation.get("error"),
-                            "file": str(module_file)
-                        }
-
-                    # 🔥 EXTRA SAFETY (defensive layer)
-                    dangerous_patterns = ["os.system", "subprocess", "eval(", "exec("]
-
-                    if any(p in code for p in dangerous_patterns):
-                        _log("[LLM] dangerous pattern detected → blocking")
-
-                        return {
-                            "status": "blocked",
-                            "reason": "dangerous_code_detected",
                             "file": str(module_file)
                         }
 
@@ -659,18 +629,18 @@ class DevelopmentOrchestrator:
 
                     code = Path(file_path).read_text(encoding="utf-8")
 
+                # =====================================================
+                # 🔒 CENTRALIZED GUARDIAN VALIDATION (PRE-WRITE)
+                # =====================================================
+                validation = self.guardian.validate(str(module_file), code)
 
-                # ✅ WRITE ONLY AFTER VALIDATION / DECISION
-
-                # 🔥 GLOBAL SAFETY CHECK (CRITICAL)
-                dangerous_patterns = ["os.system", "subprocess", "eval(", "exec("]
-
-                if any(p in code for p in dangerous_patterns):
-                    _log("[DEV_ORCH] dangerous code detected → blocking BEFORE write")
-
+                if not validation.get("success", False):
+                    _log(f"[GUARDIAN BLOCK PRE-WRITE] {validation.get('error')}")
                     return {
                         "status": "blocked",
-                        "reason": "dangerous_code_detected",
+                        "stage": "architecture_guardian",
+                        "reason": "unsafe_code_pre_write",
+                        "error": validation.get("error"),
                         "file": str(module_file)
                     }
 
@@ -693,22 +663,14 @@ class DevelopmentOrchestrator:
                     }
 
                 code = module_file.read_text(encoding="utf-8")
-                # 🔥 GLOBAL SAFETY CHECK (CRITICAL)
-                dangerous_patterns = ["os.system", "subprocess", "eval(", "exec("]
 
-                if any(p in code for p in dangerous_patterns):
-                    _log("[DEV_ORCH] dangerous code detected → blocking")
-
-                    return {
-                        "status": "blocked",
-                        "reason": "dangerous_code_detected",
-                        "file": str(module_file)
-                    }
-
+                # =====================================================
+                # 🔒 CENTRALIZED GUARDIAN VALIDATION (POST-WRITE)
+                # =====================================================
                 validation = self.guardian.validate(str(module_file), code)
 
                 if not validation.get("success", False):
-                    _log(f"[GUARDIAN BLOCK GENERATED] {validation.get('error')}")
+                    _log(f"[GUARDIAN BLOCK POST-WRITE] {validation.get('error')}")
 
                     return {
                         "status": "blocked",
