@@ -31,6 +31,11 @@ from runtime.development.cal_controller import CALController
 # --- CAL INTEGRATION END ---
 
 from runtime.governance.promotion_gate import classify_change, requires_approval
+# --- CAL SCORE UPDATE HELPER (NEW) ---
+def _update_score(score: float, delta: float) -> float:
+    score += delta
+    return max(-1.0, min(1.0, score))
+# --- CAL SCORE UPDATE HELPER END ---
 
 
 class DevAutonomousLoop:
@@ -299,7 +304,8 @@ class DevAutonomousLoop:
         if success is True:
             # --- CAL FEEDBACK START ---
             if task.get("metadata"):
-                task["metadata"]["score"] = task["metadata"].get("score", 0) + 0.1
+                score = _update_score(task["metadata"].get("score", 0), -0.1)
+                task["metadata"]["score"] = score
             # --- CAL FEEDBACK END ---
 
             self.registry.complete_task(task)
@@ -352,7 +358,9 @@ class DevAutonomousLoop:
 
         # --- CAL FEEDBACK START ---
         if task.get("metadata"):
-            task["metadata"]["score"] = task["metadata"].get("score", 0) - 0.1
+            score = task["metadata"].get("score", 0) - 0.1
+            score = max(-1.0, min(1.0, score))  # CLAMP
+            task["metadata"]["score"] = score
         # --- CAL FEEDBACK END ---
 
         self.registry.reject_task(task)
