@@ -25,6 +25,10 @@ from runtime.development.dev_sandbox_runner import DevSandboxRunner
 from runtime.development.dev_memory import DevMemory
 from runtime.development.dev_metrics import DevMetrics
 
+# --- CAL INTEGRATION START ---
+from runtime.development.cal_controller import CALController
+# --- CAL INTEGRATION END ---
+
 from runtime.governance.promotion_gate import classify_change, requires_approval
 
 
@@ -55,6 +59,11 @@ class DevAutonomousLoop:
         self.sandbox = DevSandboxRunner()
         self.memory = DevMemory()
         self.metrics = DevMetrics()
+
+        # --- CAL INTEGRATION START ---
+        self.cal = CALController(registry=self.registry)
+        # --- CAL INTEGRATION END ---
+
         self._cycle_count = 0
         self._start_time = None
 
@@ -90,6 +99,13 @@ class DevAutonomousLoop:
     def run_once(self):
 
         start = time.time()
+
+        # --- CAL CYCLE START ---
+        try:
+            self.cal.run_cycle()
+        except Exception as e:
+            print("[CAL] ERROR:", str(e))
+        # --- CAL CYCLE END ---
 
         if self._start_time is None:
             self._start_time = start
