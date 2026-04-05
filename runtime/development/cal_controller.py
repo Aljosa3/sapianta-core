@@ -22,6 +22,9 @@ class CALController:
         # --- CAL BOOTSTRAP FLAG ---
         self._bootstrap_done = False
 
+        # --- CAL FILTERING STATE ---
+        self._seen_descriptions = set()
+
     def run_cycle(self):
         """
         Single CAL cycle:
@@ -37,12 +40,21 @@ class CALController:
             if not self._bootstrap_done:
                 print("[CAL] BOOTSTRAP: generating initial task")
 
+                task_description = "implement_basic_utility_function"
+
+                if task_description in self._seen_descriptions:
+                    print("[CAL] SKIP duplicate bootstrap task")
+                    return []
+
+                self._seen_descriptions.add(task_description)
+
                 task = {
-                    "description": "implement_basic_utility_function",
+                    "description": task_description,
                     "state": "queued",
                     "metadata": {
                         "source": "CAL_BOOTSTRAP",
-                        "priority": "low"
+                        "priority": "low",
+                        "score": 0.1
                     }
                 }
 
@@ -58,10 +70,31 @@ class CALController:
         created_tasks = []
 
         for gap in gaps:
+            description = gap["description"]
+
+            # --- DEDUPLICATION ---
+            if description in self._seen_descriptions:
+                print(f"[CAL] SKIP duplicate: {description}")
+                continue
+
+            self._seen_descriptions.add(description)
+
+            # --- BASIC SCORING ---
+            score = 1.0
+
+            if "test" in description:
+                score += 0.5
+
+            if "fix" in description:
+                score += 0.3
+
             task = {
-                "description": gap["description"],
+                "description": description,
                 "state": "queued",
-                "metadata": {"source": "CAL"}
+                "metadata": {
+                    "source": "CAL",
+                    "score": score
+                }
             }
 
             self.registry.add_task(task)
