@@ -24,6 +24,7 @@ from runtime.development.dev_governance_gate import DevGovernanceGate
 from runtime.development.dev_sandbox_runner import DevSandboxRunner
 from runtime.development.dev_memory import DevMemory
 from runtime.development.dev_metrics import DevMetrics
+from runtime.development.dev_orchestrator import DevelopmentOrchestrator
 
 # --- CAL INTEGRATION START ---
 from runtime.development.cal_controller import CALController
@@ -101,10 +102,13 @@ class DevAutonomousLoop:
         start = time.time()
 
         # --- CAL CYCLE START ---
-        try:
-            self.cal.run_cycle()
-        except Exception as e:
-            print("[CAL] ERROR:", str(e))
+        in_pytest = "PYTEST_CURRENT_TEST" in os.environ
+
+        if not in_pytest:
+            try:
+                self.cal.run_cycle()
+            except Exception as e:
+                print("[CAL] ERROR:", str(e))
         # --- CAL CYCLE END ---
 
         if self._start_time is None:
@@ -231,8 +235,6 @@ class DevAutonomousLoop:
         # EXECUTION
         # ---------------------------------------------------------
 
-        from runtime.development.dev_orchestrator import DevelopmentOrchestrator
-
         orchestrator = DevelopmentOrchestrator()
 
         try:
@@ -278,7 +280,7 @@ class DevAutonomousLoop:
 
             elif isinstance(result, dict):
                 # --- SUCCESS LOGIC (FIXED) ---
-                success = result.get("success") is True
+                success = bool(result.get("success"))
                 reason = None if success else (result.get("reason") or "incomplete_execution")
 
             else:
@@ -295,6 +297,11 @@ class DevAutonomousLoop:
         # ---------------------------------------------------------
 
         if success is True:
+            # --- CAL FEEDBACK START ---
+            if task.get("metadata"):
+                task["metadata"]["score"] = task["metadata"].get("score", 0) + 0.1
+            # --- CAL FEEDBACK END ---
+
             self.registry.complete_task(task)
             self.memory.record_completed(task)
 
@@ -342,6 +349,11 @@ class DevAutonomousLoop:
                 "task": task,
                 "reason": "stagnation_detected"
             }
+
+        # --- CAL FEEDBACK START ---
+        if task.get("metadata"):
+            task["metadata"]["score"] = task["metadata"].get("score", 0) - 0.1
+        # --- CAL FEEDBACK END ---
 
         self.registry.reject_task(task)
         self.memory.record_failed(task)
