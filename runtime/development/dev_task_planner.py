@@ -50,8 +50,23 @@ class DevTaskPlanner:
         Sort tasks by priority.
         """
 
+        # Preserve deterministic behavior:
+        # - stable sort
+        # - combine heuristic + metadata score
+
+        def _score(task):
+            metadata = task.get("metadata", {})
+
+            # Cold-start bias correction:
+            # new tasks (no score) get small positive default to ensure exploration
+            metadata_score = metadata.get("score", 0.1)
+
+            heuristic_score = self.score_task(task)
+
+            return metadata_score + heuristic_score
+
         return sorted(
             tasks,
-            key=lambda t: self.score_task(t),
+            key=_score,
             reverse=True
         )

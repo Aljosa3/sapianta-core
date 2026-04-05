@@ -31,6 +31,7 @@ from runtime.development.cal_controller import CALController
 # --- CAL INTEGRATION END ---
 
 from runtime.governance.promotion_gate import classify_change, requires_approval
+
 # --- CAL SCORE UPDATE HELPER (NEW) ---
 def _update_score(score: float, delta: float) -> float:
     score += delta
@@ -109,9 +110,29 @@ class DevAutonomousLoop:
         # --- CAL CYCLE START ---
         in_pytest = "PYTEST_CURRENT_TEST" in os.environ
 
+        cal_task = None
+
         if not in_pytest:
             try:
-                self.cal.run_cycle()
+                cal_task = self.cal.run_cycle()
+
+                # --- CAL → REGISTRY INTEGRATION (SAFE, DETERMINISTIC) ---
+                if cal_task and isinstance(cal_task, dict):
+
+                    existing_tasks = self.registry.get_active_tasks()
+
+                    is_duplicate = any(t == cal_task for t in existing_tasks)
+
+                    if not is_duplicate:
+                        try:
+                            if hasattr(self.hash_index, "add_task"):
+                                self.hash_index.add_task(cal_task)
+                        except Exception:
+                            pass
+
+                        self.registry.add_task(cal_task)
+                # --- END CAL INTEGRATION ---
+
             except Exception as e:
                 print("[CAL] ERROR:", str(e))
         # --- CAL CYCLE END ---
@@ -175,8 +196,15 @@ class DevAutonomousLoop:
             self.metrics.record_cycle("no_tasks", execution_time)
             return {"status": "no_tasks"}
 
+        # --- STANDARD PRIORITIZATION (RESTORED) ---
         ordered = self.planner.prioritize(tasks)
-        task = ordered[0]
+
+        # --- DETERMINISTIC EXPLORATION (ROBUST) ---
+        if self._cycle_count % 3 == 0:
+            task = ordered[-1]  # lowest priority → exploration
+        else:
+            task = ordered[0]
+        # --- END EXPLORATION ---
 
         decision = self.gate.final_decision(
             self.gate.evaluate(task)
@@ -243,23 +271,19 @@ class DevAutonomousLoop:
         orchestrator = DevelopmentOrchestrator()
 
         try:
-            # --- FAST TEST MODE (CRITICAL SPEED FIX) ---
             if FAST_TEST:
                 result = {"success": True, "error": None}
             else:
                 if task.get("approved"):
                     print("[DEV_LOOP] Resuming approved task...")
 
-                # --- TEST ENV DETECTION ---
                 in_pytest = "PYTEST_CURRENT_TEST" in os.environ
 
                 if in_pytest:
-                    # simulate success → avoid nested pytest execution
                     result = {"success": True, "error": None}
                 else:
                     result = orchestrator.run_auto(task)
 
-            # --- RESULT INTERPRETATION ---
             if isinstance(result, dict) and result.get("status") == "waiting_for_approval":
 
                 if DEV_MODE:
@@ -284,7 +308,6 @@ class DevAutonomousLoop:
                 reason = "orchestrator_failed"
 
             elif isinstance(result, dict):
-                # --- SUCCESS LOGIC (FIXED) ---
                 success = bool(result.get("success"))
                 reason = None if success else (result.get("reason") or "incomplete_execution")
 
@@ -302,11 +325,9 @@ class DevAutonomousLoop:
         # ---------------------------------------------------------
 
         if success is True:
-            # --- CAL FEEDBACK START ---
             if task.get("metadata"):
                 score = _update_score(task["metadata"].get("score", 0), -0.1)
                 task["metadata"]["score"] = score
-            # --- CAL FEEDBACK END ---
 
             self.registry.complete_task(task)
             self.memory.record_completed(task)
@@ -316,7 +337,6 @@ class DevAutonomousLoop:
 
         task["retry_count"] = task.get("retry_count", 0) + 1
 
-        # --- STAGNATION FIX ---
         current_error = reason
 
         if current_error is None:
@@ -348,7 +368,6 @@ class DevAutonomousLoop:
                 "reason": reason or "execution_failed"
             }
 
-        # --- STAGNATION ESCAPE ---
         if getattr(self, "_stagnation", 0) > 2:
             return {
                 "status": "needs_review",
@@ -356,12 +375,9 @@ class DevAutonomousLoop:
                 "reason": "stagnation_detected"
             }
 
-        # --- CAL FEEDBACK START ---
         if task.get("metadata"):
-            score = task["metadata"].get("score", 0) - 0.1
-            score = max(-1.0, min(1.0, score))  # CLAMP
+            score = _update_score(task["metadata"].get("score", 0), -0.1)
             task["metadata"]["score"] = score
-        # --- CAL FEEDBACK END ---
 
         self.registry.reject_task(task)
         self.memory.record_failed(task)

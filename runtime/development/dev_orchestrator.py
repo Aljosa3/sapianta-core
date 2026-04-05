@@ -276,6 +276,7 @@ class DevelopmentOrchestrator:
         # 🔥 LLM METRICS (PHASE 2 OBSERVABILITY)
         self.metrics = {
             "llm_used": 0,
+            "llm_rejected": 0,
             "fallback_used": 0,
         }
 
@@ -605,11 +606,14 @@ class DevelopmentOrchestrator:
 
                     code = llm_result["code"]
 
-                    # 🔒 CENTRALIZED VALIDATION (LLM OUTPUT)
+                    # 🔒 VALIDATION (LLM OUTPUT)
                     validation = self.guardian.validate(str(module_file), code)
 
                     if not validation.get("success", False):
                         _log("[LLM] rejected by guardian → blocking")
+
+                        # 🔥 OBSERVABILITY (LLM FUNNEL)
+                        self.metrics["llm_rejected"] += 1
 
                         return {
                             "status": "blocked",
@@ -618,7 +622,7 @@ class DevelopmentOrchestrator:
                             "file": str(module_file)
                         }
 
-                    # ✅ šteješ samo VALID LLM (ključni popravek)
+                    # ✅ šteješ samo VALID LLM
                     self.metrics["llm_used"] += 1
 
                     _log("[LLM] passed guardian → using LLM code")
@@ -631,6 +635,8 @@ class DevelopmentOrchestrator:
 
                 else:
                     _log("[LLM] fallback → deterministic generator")
+
+                    # 🔥 OBSERVABILITY
                     self.metrics["fallback_used"] += 1
 
                     result = self.code_generator.generate_module(

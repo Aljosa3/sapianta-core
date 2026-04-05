@@ -48,13 +48,16 @@ class CALController:
 
                 self._seen_descriptions.add(task_description)
 
+                # --- CLAMPED SCORE (NEW) ---
+                score = max(-1.0, min(1.0, 0.1))
+
                 task = {
                     "description": task_description,
                     "state": "queued",
                     "metadata": {
                         "source": "CAL_BOOTSTRAP",
                         "priority": "low",
-                        "score": 0.1
+                        "score": score
                     }
                 }
 
@@ -87,6 +90,9 @@ class CALController:
 
             if "fix" in description:
                 score += 0.3
+
+            # --- CLAMP (NEW) ---
+            score = max(-1.0, min(1.0, score))
 
             task = {
                 "description": description,

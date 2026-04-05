@@ -40,8 +40,8 @@ def run(args=None):
 
             if not tasks:
 
-                # 🔥 FALLBACK: generate plan only when registry is empty
-                if not current_plan:
+                # 🔥 PLAN THROTTLING (MINIMAL, DETERMINISTIC)
+                if not current_plan and loop._cycle_count % 3 == 0:
 
                     print("[PLAN] Plan exhausted")
 
@@ -53,12 +53,13 @@ def run(args=None):
 
                     print(f"[PLAN] Generated {len(current_plan)} tasks")
 
-                # vzamemo naslednji task iz plana
-                next_task = current_plan.pop(0)
+                # vzamemo naslednji task iz plana (če obstaja)
+                if current_plan:
+                    next_task = current_plan.pop(0)
 
-                print(f"[PLAN] Next task: {next_task}")
+                    print(f"[PLAN] Next task: {next_task}")
 
-                loop.submit_task(next_task)
+                    loop.submit_task(next_task)
 
             # -------------------------------------------------
             # RUN LOOP
@@ -82,13 +83,10 @@ def run(args=None):
             # 🔥 HARD STOP CONDITIONS
             # -------------------------------------------------
 
-            # ✅ STOP samo za approval
             if status == "waiting_for_approval":
                 print(f"[DEV_LOOP] STOP (status={status})")
                 break
 
-            # ❌ prej: needs_review je ustavil sistem
-            # ✅ zdaj: nadaljuj execution
             if status == "needs_review":
                 print("[DEV_LOOP] Continuing execution (needs_review)")
                 continue
@@ -97,7 +95,6 @@ def run(args=None):
                 print(f"[DEV_LOOP] END (status={status})")
                 break
 
-            # 🔥 CONTINUOUS MODE
             if status == "completed":
                 print("[DEV_LOOP] Task completed → continuing (PLAN MODE)")
 
