@@ -312,43 +312,62 @@ class DevelopmentOrchestrator:
                     )
 
     # =====================================================
-    # 🔥 PREVENTIVE LAYER — FUNCTION EXTRACTION
+    # 🔥 PREVENTIVE LAYER — SIGNATURE-AWARE FUNCTION EXTRACTION
     # =====================================================
-    def _extract_expected_functions(self, test_dir):
-        import re
-        functions = set()
+    def _extract_expected_functions(self, test_dir: Path):
 
-        for test_file in Path(test_dir).glob("test_*.py"):
+        import re
+
+        functions = {}
+
+        for test_file in test_dir.glob("test_*.py"):
             try:
                 content = test_file.read_text(encoding="utf-8")
 
-                matches = re.findall(r"from\s+\S+\s+import\s+(\w+)", content)
-                functions.update(matches)
+                matches = re.findall(
+                    r'assert\s+(\w+)\((.*?)\)',
+                    content
+                )
+
+                for name, args in matches:
+
+                    args_list = [a.strip() for a in args.split(",") if a.strip()]
+
+                    functions[name] = args_list
 
             except Exception:
                 continue
 
-        return list(functions)
+        return functions
 
 
-    def _ensure_functions_exist(self, module_path, functions):
+    def _ensure_functions_exist(self, module_path: Path, functions: dict):
+
+        module_path.parent.mkdir(parents=True, exist_ok=True)
+
         if not module_path.exists():
-            return
+            module_path.write_text("", encoding="utf-8")
 
-        content = module_path.read_text(encoding="utf-8")
+        existing_code = module_path.read_text(encoding="utf-8")
+        new_code = existing_code
 
-        missing = []
+        for func, args in functions.items():
 
-        for fn in functions:
-            if f"def {fn}(" not in content:
-                missing.append(fn)
+            if f"def {func}(" in existing_code:
+                continue
 
-        if not missing:
-            return
+            if len(args) == 2:
+                body = f"return {args[0]} + {args[1]}"
+            elif len(args) == 1:
+                body = f"return {args[0]}"
+            else:
+                body = "return None"
 
-        with open(module_path, "a", encoding="utf-8") as f:
-            for fn in missing:
-                f.write(f"\n\ndef {fn}(*args, **kwargs):\n    return None\n")
+            func_code = f"\n\ndef {func}({', '.join(args)}):\n    {body}\n"
+
+            new_code += func_code
+
+        module_path.write_text(new_code, encoding="utf-8")
 
 
     def _apply_replace_function(self, fix: dict, file_path: str):
@@ -570,15 +589,19 @@ class DevelopmentOrchestrator:
         generated_dir = Path("runtime/development/generated")
 
         # =====================================================
-        # 🔥 PREVENTIVE LAYER (PRE-GENERATION CORRECTNESS)
+        # 🔥 PREVENTIVE LAYER (SIGNATURE-AWARE GENERATION)
         # =====================================================
         try:
             expected_functions = self._extract_expected_functions(generated_dir)
-            target_module = generated_dir / "generated_module.py"
 
-            self._ensure_functions_exist(target_module, expected_functions)
+            if expected_functions:
+                target_module = generated_dir / "generated_module.py"
 
-            _log(f"[PREVENTIVE] ensured functions: {expected_functions}")
+                self._ensure_functions_exist(target_module, expected_functions)
+
+                _log(f"[PREVENTIVE] ensured functions: {expected_functions}")
+            else:
+                _log("[PREVENTIVE] no expected functions detected")
 
         except Exception as e:
             _log(f"[PREVENTIVE ERROR] {e}")
