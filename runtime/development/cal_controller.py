@@ -35,6 +35,44 @@ class CALController:
         # --- CAL FILTERING STATE ---
         self._seen_descriptions = set()
 
+    # ---------------------------------------------------------
+    # EXECUTION HANDLERS (NEW)
+    # ---------------------------------------------------------
+
+    def _execute_task(self, task):
+        """
+        Deterministic execution of CAL-generated tasks.
+        """
+
+        desc = task["description"]
+
+        if desc.startswith("explore_test_generation"):
+            self._handle_test_generation()
+
+    def _handle_test_generation(self):
+        """
+        Minimal deterministic test generation.
+        Creates a simple pytest file if none exists.
+        """
+
+        import os
+
+        test_path = os.path.join("tests", "test_auto_generated.py")
+
+        if os.path.exists(test_path):
+            print("[CAL] Test file already exists → skip")
+            return
+
+        content = '''
+def test_auto_generated_basic():
+    assert 1 + 1 == 2
+'''
+
+        with open(test_path, "w") as f:
+            f.write(content.strip())
+
+        print("[CAL] Generated test_auto_generated.py")
+
     def run_cycle(self):
         """
         Single CAL cycle:
@@ -42,7 +80,7 @@ class CALController:
         - register new tasks
         """
 
-        # --- BOOTSTRAP HAS PRIORITY (CRITICAL FIX) ---
+        # --- BOOTSTRAP HAS PRIORITY ---
         if not self._bootstrap_done:
             print("[CAL] BOOTSTRAP: generating initial task")
 
@@ -71,10 +109,9 @@ class CALController:
             self._bootstrap_done = True
             return [task]
 
-        # --- NORMAL FLOW AFTER BOOTSTRAP ---
+        # --- NORMAL FLOW ---
         gaps = self.detector.detect(registry=self.registry)
 
-        # --- FORCE STAGNATION GAP IF NONE ---
         if not gaps:
             gaps = [{
                 "description": "System idle detected (no tasks in registry). Introduce task generation or exploration capability."
@@ -85,7 +122,7 @@ class CALController:
         for gap in gaps:
             description = gap["description"]
 
-            # --- STAGNATION → DETERMINISTIC EXPLORATION ---
+            # --- STAGNATION → EXPLORATION ---
             if description == "System idle detected (no tasks in registry). Introduce task generation or exploration capability.":
 
                 idx = len(self._seen_descriptions) % len(self._EXPLORATION_TARGETS)
@@ -95,14 +132,14 @@ class CALController:
 
                 print(f"[CAL] STAGNATION → exploration: {description}")
 
-            # --- DEDUPLICATION ---
+            # --- DEDUP ---
             if description in self._seen_descriptions:
                 print(f"[CAL] SKIP duplicate: {description}")
                 continue
 
             self._seen_descriptions.add(description)
 
-            # --- BASIC SCORING ---
+            # --- SCORING ---
             score = 1.0
 
             if "test" in description:
@@ -111,7 +148,6 @@ class CALController:
             if "fix" in description:
                 score += 0.3
 
-            # --- CLAMP ---
             score = max(-1.0, min(1.0, score))
 
             task = {
@@ -127,5 +163,8 @@ class CALController:
             created_tasks.append(task)
 
             print(f"[CAL] Created task: {task}")
+
+            # --- NEW: EXECUTION ---
+            self._execute_task(task)
 
         return created_tasks
