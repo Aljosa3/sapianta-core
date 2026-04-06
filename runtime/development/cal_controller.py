@@ -15,6 +15,16 @@ from runtime.development.dev_task_registry import DevTaskRegistry
 
 
 class CALController:
+
+    # --- DETERMINISTIC EXPLORATION TARGETS (NEW) ---
+    _EXPLORATION_TARGETS = [
+        "test_generation",
+        "code_quality_improvement",
+        "edge_case_handling",
+        "performance_optimization",
+        "refactoring"
+    ]
+
     def __init__(self, registry=None):
         self.detector = CapabilityGapDetector()
         self.registry = registry if registry is not None else DevTaskRegistry()
@@ -32,48 +42,58 @@ class CALController:
         - register new tasks
         """
 
-        gaps = self.detector.detect()
+        # --- BOOTSTRAP HAS PRIORITY (CRITICAL FIX) ---
+        if not self._bootstrap_done:
+            print("[CAL] BOOTSTRAP: generating initial task")
 
-        # --- CAL BOOTSTRAP START ---
-        if not gaps:
+            task_description = "implement_basic_utility_function"
 
-            if not self._bootstrap_done:
-                print("[CAL] BOOTSTRAP: generating initial task")
+            if task_description in self._seen_descriptions:
+                print("[CAL] SKIP duplicate bootstrap task")
+                return []
 
-                task_description = "implement_basic_utility_function"
+            self._seen_descriptions.add(task_description)
 
-                if task_description in self._seen_descriptions:
-                    print("[CAL] SKIP duplicate bootstrap task")
-                    return []
+            score = max(-1.0, min(1.0, 0.1))
 
-                self._seen_descriptions.add(task_description)
-
-                # --- CLAMPED SCORE (NEW) ---
-                score = max(-1.0, min(1.0, 0.1))
-
-                task = {
-                    "description": task_description,
-                    "state": "queued",
-                    "metadata": {
-                        "source": "CAL_BOOTSTRAP",
-                        "priority": "low",
-                        "score": score
-                    }
+            task = {
+                "description": task_description,
+                "state": "queued",
+                "metadata": {
+                    "source": "CAL_BOOTSTRAP",
+                    "priority": "low",
+                    "score": score
                 }
+            }
 
-                self.registry.add_task(task)
+            self.registry.add_task(task)
 
-                self._bootstrap_done = True
-                return [task]
+            self._bootstrap_done = True
+            return [task]
 
-            print("[CAL] No capability gaps detected")
-            return []
-        # --- CAL BOOTSTRAP END ---
+        # --- NORMAL FLOW AFTER BOOTSTRAP ---
+        gaps = self.detector.detect(registry=self.registry)
+
+        # --- FORCE STAGNATION GAP IF NONE ---
+        if not gaps:
+            gaps = [{
+                "description": "System idle detected (no tasks in registry). Introduce task generation or exploration capability."
+            }]
 
         created_tasks = []
 
         for gap in gaps:
             description = gap["description"]
+
+            # --- STAGNATION → DETERMINISTIC EXPLORATION ---
+            if description == "System idle detected (no tasks in registry). Introduce task generation or exploration capability.":
+
+                idx = len(self._seen_descriptions) % len(self._EXPLORATION_TARGETS)
+                target = self._EXPLORATION_TARGETS[idx]
+
+                description = f"explore_{target}"
+
+                print(f"[CAL] STAGNATION → exploration: {description}")
 
             # --- DEDUPLICATION ---
             if description in self._seen_descriptions:
@@ -91,7 +111,7 @@ class CALController:
             if "fix" in description:
                 score += 0.3
 
-            # --- CLAMP (NEW) ---
+            # --- CLAMP ---
             score = max(-1.0, min(1.0, score))
 
             task = {

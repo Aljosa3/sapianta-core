@@ -46,7 +46,14 @@ class CapabilityGapDetector:
     # GAP DETECTION
     # ---------------------------------------------------------
 
-    def detect(self):
+    def detect(self, registry=None):
+        """
+        Deterministic capability gap detection.
+
+        Priority:
+        1) Static declared gaps
+        2) Runtime stagnation detection (NEW, minimal patch)
+        """
 
         declared_missing = self.state.get("missing_capabilities", [])
 
@@ -55,6 +62,7 @@ class CapabilityGapDetector:
 
         proposals = []
 
+        # --- EXISTING STATIC LOGIC (UNCHANGED) ---
         for capability in declared_missing:
 
             # if runtime already has the capability skip it
@@ -64,6 +72,24 @@ class CapabilityGapDetector:
             proposals.append(
                 self._build_proposal(capability)
             )
+
+        # --- NEW: RUNTIME GAP DETECTION (MINIMAL PATCH) ---
+        if not proposals and registry is not None:
+
+            queued = registry.get_tasks_by_state("queued")
+            running = registry.get_tasks_by_state("running")
+
+            # deterministic stagnation condition
+            if len(queued) == 0 and len(running) == 0:
+
+                proposals.append({
+                    "generated_at": datetime.now(UTC).isoformat(),
+                    "type": "development_proposal",
+                    "capability": "resolve_stagnation",
+                    "priority": "HIGH",
+                    "recommended_module": "runtime.development.resolve_stagnation",
+                    "description": "System idle detected (no tasks in registry). Introduce task generation or exploration capability."
+                })
 
         return proposals
 
