@@ -24,11 +24,12 @@ class CertificationEngine:
             self.registry.set_status(file_path, "REJECTED")
             return "REJECTED"
 
-        # 2. Test validation (minimal fix: replace invalid import with TestRunner)
-        runner = TestRunner(project_root=".", timeout=10)
-        diagnostics = runner.run_tests()
+        # 2. Test validation (CRITICAL FIX: use STRICT TEST MODE same as orchestrator)
+        from runtime.development.dev_orchestrator import run_strict_generated_tests
 
-        if not diagnostics.success:
+        result = run_strict_generated_tests()
+
+        if not result.get("success"):
             self.registry.set_status(file_path, "REJECTED")
             return "REJECTED"
 

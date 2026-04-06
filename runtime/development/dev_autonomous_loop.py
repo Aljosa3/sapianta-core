@@ -270,19 +270,16 @@ class DevAutonomousLoop:
 
         orchestrator = DevelopmentOrchestrator()
 
+        print(f"[DEBUG] EXECUTING TASK → {task}")
+
         try:
-            if FAST_TEST:
-                result = {"success": True, "error": None}
-            else:
-                if task.get("approved"):
-                    print("[DEV_LOOP] Resuming approved task...")
+            # 🔥 FORCE REAL EXECUTION (CCS TEST MODE)
+            if task.get("approved"):
+                print("[DEV_LOOP] Resuming approved task...")
 
-                in_pytest = "PYTEST_CURRENT_TEST" in os.environ
-
-                if in_pytest:
-                    result = {"success": True, "error": None}
-                else:
-                    result = orchestrator.run_auto(task)
+            print("[DEBUG] CALLING run_auto()")
+            result = orchestrator.run_auto(task)
+            print(f"[DEBUG] run_auto RESULT → {result}")
 
             if isinstance(result, dict) and result.get("status") == "waiting_for_approval":
 
