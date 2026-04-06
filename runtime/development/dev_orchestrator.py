@@ -664,11 +664,23 @@ class DevelopmentOrchestrator:
                 # ✅ SAFE WRITE
                 module_file.write_text(code, encoding="utf-8")
 
+                # =====================================================
+                # 🧩 CCS CERTIFICATION HOOK (MINIMAL, DETERMINISTIC)
+                # =====================================================
+                from runtime.development.ccs.certification_engine import CertificationEngine
+
+                if not hasattr(self, "_ccs_engine"):
+                    self._ccs_engine = CertificationEngine()
+
+                try:
+                    cert_status = self._ccs_engine.certify(str(module_file))
+                    _log(f"[CCS] {module_file} → {cert_status}")
+                except Exception as e:
+                    _log(f"[CCS] ERROR during certification: {e}")
+                # =====================================================
+
                 global LAST_CODEGEN_RESULT
                 LAST_CODEGEN_RESULT = result
-
-                # ✅ FIX: use actual generated file
-                module_file = Path(file_path)
 
                 if not module_file.exists():
                     _log(f"[ERROR] Expected module file missing: {module_file}")
