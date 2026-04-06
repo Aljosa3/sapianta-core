@@ -16,6 +16,19 @@ from runtime.development.test_runner import TestRunner
 
 
 class CALController:
+    
+    # ---------------------------------------------------------
+    # DECISION ENGINE (NEW)
+    # ---------------------------------------------------------
+
+    def _should_generate_fix(self, task):
+        """
+        Decide whether a fix task should be generated.
+        """
+
+        score = task["metadata"]["score"]
+
+        return score < 0
 
     # --- DETERMINISTIC EXPLORATION TARGETS (NEW) ---
     _EXPLORATION_TARGETS = [
