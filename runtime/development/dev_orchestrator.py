@@ -19,6 +19,7 @@ LAST_CODEGEN_RESULT = None
 
 from runtime.development.mutation_validator import MutationValidator
 from runtime.development.code_generator import CodeGenerator
+from runtime.development.llm_test_generator import LLMTestGenerator
 from runtime.development.test_validator import TestValidator
 from runtime.development.mutation_guard import MutationGuard
 from runtime.system.system_knowledge import SystemKnowledge
@@ -269,6 +270,7 @@ class DevelopmentOrchestrator:
 
         self.validator = MutationValidator()
         self.code_generator = CodeGenerator()
+        self.test_generator = LLMTestGenerator()
         self.test_validator = TestValidator()
         self.mutation_guard = MutationGuard()
 
@@ -643,6 +645,25 @@ class DevelopmentOrchestrator:
                 goal = discussion_context
 
             architecture = self.propose_architecture(goal)
+
+            # =====================================================
+            # 🧪 LLM TEST GENERATION (SAFE MODE)
+            # =====================================================
+            test_code = self.test_generator.generate(goal)
+
+            if test_code:
+                _log("[LLM TEST] generated")
+
+                validation = self.test_validator.validate(test_code)
+
+                if not validation["valid"]:
+                    _log(f"[LLM TEST] rejected → {validation['reason']}")
+                    test_code = None
+                else:
+                    _log("[LLM TEST] accepted")
+
+                    test_file = Path("runtime/development/generated/test_generated.py")
+                    test_file.write_text(test_code, encoding="utf-8")
 
             implementation_plan = self.build_implementation_plan(architecture)
 
