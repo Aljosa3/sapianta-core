@@ -19,7 +19,7 @@ LAST_CODEGEN_RESULT = None
 
 from runtime.development.mutation_validator import MutationValidator
 from runtime.development.code_generator import CodeGenerator
-from runtime.development.llm_test_generator import LLMTestGenerator
+from runtime.development.llm_interface import LLMInterface
 from runtime.development.test_validator import TestValidator
 from runtime.development.mutation_guard import MutationGuard
 from runtime.system.system_knowledge import SystemKnowledge
@@ -270,7 +270,7 @@ class DevelopmentOrchestrator:
 
         self.validator = MutationValidator()
         self.code_generator = CodeGenerator()
-        self.test_generator = LLMTestGenerator()
+        self.llm = LLMInterface()
         self.test_validator = TestValidator()
         self.mutation_guard = MutationGuard()
 
@@ -649,7 +649,7 @@ class DevelopmentOrchestrator:
             # =====================================================
             # 🧪 LLM TEST GENERATION (SAFE MODE)
             # =====================================================
-            test_code = self.test_generator.generate(goal)
+            test_code = self.llm.generate_tests(goal)
 
             if test_code:
                 _log("[LLM TEST] generated")
