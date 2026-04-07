@@ -284,12 +284,14 @@ class DevelopmentOrchestrator:
 
         self.outcome_tracker = ArtifactOutcomeTracker()
         self.evaluator = ArtifactEvaluator()
-        self.strategy_selector = StrategySelector()
-
-        self.test_runner = TestRunner(project_root=".", timeout=10)
 
         self.auto_fix_engine = AutoFixEngine()
         self.fix_memory = FixMemory()
+
+        self.strategy_selector = StrategySelector()
+        self.strategy_selector.fix_memory = self.fix_memory
+
+        self.test_runner = TestRunner(project_root=".", timeout=10)
 
         self.execution_guard = ExecutionGuard(
             max_processes=3,

@@ -45,9 +45,13 @@ class StrategySelector:
 
         Priority:
         1. intent/semantic fixes (highest)
-        2. adaptive score (confidence + heuristics)
+        2. adaptive score (confidence + heuristics + memory)
         3. strategy priority (tie-breaker)
         """
+
+        # =====================================================
+        # 🧠 ADAPTIVE STRATEGY WEIGHTING (MINIMAL, SAFE)
+        # =====================================================
 
         def adaptive_score(f):
             base = f.get("confidence", 0)
@@ -61,7 +65,24 @@ class StrategySelector:
             if "fallback" in strategy:
                 base -= 0.2
 
+            # =====================================================
+            # 🧠 FixMemory influence (MINIMAL, NON-INTRUSIVE)
+            # =====================================================
+            try:
+                if hasattr(self, "fix_memory") and strategy:
+                    error_text = f.get("error", "")
+                    best = self.fix_memory.get_best_strategy(error_text)
+
+                    if best == strategy:
+                        base += 0.5  # 🔥 minimal adaptive boost
+
+            except Exception:
+                pass
+            # =====================================================
+
             return base
+
+        # =====================================================
 
         return sorted(
             fixes,
