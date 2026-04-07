@@ -968,7 +968,16 @@ class DevelopmentOrchestrator:
             # 🔥 OUTSIDE LOOP (CRITICAL)
             previous_error = None
 
+            # =====================================================
+            # 📊 LEARNING METRIC (MINIMAL, NON-INTRUSIVE)
+            # =====================================================
+            repair_attempts = 0
+            # =====================================================
+
             for attempt in range(3):
+
+                # 📊 track repair attempts (CRITICAL: at loop start)
+                repair_attempts += 1
 
                 _log(f"Test run {attempt + 1}")
 
@@ -1074,7 +1083,8 @@ class DevelopmentOrchestrator:
                     _log("[AUTO-APPROVED]")
                     return {
                         "success": True,
-                        "reason": "execution_completed"
+                        "reason": "execution_completed",
+                        "repair_iterations": repair_attempts
                     }
 
                 failure_info = {
@@ -1244,7 +1254,8 @@ class DevelopmentOrchestrator:
                         _log("[AUTO-APPROVED AFTER FIX]")
                         return {
                             "success": True,
-                            "reason": "execution_completed_after_fix"
+                            "reason": "execution_completed_after_fix",
+                            "repair_iterations": repair_attempts
                         }
 
             try:
@@ -1305,7 +1316,8 @@ class DevelopmentOrchestrator:
 
             return {
                 "success": False,
-                "reason": "execution_failed"
+                "reason": "execution_failed",
+                "repair_iterations": repair_attempts
             }
 
         except Exception:
