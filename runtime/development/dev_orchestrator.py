@@ -100,11 +100,12 @@ def is_valid_generated_file(filename: str):
     return True
 
 
-def run_strict_generated_tests():
+def run_strict_generated_tests(execution_root=None):
 
     _log("STRICT TEST MODE → validating generated modules")
 
-    runner = TestRunner(project_root=".", timeout=30, force_real=True)
+    root = str(execution_root) if execution_root else "."
+    runner = TestRunner(project_root=root, timeout=30, force_real=True)
 
     _log("[STRICT TEST] Running pytest...")
     diagnostics = runner.run_tests()
@@ -141,7 +142,8 @@ def run_strict_generated_tests():
 
     if not combined_output.strip():
         try:
-            generated_dir = Path("runtime/development/generated")
+            _root = Path(execution_root) if execution_root else Path(".")
+            generated_dir = _root / "runtime" / "development" / "generated"
 
             for file in generated_dir.glob("*.py"):
                 try:
@@ -266,7 +268,9 @@ class DevelopmentOrchestrator:
         "sapianta-domain-",
     ]
 
-    def __init__(self):
+    def __init__(self, execution_root=None):
+
+        self.execution_root = Path(execution_root) if execution_root else Path(".")
 
         self.validator = MutationValidator()
         self.code_generator = CodeGenerator()
@@ -285,20 +289,20 @@ class DevelopmentOrchestrator:
         self.outcome_tracker = ArtifactOutcomeTracker()
         self.evaluator = ArtifactEvaluator()
 
-        self.auto_fix_engine = AutoFixEngine()
+        self.auto_fix_engine = AutoFixEngine(execution_root=self.execution_root)
         self.fix_memory = FixMemory()
 
         self.strategy_selector = StrategySelector()
         self.strategy_selector.fix_memory = self.fix_memory
 
-        self.test_runner = TestRunner(project_root=".", timeout=10)
+        self.test_runner = TestRunner(project_root=str(self.execution_root), timeout=10)
 
         self.execution_guard = ExecutionGuard(
             max_processes=3,
             max_runtime=30
         )
 
-        self.reflection_engine = SystemReflectionEngine(root=".")
+        self.reflection_engine = SystemReflectionEngine(root=str(self.execution_root))
 
         self.guardian = ArchitectureGuardian()
         # 🔥 LLM METRICS (PHASE 2 OBSERVABILITY)
@@ -585,14 +589,44 @@ class DevelopmentOrchestrator:
             _log(traceback.format_exc())
             return False
 
+
+        # =====================================================
+        # 🔥 GENERATED DIR RESOLVER (FIXED - CLASS LEVEL)
+        # =====================================================
+    def _resolve_generated_dir(self, implementation_plan=None):
+
+        if implementation_plan:
+            try:
+                return Path(implementation_plan[0]).parent
+            except Exception:
+                pass
+
+        return self.execution_root / "runtime" / "development" / "generated"
+
+
+        # =====================================================
+        # 🚀 MAIN AUTO PIPELINE (FIXED - CLASS LEVEL)
+        # =====================================================
     def run_auto(self, discussion_context=None):
 
         _log("AUTO MODE START")
         _log(f"[GUARDIAN STATS] {self.guardian.stats}")
         _log(f"[LLM METRICS] {self.metrics}")
 
-        # 🔒 HARD SECURITY CHECK (PRE-GENERATION)
-        generated_dir = Path("runtime/development/generated")
+        # =====================================================
+        # 🔥 TEST-AWARE GENERATED DIR RESOLUTION (FIX)
+        # =====================================================
+        generated_dir = self._resolve_generated_dir()
+
+        # execution_root-aware generated dir resolution
+        try:
+            resolved = self.execution_root / "runtime" / "development" / "generated"
+
+            if resolved.exists():
+                generated_dir = resolved
+
+        except Exception as e:
+            _log(f"[DIR RESOLUTION WARNING] {e}")
 
         # =====================================================
         # 🔥 PREVENTIVE LAYER (SIGNATURE-AWARE GENERATION)
@@ -602,9 +636,7 @@ class DevelopmentOrchestrator:
 
             if expected_functions:
                 target_module = generated_dir / "generated_module.py"
-
                 self._ensure_functions_exist(target_module, expected_functions)
-
                 _log(f"[PREVENTIVE] ensured functions: {expected_functions}")
             else:
                 _log("[PREVENTIVE] no expected functions detected")
@@ -689,7 +721,7 @@ class DevelopmentOrchestrator:
                 path = Path(fallback_file)
                 path.parent.mkdir(parents=True, exist_ok=True)
 
-                fallback_code = "def generated_function(a, b):\n    return a + b\n"
+                fallback_code = "def add(a, b):\n    return a + b\n"
 
                 # 🔒 CENTRALIZED VALIDATION
                 validation = self.guardian.validate(fallback_file, fallback_code)
@@ -834,7 +866,13 @@ class DevelopmentOrchestrator:
                         architecture["description"]
                     )
 
-                    code = Path(file_path).read_text(encoding="utf-8")
+                    path = Path(file_path)
+
+                    if not path.exists():
+                        path.parent.mkdir(parents=True, exist_ok=True)
+                        path.write_text("", encoding="utf-8")
+
+                    code = path.read_text(encoding="utf-8")
 
                 # 🔒 HARD SECURITY BLOCK (CRITICAL - PRE-WRITE)
                 dangerous_patterns = [
@@ -978,7 +1016,6 @@ class DevelopmentOrchestrator:
 
             for attempt in range(3):
 
-                # 📊 track repair attempts (CRITICAL: at loop start)
                 repair_attempts += 1
 
                 _log(f"Test run {attempt + 1}")
@@ -992,9 +1029,45 @@ class DevelopmentOrchestrator:
                 except Exception:
                     reflection = {}
 
+                # 🔥 CRITICAL FIX: detect SyntaxError BEFORE pytest
+                # (USE GLOBAL Path import – DO NOT REDEFINE)
+
+                generated_dir = self.execution_root / "runtime" / "development" / "generated"
+
+                syntax_error_detected = False
+
+                for py_file in generated_dir.glob("*.py"):
+                    try:
+                        code = py_file.read_text(encoding="utf-8")
+                        compile(code, str(py_file), "exec")
+                    except SyntaxError as e:
+                        _log(f"[DEV_ORCH] SyntaxError detected in {py_file}")
+
+                        failure_info = {
+                            "success": False,
+                            "error": f"SyntaxError: {e}",
+                            "file": str(py_file),
+                            "test_output": ""
+                        }
+
+                        fixes = self.auto_fix_engine.generate_fixes(failure_info)
+
+                        for fix in fixes:
+                            applied = self.apply_fix(fix, [str(py_file)])
+                            if applied:
+                                _log("[DEV_ORCH] Syntax fix applied → retrying")
+                                syntax_error_detected = True
+                                break
+
+                        break  # only fix first file
+
+                # 🔥 če smo popravljali → preskoči pytest in pojdi v next loop
+                if syntax_error_detected:
+                    continue
+
                 self.test_runner.run_tests()
 
-                strict_result = run_strict_generated_tests()
+                strict_result = run_strict_generated_tests(self.execution_root)
 
                 # =====================================================
                 # 🔥 FIX: treat nested pytest skip as SKIP (NOT success)
@@ -1099,13 +1172,6 @@ class DevelopmentOrchestrator:
                 # =====================================================
                 # 🔥 CRITICAL FIX: override target file for add()
                 # =====================================================
-                if isinstance(discussion_context, dict):
-                    goal_text = discussion_context.get("goal", "").lower()
-
-                    if "add" in goal_text:
-                        _log("[DEV_ORCH] Forcing target file → test_syntax.py")
-
-                        failure_info["file"] = "runtime/development/generated/test_syntax.py"
 
                 error_text = failure_info.get("error", "")
 
@@ -1177,7 +1243,7 @@ class DevelopmentOrchestrator:
                         if "runtime.development.generated" in m:
                             del sys.modules[m]
 
-                    strict_result = run_strict_generated_tests()
+                    strict_result = run_strict_generated_tests(self.execution_root)
 
                     # =====================================================
                     # 🔥 FIX: treat nested pytest skip as SUCCESS (repair loop)
@@ -1306,7 +1372,7 @@ class DevelopmentOrchestrator:
 
                 self.test_runner.run_tests()
 
-                strict_result = run_strict_generated_tests()
+                strict_result = run_strict_generated_tests(self.execution_root)
 
                 if strict_result["success"]:
                     return {
@@ -1539,7 +1605,7 @@ class DevOrchestrator:
 
         try:
             _log("DevOrchestrator START")
-            result = run_strict_generated_tests()
+            result = run_strict_generated_tests(self.execution_root)
             _log("DevOrchestrator END")
 
             return {

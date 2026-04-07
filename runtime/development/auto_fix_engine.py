@@ -45,8 +45,9 @@ class AutoFixEngine:
         "runtime/development/generated/"
     ]
 
-    def __init__(self):
-        self.registry = FunctionRegistry(self.PROJECT_ROOT)
+    def __init__(self, execution_root=None):
+        self.execution_root = Path(execution_root) if execution_root else Path(".")
+        self.registry = FunctionRegistry(self.execution_root)
         self.validator = IntegrityValidator()
 
         # 🔥 MINIMAL ADD
@@ -75,6 +76,11 @@ class AutoFixEngine:
             failure_info = {}
 
         fixes: List[Dict] = []
+
+        # =====================================================
+        # 🔥 CRITICAL INIT (PREVENT UNBOUND LOCAL)
+        # =====================================================
+        file_path: Optional[str] = None
 
         system_context = failure_info.get("system_context") or {}
 
@@ -216,56 +222,92 @@ class AutoFixEngine:
                     pass
 
         # =====================================================
-        # 🔥 FILE TARGETING (FINAL FIX - SIMPLE & BULLETPROOF)
+        # 🔥 FILE TARGETING (FINAL FIX - SOURCE OF TRUTH)
         # =====================================================
 
-        fallback_file = failure_info.get("file")
+        from pathlib import Path
 
-        if fallback_file:
-            file_path = fallback_file
-            print(f"[FTL] USING failure_info file → {file_path}")
+        file_path = None
+        failure_file = failure_info.get("file")
 
-        else:
-            print("[ERROR] No failure_info file → using fallback")
+        # -----------------------------------------------------
+        # 🔥 0. RESOLVE GENERATED DIR (supports pytest tmp_path)
+        # -----------------------------------------------------
+        project_root = self.execution_root
 
-            file_path = "runtime/development/generated/fallback.py"
+        generated_dir = project_root / "runtime" / "development" / "generated"
 
-            path_obj = Path(file_path)
-            if not path_obj.exists():
-                path_obj.parent.mkdir(parents=True, exist_ok=True)
-                path_obj.write_text("", encoding="utf-8")
+        if not generated_dir.exists():
+            print("[AUTO_FIX] generated_dir not found → scanning cwd")
 
+            candidates = list(project_root.rglob("runtime/development/generated"))
+
+            best_dir = None
+
+            for c in candidates:
+                for py_file in c.glob("*.py"):
+                    try:
+                        compile(py_file.read_text(encoding="utf-8"), str(py_file), "exec")
+                    except SyntaxError:
+                        best_dir = c
+                        break
+                if best_dir:
+                    break
+
+            if best_dir:
+                generated_dir = best_dir
+                print(f"[AUTO_FIX] selected generated_dir → {generated_dir}")
+            elif candidates:
+                generated_dir = candidates[0]
+                print(f"[AUTO_FIX] fallback generated_dir → {generated_dir}")
+
+        # -----------------------------------------------------
+        # 1. FAILURE FILE (primary source of truth)
+        # -----------------------------------------------------
+        if failure_file:
+            p = Path(failure_file)
+            if p.exists():
+                file_path = str(p)
+                print(f"[FTL] SOURCE OF TRUTH → {file_path}")
+            else:
+                print("[FTL WARNING] failure_info file does not exist")
+
+        # -----------------------------------------------------
+        # 2. SYNTAX ERROR SCAN (only if failure_file not resolved)
+        # -----------------------------------------------------
+        if not file_path:
+            syntax_error_files = []
+
+            if generated_dir.exists():
+                for py_file in generated_dir.glob("*.py"):
+                    try:
+                        compile(py_file.read_text(encoding="utf-8"), str(py_file), "exec")
+                    except SyntaxError:
+                        syntax_error_files.append(str(py_file))
+
+            if len(syntax_error_files) == 1:
+                file_path = syntax_error_files[0]
+                print(f"[FTL] SYNTAX ERROR TARGET → {file_path}")
+
+        # -----------------------------------------------------
+        # 3. FALLBACK (last resort)
+        # -----------------------------------------------------
+        if not file_path:
+            print("[FTL] No valid target → using fallback")
+
+            fallback = generated_dir / "generated_module.py"
+
+            if not fallback.exists():
+                fallback.parent.mkdir(parents=True, exist_ok=True)
+                fallback.write_text("", encoding="utf-8")
+
+            file_path = str(fallback)
+
+        # -----------------------------------------------------
+        # DEBUG
+        # -----------------------------------------------------
         print("\n[DEBUG TARGET FILE]")
         print(file_path)
-
-        # =====================================================
-        # 🔥 HARD FIX: ALWAYS USE failure_info FILE FIRST
-        # =====================================================
-
-        fallback_file = failure_info.get("file")
-
-        # 🔥 USE failure_info ONLY IF NO BETTER FILE FOUND
-        if fallback_file and not file_path:
-            file_path = fallback_file
-            print(f"[FTL] fallback file_path → {file_path}")
-
-        # 🔥 šele potem fallback
-        if not file_path:
-
-            print("[ERROR] No target file resolved → using fallback strategy")
-
-            file_path = "runtime/development/generated/fallback.py"
-
-            path_obj = Path(file_path)
-            if not path_obj.exists():
-                path_obj.parent.mkdir(parents=True, exist_ok=True)
-                path_obj.write_text("", encoding="utf-8")
-
-            # 🔥 ensure file exists
-            path_obj = Path(file_path)
-            if not path_obj.exists():
-                path_obj.parent.mkdir(parents=True, exist_ok=True)
-                path_obj.write_text("", encoding="utf-8")
 
         # =====================================================
         # CONTINUE
@@ -275,14 +317,20 @@ class AutoFixEngine:
         # =====================================================
         # 🔥 CRITICAL FIX: resolve function file via registry
         # =====================================================
+        # 🔥 CRITICAL FIX: DO NOT OVERRIDE SOURCE OF TRUTH
         if target_function and self.registry:
 
             try:
                 fn_path = self.registry.get_function_file(target_function)
 
                 if fn_path and Path(fn_path).exists():
-                    print(f"[FTL] Overriding file_path → {fn_path}")
-                    file_path = fn_path
+
+                    # ❗ ONLY override if NO failure file was provided
+                    if not failure_info.get("file"):
+                        print(f"[FTL] Registry fallback → {fn_path}")
+                        file_path = fn_path
+                    else:
+                        print("[FTL] Skipping registry override (source of truth active)")
 
             except Exception:
                 pass
@@ -367,6 +415,13 @@ class AutoFixEngine:
 
         if match:
             fn = target_function or match.group(1)
+
+            # =====================================================
+            # 🔥 CRITICAL FIX: PREVENT generated_function OVERRIDE
+            # =====================================================
+            if fn == "generated_function" and match:
+                fn = match.group(1)
+
             args = match.group(2)
             expected = match.group(3).strip()
 
@@ -1259,6 +1314,22 @@ class AutoFixEngine:
                 new_code
             )
 
+        # =====================================================
+        # 🔥 NEW: replace_file support (CRITICAL)
+        # =====================================================
+        elif action == "replace_file":
+
+            new_code = fix.get("code")
+
+            if not isinstance(new_code, str) or not new_code.strip():
+                print("[APPLY FIX] invalid replace_file code")
+                return False
+
+            # 🔥 CRITICAL: ensure overwrite
+            updated_code = new_code.strip() + "\n"
+
+            print(f"[APPLY FIX] replace_file applied → {target_file}")
+
         else:
             return False
 
@@ -1390,14 +1461,37 @@ class AutoFixEngine:
         if "SyntaxError" not in error_text:
             return None
 
-        file_path = self._extract_file_from_traceback(error_text) or failure_info.get("file")
+        file_path = failure_info.get("file")
 
-        return {
-            "strategy": "syntax_fix",
-            "action": "append",
-            "file": file_path,
-            "code": "# SYNTAX FIX PLACEHOLDER\n"
-        }
+        if not file_path or not Path(file_path).exists():
+            return None
+
+        try:
+            code = Path(file_path).read_text(encoding="utf-8")
+            lines = code.split("\n")
+
+            fixed_lines = []
+
+            for line in lines:
+
+                # 🔥 FIX: missing colon in function definition
+                if re.match(r"^\s*def\s+\w+\s*\(.*\)\s*$", line):
+                    print("[SYNTAX FIX] Adding missing ':' to function definition")
+                    fixed_lines.append(line + ":")
+                else:
+                    fixed_lines.append(line)
+
+            fixed_code = "\n".join(fixed_lines)
+
+            return {
+                "strategy": "syntax_fix",
+                "action": "replace_file",   # 🔥 CRITICAL
+                "file": file_path,
+                "code": fixed_code
+            }
+
+        except Exception:
+            return None
 
     # ================================================================
     # TRACEBACK PARSER
