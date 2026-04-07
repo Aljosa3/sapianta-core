@@ -1,5 +1,3 @@
-# runtime/development/llm_interface.py
-
 """
 SAPIANTA LLM Interface (MINIMAL, SAFE)
 
@@ -17,30 +15,94 @@ IMPORTANT:
 import os
 
 
+# =====================================================
+# 📊 LLM USAGE TRACKER (MINIMAL)
+# =====================================================
+
+class LLMUsageTracker:
+
+    def __init__(self):
+        self.calls = 0
+        self.success = 0
+        self.fallbacks = 0
+        self.errors = 0
+
+    def record_call(self):
+        self.calls += 1
+
+    def record_success(self):
+        self.success += 1
+
+    def record_fallback(self):
+        self.fallbacks += 1
+
+    def record_error(self):
+        self.errors += 1
+
+    def snapshot(self):
+        return {
+            "calls": self.calls,
+            "success": self.success,
+            "fallbacks": self.fallbacks,
+            "errors": self.errors,
+        }
+
+
 class LLMInterface:
 
     def __init__(self):
         self.enabled = os.getenv("SAPIANTA_USE_LLM", "0") == "1"
+        self.tracker = LLMUsageTracker()
 
     # =====================================================
     # 🧪 TEST GENERATION
     # =====================================================
     def generate_tests(self, goal: str):
 
+        self.tracker.record_call()
+
         if not self.enabled:
+            self.tracker.record_fallback()
             return self._mock_tests(goal)
 
-        return self._safe_claude_tests(goal)
+        try:
+            result = self._safe_claude_tests(goal)
+
+            if result:
+                self.tracker.record_success()
+                return result
+
+            self.tracker.record_fallback()
+            return self._mock_tests(goal)
+
+        except Exception:
+            self.tracker.record_error()
+            return self._mock_tests(goal)
 
     # =====================================================
     # 🧠 CODE GENERATION
     # =====================================================
     def generate_code(self, goal: str):
 
+        self.tracker.record_call()
+
         if not self.enabled:
+            self.tracker.record_fallback()
             return None  # fallback to deterministic generator
 
-        return self._safe_claude_code(goal)
+        try:
+            result = self._safe_claude_code(goal)
+
+            if result:
+                self.tracker.record_success()
+                return result
+
+            self.tracker.record_fallback()
+            return None
+
+        except Exception:
+            self.tracker.record_error()
+            return None
 
     # =====================================================
     # 🔍 ERROR ANALYSIS
@@ -146,3 +208,9 @@ Rules:
 
         except Exception:
             return None
+
+    # =====================================================
+    # 📊 METRICS ACCESS
+    # =====================================================
+    def get_metrics(self):
+        return self.tracker.snapshot()
