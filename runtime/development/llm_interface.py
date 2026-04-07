@@ -30,8 +30,8 @@ class LLMInterface:
         if not self.enabled:
             return self._mock_tests(goal)
 
-        # 🔜 future: real LLM call
-        return self._mock_tests(goal)
+        # 🔌 SAFE CLAUDE WRAPPER (minimal change)
+        return self._safe_claude_tests(goal)
 
     # =====================================================
     # 🧠 CODE GENERATION
@@ -73,3 +73,41 @@ def test_add_zero():
 def test_basic():
     assert True
 """
+
+    # =====================================================
+    # 🔌 CLAUDE INTEGRATION (SAFE WRAPPER)
+    # =====================================================
+    def _safe_claude_tests(self, goal: str):
+
+        try:
+            from runtime_platform.claude_client import ClaudeClient
+
+            client = ClaudeClient()
+
+            prompt = f"""
+Generate minimal pytest tests for the following goal:
+
+{goal}
+
+Rules:
+- only Python code
+- no explanations
+- no imports except pytest
+- no file operations
+"""
+
+            response = client.call(prompt)
+
+            if not response or not isinstance(response, str):
+                return self._mock_tests(goal)
+
+            # 🔒 BASIC SANITIZATION (CRITICAL)
+            forbidden = ["os.", "subprocess", "eval(", "exec("]
+
+            if any(f in response for f in forbidden):
+                return self._mock_tests(goal)
+
+            return response
+
+        except Exception:
+            return self._mock_tests(goal)
