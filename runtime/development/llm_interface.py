@@ -30,7 +30,6 @@ class LLMInterface:
         if not self.enabled:
             return self._mock_tests(goal)
 
-        # 🔌 SAFE CLAUDE WRAPPER (minimal change)
         return self._safe_claude_tests(goal)
 
     # =====================================================
@@ -41,8 +40,7 @@ class LLMInterface:
         if not self.enabled:
             return None  # fallback to deterministic generator
 
-        # 🔜 future: real LLM call
-        return None
+        return self._safe_claude_code(goal)
 
     # =====================================================
     # 🔍 ERROR ANALYSIS
@@ -75,7 +73,7 @@ def test_basic():
 """
 
     # =====================================================
-    # 🔌 CLAUDE INTEGRATION (SAFE WRAPPER)
+    # 🔌 CLAUDE TEST GENERATION (SAFE)
     # =====================================================
     def _safe_claude_tests(self, goal: str):
 
@@ -101,7 +99,6 @@ Rules:
             if not response or not isinstance(response, str):
                 return self._mock_tests(goal)
 
-            # 🔒 BASIC SANITIZATION (CRITICAL)
             forbidden = ["os.", "subprocess", "eval(", "exec("]
 
             if any(f in response for f in forbidden):
@@ -111,3 +108,41 @@ Rules:
 
         except Exception:
             return self._mock_tests(goal)
+
+    # =====================================================
+    # 🔌 CLAUDE CODE GENERATION (SAFE)
+    # =====================================================
+    def _safe_claude_code(self, goal: str):
+
+        try:
+            from runtime_platform.claude_client import ClaudeClient
+
+            client = ClaudeClient()
+
+            prompt = f"""
+Generate minimal Python function for the following goal:
+
+{goal}
+
+Rules:
+- only Python code
+- no explanations
+- no file operations
+- no imports unless strictly necessary
+"""
+
+            response = client.call(prompt)
+
+            if not response or not isinstance(response, str):
+                return None  # fallback
+
+            # 🔒 BASIC SANITIZATION (CRITICAL)
+            forbidden = ["os.", "subprocess", "eval(", "exec("]
+
+            if any(f in response for f in forbidden):
+                return None
+
+            return response
+
+        except Exception:
+            return None
