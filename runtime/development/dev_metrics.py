@@ -23,6 +23,9 @@ class DevMetrics:
         # ---------------------------------------------------------
         self.file_path = METRICS_FILE
 
+        self.repair_history = []
+        self.last_repair_iterations = 0
+
         self._ensure_file()
 
         # ---------------------------------------------------------
@@ -150,6 +153,15 @@ class DevMetrics:
     # ------------------------------------------------
     # Get metrics
     # ------------------------------------------------
+
+    def record_repair_iterations(self, value: int) -> None:
+        self.last_repair_iterations = value
+        self.repair_history.append(value)
+
+    def get_avg_repair_iterations(self) -> float:
+        if not self.repair_history:
+            return 0.0
+        return sum(self.repair_history) / len(self.repair_history)
 
     def get_metrics(self):
 

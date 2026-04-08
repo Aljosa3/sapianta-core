@@ -327,6 +327,9 @@ class DevAutonomousLoop:
                 success = bool(result.get("success"))
                 reason = None if success else (result.get("reason") or "incomplete_execution")
 
+                if "repair_iterations" in result:
+                    self.metrics.record_repair_iterations(result["repair_iterations"])
+
             else:
                 success = False
                 reason = "invalid_result_type"
@@ -410,7 +413,7 @@ class DevAutonomousLoop:
         # 🧠 CAL FEEDBACK (FAILURE)
         # =====================================================
         try:
-            if hasattr(self, "cal") and self.cal:
+            if hasattr(self, "cal") and self.cal and hasattr(self.cal, "penalize"):
                 self.cal.penalize(task)
         except Exception as e:
             print("[CAL] penalize error:", str(e))
