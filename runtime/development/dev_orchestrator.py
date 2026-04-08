@@ -986,7 +986,7 @@ class DevelopmentOrchestrator:
                 # =====================================================
 
                 # =====================================================
-                # 🧠 CCS → CAL INTEGRATION (FIXED - SHARED REGISTRY)
+                # 🧠 CCS → CAL INTEGRATION (PRIORITY + LEARNING READY)
                 # =====================================================
                 try:
                     if cert_status == "REJECTED":
@@ -997,15 +997,66 @@ class DevelopmentOrchestrator:
 
                         registry = DevTaskRegistry()
 
+                        # === FAILURE CONTEXT ===
                         failure_context = {
                             "file": str(module_file),
                             "timestamp": datetime.now(UTC).isoformat()
                         }
 
+                        # === ERROR SIGNATURE (SAFE) ===
+                        error_signature = "unknown"
+                        try:
+                            if "failure_info" in locals() and isinstance(failure_info, dict):
+                                error_signature = failure_info.get("error", "unknown")
+                        except Exception:
+                            pass
+
+                        # === PRIORITY SYSTEM (MINIMAL) ===
+
+                        base_priority = 1.0
+
+                        # FixMemory boost
+                        memory_score = 0.0
+                        if hasattr(self, "fix_memory"):
+                            try:
+                                memory_score = self.fix_memory.get_score(error_signature)
+                            except Exception:
+                                memory_score = 0.0
+
+                        # init counters (lazy)
+                        if not hasattr(self, "_error_counter"):
+                            self._error_counter = {}
+                        if not hasattr(self, "_failure_counter"):
+                            self._failure_counter = {}
+
+                        # repeat boost
+                        repeat_boost = min(
+                            0.5,
+                            self._error_counter.get(error_signature, 0) * 0.1
+                        )
+
+                        # failure penalty
+                        failure_penalty = min(
+                            0.5,
+                            self._failure_counter.get(error_signature, 0) * 0.1
+                        )
+
+                        priority = base_priority + memory_score + repeat_boost - failure_penalty
+                        priority = round(priority, 3)
+
+                        # update error counter
+                        self._error_counter[error_signature] = (
+                            self._error_counter.get(error_signature, 0) + 1
+                        )
+
+                        _log(f"[CCS→CAL] Priority={priority} (mem={memory_score:.2f}, repeat={repeat_boost:.2f}, penalty={failure_penalty:.2f})")
+
+                        # === TASK REGISTRATION ===
+
                         registry.add_task({
                             "task_type": "repair",
                             "source": "ccs_auto",
-                            "priority": 1.0,
+                            "priority": priority,
                             "file": str(module_file),
                             "context": failure_context,
                             "description": f"Auto-repair triggered from CCS rejection: {module_file}"
@@ -1334,6 +1385,7 @@ def test_basic_function_exists():
                         }
 
                     _log("[AUTO-APPROVED]")
+                    _log(f"[LEARNING] repair_iterations: {repair_attempts}")
                     return {
                         "success": True,
                         "reason": "execution_completed",
@@ -1499,10 +1551,24 @@ def test_basic_function_exists():
 
                     if strict_result["success"]:
 
+                        # =====================================================
+                        # 🧠 FIX MEMORY (EXISTING BEHAVIOR)
+                        # =====================================================
                         self.fix_memory.record_success(
                             error_text,
                             fix.get("strategy")
                         )
+
+                        # =====================================================
+                        # 🧠 LEARNING FEEDBACK LOOP (SUCCESS PATH)
+                        # =====================================================
+                        error_signature = error_text or "unknown"
+
+                        # reset failure counter (če obstaja)
+                        if hasattr(self, "_failure_counter"):
+                            self._failure_counter[error_signature] = 0
+
+                        # =====================================================
 
                         approval = build_approval_request(
                             task={"goal": discussion_context},
@@ -1530,6 +1596,7 @@ def test_basic_function_exists():
                             }
 
                         _log("[AUTO-APPROVED AFTER FIX]")
+                        _log(f"[LEARNING] repair_iterations: {repair_attempts}")
                         return {
                             "success": True,
                             "reason": "execution_completed_after_fix",
@@ -1592,6 +1659,7 @@ def test_basic_function_exists():
             except Exception:
                 _log("[RETEST AFTER REPAIR FAILED]")
 
+            _log(f"[LEARNING] repair_iterations: {repair_attempts}")
             return {
                 "success": False,
                 "reason": "execution_failed",

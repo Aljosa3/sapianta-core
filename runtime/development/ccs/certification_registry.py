@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 
+
 class CertificationRegistry:
     def __init__(self, path="runtime/development/ccs/cert_registry.json"):
         self.path = path
@@ -14,6 +15,11 @@ class CertificationRegistry:
             return {}
 
     def save(self):
+        # 🔥 CRITICAL FIX: ensure directory exists before write
+        from pathlib import Path
+
+        Path(self.path).parent.mkdir(parents=True, exist_ok=True)
+
         with open(self.path, "w") as f:
             json.dump(self._data, f, indent=2)
 

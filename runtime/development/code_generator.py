@@ -124,6 +124,10 @@ class CodeGenerator:
             f.write(template)
 
         print(f"[CODEGEN] Module created: {safe_file_path}")
+        # === SAPIANTA ARTIFACT REGISTRATION (MODULE) ===
+        from runtime.development.artifact_registry import artifact_registry
+
+        artifact_registry.register(str(safe_file_path), "MODULE")
 
         # ------------------------------------------------
         # CREATE TEST FILE
@@ -174,6 +178,8 @@ def test_{safe_module_name}_execution():
             f.write(test_code)
 
         print(f"[CODEGEN] Test file created: {test_file_path}")
+        # === SAPIANTA ARTIFACT REGISTRATION (TEST) ===
+        artifact_registry.register(str(test_file_path), "TEST")
 
         # ------------------------------------------------
         # MODULE IMPORT PATH

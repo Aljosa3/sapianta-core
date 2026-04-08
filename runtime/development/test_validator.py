@@ -16,6 +16,15 @@ Design:
 import re
 
 
+def _is_valid_python(code: str) -> bool:
+    import ast
+    try:
+        ast.parse(code)
+        return True
+    except Exception:
+        return False
+
+
 class TestValidator:
 
     MIN_ASSERTS = 2
@@ -34,6 +43,9 @@ class TestValidator:
 
         if not test_code or not isinstance(test_code, str):
             return {"valid": False, "reason": "empty_test"}
+
+        if not _is_valid_python(test_code):
+            return {"valid": False, "reason": "invalid_python_syntax"}
 
         # -------------------------------------------------
         # RULE 1: must contain assert
