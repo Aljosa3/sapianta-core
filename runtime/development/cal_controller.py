@@ -342,3 +342,19 @@ def test_auto_generated_basic():
                     self.registry.add_task(fix_task)
 
         return created_tasks
+
+    # =========================================================
+    # CAL FEEDBACK (SAFE, DETERMINISTIC)
+    # =========================================================
+
+    def reward(self, task):
+        meta = task.setdefault("metadata", {})
+        score = float(meta.get("score", 0.0))
+        score = min(1.0, score + 0.1)
+        meta["score"] = score
+
+    def penalize(self, task):
+        meta = task.setdefault("metadata", {})
+        score = float(meta.get("score", 0.0))
+        score = max(-1.0, score - 0.1)
+        meta["score"] = score
