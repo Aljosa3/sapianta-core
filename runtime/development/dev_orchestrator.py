@@ -29,7 +29,7 @@ from runtime.system.capability_planner import CapabilityPlanner
 from runtime.development.architecture_agent import ArchitectureAgent
 
 from runtime.governance.promotion_gate import classify_change, requires_approval
-from runtime.artifacts.artifact_registry import register_artifact
+from runtime.development.artifact_registry import artifact_registry
 
 from runtime.development.artifact_outcome_tracker import ArtifactOutcomeTracker
 from runtime.development.artifact_evaluator import ArtifactEvaluator
@@ -708,6 +708,7 @@ class DevelopmentOrchestrator:
 
                     test_file = Path("runtime/development/generated/test_generated.py")
                     test_file.write_text(test_code, encoding="utf-8")
+                    artifact_registry.register(str(test_file.resolve()), "TEST")
 
             implementation_plan = self.build_implementation_plan(architecture)
 
@@ -921,6 +922,14 @@ class DevelopmentOrchestrator:
                 # ✅ SAFE WRITE
                 module_file.write_text(code, encoding="utf-8")
 
+                # === SAPIANTA ARTIFACT REGISTRATION (FALLBACK SAFETY) ===
+                from runtime.development.artifact_registry import artifact_registry
+
+                try:
+                    artifact_registry.register(str(module_file.resolve()), "MODULE")
+                except Exception as e:
+                    _log(f"[ARTIFACT REGISTRATION ERROR] {e}")
+
                 # 🔒 HARD SECURITY BLOCK (POST-WRITE - CRITICAL)
                 existing_code = module_file.read_text(encoding="utf-8")
 
@@ -948,10 +957,27 @@ class DevelopmentOrchestrator:
                 _log("[DEBUG] CCS HOOK REACHED")
                 from runtime.development.ccs.certification_engine import CertificationEngine
 
+                # === SAPIANTA ARTIFACT REGISTRY (CCS INTEGRATION) ===
+                from runtime.development.artifact_registry import artifact_registry
+
                 if not hasattr(self, "_ccs_engine"):
                     self._ccs_engine = CertificationEngine()
 
                 try:
+                    # === ARTIFACT TYPE RESOLUTION (DETERMINISTIC) ===
+                    try:
+                        artifact_type = artifact_registry.require_type(str(module_file.resolve()))
+                    except Exception as e:
+                        _log(f"[CCS BLOCK] Missing artifact type → {module_file}")
+                        return {
+                            "status": "blocked",
+                            "reason": "missing_artifact_type",
+                            "file": str(module_file)
+                        }
+
+                    # OPTIONAL: log for traceability
+                    _log(f"[CCS] artifact_type={artifact_type} for {module_file}")
+
                     cert_status = self._ccs_engine.certify(str(module_file))
                     _log(f"[CCS] {module_file} → {cert_status}")
                 except Exception as e:
@@ -1047,8 +1073,15 @@ class DevelopmentOrchestrator:
                     try:
                         content = _test_file.read_text(encoding="utf-8")
 
-                        # 🔒 CRITICAL: ONLY quarantine real TEST files
-                        if "# SAPIANTA_TYPE: TEST" not in content:
+                        from runtime.development.artifact_registry import artifact_registry
+
+                        try:
+                            artifact_type = artifact_registry.require_type(str(_test_file.resolve()))
+                        except Exception:
+                            # FAIL-CLOSED → skip unknown files
+                            continue
+
+                        if artifact_type != "TEST":
                             continue
 
                         # validacija sintakse SAMO za prave test datoteke
@@ -1150,6 +1183,7 @@ def test_basic_function_exists():
 """
 
                         test_file.write_text(fallback_test.strip(), encoding="utf-8")
+                        artifact_registry.register(str(test_file.resolve()), "TEST")
 
                         _log(f"[AUTO TEST] Created fallback test: {test_file}")
 
@@ -1180,7 +1214,14 @@ def test_basic_function_exists():
                             try:
                                 content = _tf.read_text(encoding="utf-8")
 
-                                if "# SAPIANTA_TYPE: TEST" not in content:
+                                from runtime.development.artifact_registry import artifact_registry
+
+                                try:
+                                    artifact_type = artifact_registry.require_type(str(_tf.resolve()))
+                                except Exception:
+                                    continue
+
+                                if artifact_type != "TEST":
                                     continue
 
                                 # =====================================================
@@ -1404,6 +1445,7 @@ def test_basic_function_exists():
                     """
 
                             test_file.write_text(fallback_test.strip(), encoding="utf-8")
+                            artifact_registry.register(str(test_file.resolve()), "TEST")
 
                             _log(f"[AUTO TEST] Created fallback test: {test_file}")
 
