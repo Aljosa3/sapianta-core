@@ -325,6 +325,17 @@ class DevAutonomousLoop:
         # ---------------------------------------------------------
 
         if success is True:
+
+            # =====================================================
+            # 🧠 CAL FEEDBACK (SUCCESS)
+            # =====================================================
+            try:
+                if hasattr(self, "cal") and self.cal:
+                    self.cal.reward(task)
+            except Exception as e:
+                print("[CAL] reward error:", str(e))
+            # =====================================================
+
             if task.get("metadata"):
                 score = _update_score(task["metadata"].get("score", 0), -0.1)
                 task["metadata"]["score"] = score
@@ -378,6 +389,16 @@ class DevAutonomousLoop:
         if task.get("metadata"):
             score = _update_score(task["metadata"].get("score", 0), -0.1)
             task["metadata"]["score"] = score
+
+        # =====================================================
+        # 🧠 CAL FEEDBACK (FAILURE)
+        # =====================================================
+        try:
+            if hasattr(self, "cal") and self.cal:
+                self.cal.penalize(task)
+        except Exception as e:
+            print("[CAL] penalize error:", str(e))
+        # =====================================================
 
         self.registry.reject_task(task)
         self.memory.record_failed(task)
