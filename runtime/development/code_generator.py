@@ -137,7 +137,8 @@ class CodeGenerator:
         if is_function:
             function_name = self._infer_function_name(description)
 
-            test_code = f'''"""
+            test_code = f'''# SAPIANTA_TYPE: TEST
+"""
 Auto-generated functional test for {function_name}
 """
 
@@ -148,7 +149,8 @@ def test_{function_name}_execution():
         else:
             class_name = self._infer_class_name(safe_file_path.name)
 
-            test_code = f'''"""
+            test_code = f'''# SAPIANTA_TYPE: TEST
+"""
 Auto-generated functional test for {class_name}
 """
 
@@ -236,7 +238,8 @@ def {function_name}(a, b):
     return foo()
 '''
 
-            return f'''"""
+            return f'''# SAPIANTA_TYPE: MODULE
+"""
 {function_name}
 
 {description}
@@ -268,7 +271,8 @@ class {class_name}:
         return foo()
 '''
 
-        return f'''"""
+        return f'''# SAPIANTA_TYPE: MODULE
+"""
 {class_name}
 
 {description}
