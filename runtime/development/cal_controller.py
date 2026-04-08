@@ -66,6 +66,15 @@ class CALController:
         self._recent_results = []
         self._seen_ideas = set()
 
+        # ---------------------------------------------------------
+        # NEW: FIX MEMORY HOOK (SAFE, OPTIONAL)
+        # ---------------------------------------------------------
+        try:
+            from runtime.development.fix_memory import FixMemory
+            self.fix_memory = FixMemory()
+        except Exception:
+            self.fix_memory = None
+
     # ---------------------------------------------------------
     # EXECUTION HANDLERS
     # ---------------------------------------------------------
@@ -128,7 +137,7 @@ def test_auto_generated_basic():
             self._recent_results = self._recent_results[-50:]
 
     # ---------------------------------------------------------
-    # DIFFICULTY LADDER (WITH SIGNATURE-AWARE FAILURE)
+    # DIFFICULTY LADDER (WITH SIGNATURE + MEMORY)
     # ---------------------------------------------------------
 
     def generate_followup_task(self):
@@ -160,10 +169,27 @@ def test_auto_generated_basic():
 
             new_score = 0.2
 
-        # --- FAILURE (SIGNATURE-AWARE) ---
+        # --- FAILURE (SIGNATURE + MEMORY BOOST) ---
         elif outcome == "failure":
 
             signature = self._extract_error_signature(description)
+
+            # ---------------------------------------------------------
+            # NEW: SIGNATURE WEIGHTING (MINIMAL)
+            # ---------------------------------------------------------
+            boost = 0.0
+
+            try:
+                if self.fix_memory and hasattr(self.fix_memory, "failure_memory"):
+                    count = self.fix_memory.failure_memory.get(signature, 0)
+
+                    if count > 5:
+                        boost = 0.2
+                    elif count > 2:
+                        boost = 0.1
+            except Exception:
+                pass
+            # ---------------------------------------------------------
 
             if level == "advanced":
                 idea = f"fix_{signature}_{description.replace('_advanced', '_intermediate')}"
@@ -172,7 +198,7 @@ def test_auto_generated_basic():
             else:
                 idea = f"fix_{signature}_{description}"
 
-            new_score = 0.0
+            new_score = min(1.0, 0.0 + boost)
 
         else:
             return None
@@ -289,7 +315,6 @@ def test_auto_generated_basic():
 
             self._update_score_from_result(task, result)
 
-            # --- FOLLOW-UP ---
             try:
                 followup = self.generate_followup_task()
                 if followup:
