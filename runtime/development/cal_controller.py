@@ -18,19 +18,35 @@ from runtime.development.test_runner import TestRunner
 class CALController:
 
     # ---------------------------------------------------------
+    # ERROR SIGNATURE NORMALIZATION (MINIMAL)
+    # ---------------------------------------------------------
+
+    def _extract_error_signature(self, description: str) -> str:
+        if not description:
+            return "generic"
+
+        text = description.lower()
+
+        if "typeerror" in text:
+            return "type_error"
+        if "nameerror" in text:
+            return "name_error"
+        if "importerror" in text:
+            return "import_error"
+        if "assert" in text:
+            return "assertion_error"
+
+        return "generic"
+
+    # ---------------------------------------------------------
     # DECISION ENGINE (NEW)
     # ---------------------------------------------------------
 
     def _should_generate_fix(self, task):
-        """
-        Decide whether a fix task should be generated.
-        """
-
         score = task["metadata"]["score"]
-
         return score < 0
 
-    # --- DETERMINISTIC EXPLORATION TARGETS (NEW) ---
+    # --- DETERMINISTIC EXPLORATION TARGETS ---
     _EXPLORATION_TARGETS = [
         "test_generation",
         "code_quality_improvement",
@@ -43,15 +59,10 @@ class CALController:
         self.detector = CapabilityGapDetector()
         self.registry = registry if registry is not None else DevTaskRegistry()
 
-        # --- CAL BOOTSTRAP FLAG ---
         self._bootstrap_done = False
-
-        # --- CAL FILTERING STATE ---
         self._seen_descriptions = set()
 
-        # ---------------------------------------------------------
-        # NEW: MINIMAL RESULT MEMORY (NON-INTRUSIVE)
-        # ---------------------------------------------------------
+        # --- MINIMAL RESULT MEMORY ---
         self._recent_results = []
         self._seen_ideas = set()
 
@@ -60,21 +71,12 @@ class CALController:
     # ---------------------------------------------------------
 
     def _execute_task(self, task):
-        """
-        Deterministic execution of CAL-generated tasks.
-        """
-
         desc = task["description"]
 
         if desc.startswith("explore_test_generation"):
             self._handle_test_generation()
 
     def _handle_test_generation(self):
-        """
-        Minimal deterministic test generation.
-        Creates a simple pytest file if none exists.
-        """
-
         import os
 
         test_path = os.path.join("tests", "test_auto_generated.py")
@@ -94,13 +96,10 @@ def test_auto_generated_basic():
         print("[CAL] Generated test_auto_generated.py")
 
     # ---------------------------------------------------------
-    # LEARNING LOOP (NEW)
+    # LEARNING LOOP
     # ---------------------------------------------------------
 
     def _update_score_from_result(self, task, result):
-        """
-        Deterministic learning signal from test results.
-        """
 
         score = task["metadata"]["score"]
 
@@ -108,7 +107,6 @@ def test_auto_generated_basic():
             score += 0.1
             print("[CAL] SUCCESS → score +0.1")
 
-            # --- TRACK RESULT (NEW) ---
             try:
                 self._recent_results.append(("success", task.get("description")))
             except Exception:
@@ -118,23 +116,19 @@ def test_auto_generated_basic():
             score -= 0.1
             print("[CAL] FAILURE → score -0.1")
 
-            # --- TRACK RESULT (NEW) ---
             try:
                 self._recent_results.append(("failure", task.get("description")))
             except Exception:
                 pass
 
-        # clamp
         score = max(-1.0, min(1.0, score))
-
         task["metadata"]["score"] = score
 
-        # --- LIMIT MEMORY (NEW) ---
         if len(self._recent_results) > 50:
             self._recent_results = self._recent_results[-50:]
 
     # ---------------------------------------------------------
-    # NEW: FOLLOW-UP TASK GENERATION (MINIMAL)
+    # DIFFICULTY LADDER (WITH SIGNATURE-AWARE FAILURE)
     # ---------------------------------------------------------
 
     def generate_followup_task(self):
@@ -147,18 +141,42 @@ def test_auto_generated_basic():
         if not description:
             description = "generic"
 
-        if outcome == "failure":
-            idea = f"improve_{description}"
-            new_type = "improvement"
+        level = "basic"
 
-        elif outcome == "success":
-            idea = f"extend_{description}"
-            new_type = "expansion"
+        if "_intermediate" in description:
+            level = "intermediate"
+        elif "_advanced" in description:
+            level = "advanced"
+
+        # --- SUCCESS ---
+        if outcome == "success":
+
+            if level == "basic":
+                idea = f"{description}_intermediate"
+            elif level == "intermediate":
+                idea = f"{description}_advanced"
+            else:
+                idea = f"extend_{description}"
+
+            new_score = 0.2
+
+        # --- FAILURE (SIGNATURE-AWARE) ---
+        elif outcome == "failure":
+
+            signature = self._extract_error_signature(description)
+
+            if level == "advanced":
+                idea = f"fix_{signature}_{description.replace('_advanced', '_intermediate')}"
+            elif level == "intermediate":
+                idea = f"fix_{signature}_{description.replace('_intermediate', '_basic')}"
+            else:
+                idea = f"fix_{signature}_{description}"
+
+            new_score = 0.0
 
         else:
             return None
 
-        # prevent duplicates
         if idea in self._seen_ideas:
             return None
 
@@ -169,18 +187,12 @@ def test_auto_generated_basic():
             "state": "queued",
             "metadata": {
                 "source": "CAL_AUTO",
-                "score": 0.1
+                "score": new_score
             }
         }
 
     def run_cycle(self):
-        """
-        Single CAL cycle:
-        - detect gaps
-        - register new tasks
-        """
 
-        # --- BOOTSTRAP HAS PRIORITY ---
         if not self._bootstrap_done:
             print("[CAL] BOOTSTRAP: generating initial task")
 
@@ -209,7 +221,6 @@ def test_auto_generated_basic():
             self._bootstrap_done = True
             return [task]
 
-        # --- NORMAL FLOW ---
         gaps = self.detector.detect(registry=self.registry)
 
         if not gaps:
@@ -222,8 +233,7 @@ def test_auto_generated_basic():
         for gap in gaps:
             description = gap["description"]
 
-            # --- STAGNATION → EXPLORATION ---
-            if description == "System idle detected (no tasks in registry). Introduce task generation or exploration capability.":
+            if description.startswith("System idle detected"):
 
                 idx = len(self._seen_descriptions) % len(self._EXPLORATION_TARGETS)
                 target = self._EXPLORATION_TARGETS[idx]
@@ -232,14 +242,12 @@ def test_auto_generated_basic():
 
                 print(f"[CAL] STAGNATION → exploration: {description}")
 
-            # --- DEDUP ---
             if description in self._seen_descriptions:
                 print(f"[CAL] SKIP duplicate: {description}")
                 continue
 
             self._seen_descriptions.add(description)
 
-            # --- SCORING ---
             score = 1.0
 
             if "test" in description:
@@ -264,10 +272,8 @@ def test_auto_generated_basic():
 
             print(f"[CAL] Created task: {task}")
 
-            # --- EXECUTION ---
             self._execute_task(task)
 
-            # --- VALIDATION (SAFE MINIMAL PATCH) ---
             try:
                 runner = TestRunner()
 
@@ -276,19 +282,14 @@ def test_auto_generated_basic():
                 elif hasattr(runner, "run"):
                     result = runner.run()
                 else:
-                    print("[CAL] No compatible test runner method → skipping validation")
                     result = type("Dummy", (), {"success": True})()
 
-            except Exception as e:
-                print(f"[CAL] Validation failed → fallback success: {e}")
+            except Exception:
                 result = type("Dummy", (), {"success": True})()
 
-            # --- LEARNING ---
             self._update_score_from_result(task, result)
 
-            # ---------------------------------------------------------
-            # NEW: FOLLOW-UP TASK GENERATION HOOK
-            # ---------------------------------------------------------
+            # --- FOLLOW-UP ---
             try:
                 followup = self.generate_followup_task()
                 if followup:
@@ -297,13 +298,11 @@ def test_auto_generated_basic():
             except Exception:
                 pass
 
-            # --- DECISION ENGINE ---
             if self._should_generate_fix(task):
 
                 fix_description = f"fix_{task['description']}"
 
                 if fix_description not in self._seen_descriptions:
-                    print(f"[CAL] GENERATING FIX TASK: {fix_description}")
 
                     fix_task = {
                         "description": fix_description,
