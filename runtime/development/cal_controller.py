@@ -16,7 +16,7 @@ from runtime.development.test_runner import TestRunner
 
 
 class CALController:
-    
+
     # ---------------------------------------------------------
     # DECISION ENGINE (NEW)
     # ---------------------------------------------------------
@@ -48,6 +48,12 @@ class CALController:
 
         # --- CAL FILTERING STATE ---
         self._seen_descriptions = set()
+
+        # ---------------------------------------------------------
+        # NEW: MINIMAL RESULT MEMORY (NON-INTRUSIVE)
+        # ---------------------------------------------------------
+        self._recent_results = []
+        self._seen_ideas = set()
 
     # ---------------------------------------------------------
     # EXECUTION HANDLERS
@@ -101,14 +107,71 @@ def test_auto_generated_basic():
         if result.success:
             score += 0.1
             print("[CAL] SUCCESS → score +0.1")
+
+            # --- TRACK RESULT (NEW) ---
+            try:
+                self._recent_results.append(("success", task.get("description")))
+            except Exception:
+                pass
+
         else:
             score -= 0.1
             print("[CAL] FAILURE → score -0.1")
+
+            # --- TRACK RESULT (NEW) ---
+            try:
+                self._recent_results.append(("failure", task.get("description")))
+            except Exception:
+                pass
 
         # clamp
         score = max(-1.0, min(1.0, score))
 
         task["metadata"]["score"] = score
+
+        # --- LIMIT MEMORY (NEW) ---
+        if len(self._recent_results) > 50:
+            self._recent_results = self._recent_results[-50:]
+
+    # ---------------------------------------------------------
+    # NEW: FOLLOW-UP TASK GENERATION (MINIMAL)
+    # ---------------------------------------------------------
+
+    def generate_followup_task(self):
+
+        if not self._recent_results:
+            return None
+
+        outcome, description = self._recent_results[-1]
+
+        if not description:
+            description = "generic"
+
+        if outcome == "failure":
+            idea = f"improve_{description}"
+            new_type = "improvement"
+
+        elif outcome == "success":
+            idea = f"extend_{description}"
+            new_type = "expansion"
+
+        else:
+            return None
+
+        # prevent duplicates
+        if idea in self._seen_ideas:
+            return None
+
+        self._seen_ideas.add(idea)
+
+        return {
+            "description": idea,
+            "state": "queued",
+            "metadata": {
+                "source": "CAL_AUTO",
+                "score": 0.1
+            }
+        }
 
     def run_cycle(self):
         """
@@ -222,5 +285,36 @@ def test_auto_generated_basic():
 
             # --- LEARNING ---
             self._update_score_from_result(task, result)
+
+            # ---------------------------------------------------------
+            # NEW: FOLLOW-UP TASK GENERATION HOOK
+            # ---------------------------------------------------------
+            try:
+                followup = self.generate_followup_task()
+                if followup:
+                    print(f"[CAL] AUTO-GENERATED FOLLOW-UP: {followup['description']}")
+                    self.registry.add_task(followup)
+            except Exception:
+                pass
+
+            # --- DECISION ENGINE ---
+            if self._should_generate_fix(task):
+
+                fix_description = f"fix_{task['description']}"
+
+                if fix_description not in self._seen_descriptions:
+                    print(f"[CAL] GENERATING FIX TASK: {fix_description}")
+
+                    fix_task = {
+                        "description": fix_description,
+                        "state": "queued",
+                        "metadata": {
+                            "source": "CAL_FIX",
+                            "score": 0.0
+                        }
+                    }
+
+                    self._seen_descriptions.add(fix_description)
+                    self.registry.add_task(fix_task)
 
         return created_tasks

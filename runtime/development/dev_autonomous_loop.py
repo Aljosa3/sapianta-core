@@ -193,6 +193,22 @@ class DevAutonomousLoop:
             if approved_tasks:
                 task = approved_tasks[0]  # deterministic fallback
             else:
+
+                # ---------------------------------------------------------
+                # CAL FOLLOW-UP TASK GENERATION (SAFE MINIMAL)
+                # ---------------------------------------------------------
+                try:
+                    if hasattr(self, "cal") and self.cal:
+                        new_task = self.cal.generate_followup_task()
+
+                        if new_task:
+                            print(f"[CAL] LOOP GENERATED TASK: {new_task['description']}")
+                            self.registry.add_task(new_task)
+                            return {"status": "generated", "task": new_task}
+                except Exception:
+                    pass
+                # ---------------------------------------------------------
+
                 execution_time = time.time() - start
                 self.metrics.record_cycle("no_tasks", execution_time)
                 return {"status": "no_tasks"}
