@@ -181,30 +181,33 @@ class DevAutonomousLoop:
                 }
 
         # ---------------------------------------------------------
-        # TASK SELECTION
+        # PRIORITY-AWARE TASK SELECTION (FIXED)
         # ---------------------------------------------------------
 
-        tasks = self.registry.get_active_tasks()
+        task = self.registry.pop_next_task()
 
-        approved_tasks = [t for t in tasks if t.get("state") == "approved"]
-        queued_tasks = [t for t in tasks if t.get("state") == "queued"]
+        # 🔥 FALLBACK: approved tasks (CRITICAL FIX)
+        if not task:
+            approved_tasks = self.registry.get_tasks_by_state("approved")
 
-        tasks = approved_tasks + queued_tasks
+            if approved_tasks:
+                task = approved_tasks[0]  # deterministic fallback
+            else:
+                execution_time = time.time() - start
+                self.metrics.record_cycle("no_tasks", execution_time)
+                return {"status": "no_tasks"}
 
-        if not tasks:
-            execution_time = time.time() - start
-            self.metrics.record_cycle("no_tasks", execution_time)
-            return {"status": "no_tasks"}
-
-        # --- STANDARD PRIORITIZATION (RESTORED) ---
-        ordered = self.planner.prioritize(tasks)
-
-        # --- DETERMINISTIC EXPLORATION (ROBUST) ---
+        # ---------------------------------------------------------
+        # OPTIONAL: deterministic exploration (SAFE)
+        # ---------------------------------------------------------
         if self._cycle_count % 3 == 0:
-            task = ordered[-1]  # lowest priority → exploration
-        else:
-            task = ordered[0]
-        # --- END EXPLORATION ---
+            alt_tasks = [
+                t for t in self.registry.get_active_tasks()
+                if t.get("state") == "queued"
+            ]
+            if alt_tasks:
+                task = alt_tasks[-1]  # exploration fallback
+        # ---------------------------------------------------------
 
         decision = self.gate.final_decision(
             self.gate.evaluate(task)
