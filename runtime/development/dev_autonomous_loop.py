@@ -357,6 +357,8 @@ class DevAutonomousLoop:
 
             if task.get("metadata"):
                 score = _update_score(task["metadata"].get("score", 0), -0.1)
+                # apply score decay (temporal adaptation)
+                score = round(score * 0.98, 4)
                 task["metadata"]["score"] = score
 
             self.registry.complete_task(task)
@@ -439,6 +441,8 @@ class DevAutonomousLoop:
 
         if task.get("metadata"):
             score = _update_score(task["metadata"].get("score", 0), -0.1)
+            # apply score decay (temporal adaptation)
+            score = round(score * 0.98, 4)
             task["metadata"]["score"] = score
 
         # =====================================================
