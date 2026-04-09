@@ -362,6 +362,38 @@ class DevAutonomousLoop:
             self.registry.complete_task(task)
             self.memory.record_completed(task)
 
+            # --- SCORE-AWARE GENERATION (CAL minimal deterministic) ---
+            metadata = task.get("metadata", {})
+            score = metadata.get("score", 0)
+
+            # HIGH SCORE → AMPLIFY (generate similar task)
+            idea = task.get("idea", "")
+
+            # prevent recursive amplification
+            if "extend:" in idea:
+                pass
+
+            elif score > 0.5:
+                new_task = {
+                    "task_type": task.get("task_type"),
+                    "idea": f"extend: {idea}",
+                    "source": "cal_amplify",
+                    "metadata": {"parent_score": score}
+                }
+                self.registry.submit_task(new_task)
+
+            # LOW SCORE → FIX TASK
+            elif score < -0.5:
+                new_task = {
+                    "task_type": "fix",
+                    "idea": f"improve: {task.get('idea')}",
+                    "source": "cal_repair",
+                    "metadata": {"parent_score": score}
+                }
+                self.registry.submit_task(new_task)
+
+            # --- END SCORE-AWARE GENERATION ---
+
             self._sleep_if_dev()
             return {"status": "completed", "task": task}
 
