@@ -73,6 +73,7 @@ class DevAutonomousLoop:
 
         self._cycle_count = 0
         self._start_time = None
+        self._last_system_stable = False
 
     def _sleep_if_dev(self):
         if DEV_MODE:
@@ -114,7 +115,8 @@ class DevAutonomousLoop:
 
         if not in_pytest:
             try:
-                cal_task = self.cal.run_cycle()
+                cal_context = {"system_stable": self._last_system_stable}
+                cal_task = self.cal.run_cycle(context=cal_context)
 
                 # --- CAL → REGISTRY INTEGRATION (SAFE, DETERMINISTIC) ---
                 if cal_task and isinstance(cal_task, dict):
@@ -135,7 +137,23 @@ class DevAutonomousLoop:
 
             except Exception as e:
                 print("[CAL] ERROR:", str(e))
+                
         # --- CAL CYCLE END ---
+
+        # =====================================================
+        # 🛑 GLOBAL QUIESCENCE (PLAN + EXECUTION GUARD)
+        # =====================================================
+        if self._last_system_stable:
+            print("[GLOBAL QUIESCENCE] system stable → skipping planning + execution")
+
+            execution_time = time.time() - start
+            self.metrics.record_cycle("stable", execution_time)
+
+            return {
+                "status": "stable",
+                "system_stable": True
+            }
+        # =====================================================
 
         if self._start_time is None:
             self._start_time = start
@@ -177,7 +195,8 @@ class DevAutonomousLoop:
 
                 return {
                     "status": "waiting_for_approval",
-                    "tasks": waiting_tasks
+                    "tasks": waiting_tasks,
+                    "system_stable": self._last_system_stable
                 }
 
         # ---------------------------------------------------------
@@ -204,14 +223,14 @@ class DevAutonomousLoop:
                         if new_task:
                             print(f"[CAL] LOOP GENERATED TASK: {new_task['description']}")
                             self.registry.add_task(new_task)
-                            return {"status": "generated", "task": new_task}
+                            return {"status": "generated", "task": new_task, "system_stable": self._last_system_stable}
                 except Exception:
                     pass
                 # ---------------------------------------------------------
 
                 execution_time = time.time() - start
                 self.metrics.record_cycle("no_tasks", execution_time)
-                return {"status": "no_tasks"}
+                return {"status": "no_tasks", "system_stable": self._last_system_stable}
 
         # ---------------------------------------------------------
         # OPTIONAL: deterministic exploration (SAFE)
@@ -261,7 +280,8 @@ class DevAutonomousLoop:
             return {
                 "status": "needs_review",
                 "task": task,
-                "reason": f"approval_required_{level}"
+                "reason": f"approval_required_{level}",
+                "system_stable": self._last_system_stable
             }
 
         # ---------------------------------------------------------
@@ -272,7 +292,7 @@ class DevAutonomousLoop:
             self.registry.reject_task(task)
             self.memory.record_blocked(task)
 
-            return {"status": "blocked", "task": task}
+            return {"status": "blocked", "task": task, "system_stable": self._last_system_stable}
 
         if decision == DevGovernanceGate.REVIEW:
             print("[DEV_LOOP] REVIEW decision (non-DEV mode)")
@@ -281,7 +301,20 @@ class DevAutonomousLoop:
             self.metrics.record_cycle("needs_review", execution_time, task=task)
 
             self._sleep_if_dev()
-            return {"status": "needs_review", "task": task}
+            return {"status": "needs_review", "task": task, "system_stable": self._last_system_stable}
+
+        # --- EXECUTION FREQUENCY SCALING (deterministic) ---
+        metadata = task.get("metadata", {})
+        score = metadata.get("score", 0)
+
+        K = 2  # conservative amplification
+
+        effective_score = max(score, 0)
+        runs = int(1 + effective_score * K)
+
+        # safety cap (prevent runaway loops)
+        runs = min(runs, 3)
+        # --- END EXECUTION FREQUENCY SCALING ---
 
         # ---------------------------------------------------------
         # EXECUTION
@@ -297,7 +330,20 @@ class DevAutonomousLoop:
                 print("[DEV_LOOP] Resuming approved task...")
 
             print("[DEBUG] CALLING run_auto()")
-            result = orchestrator.run_auto(task)
+            result = None
+            for _ in range(runs):
+                result = orchestrator.run_auto(task)
+                if isinstance(result, dict) and result.get("status") == "failed":
+                    break
+
+            # 🔥 GLOBAL STABILITY PROPAGATION (CRITICAL FIX)
+            if isinstance(result, dict) and result.get("system_stable"):
+                self._last_system_stable = True
+
+            # requeue task if it had multiple execution attempts
+            if runs > 1 and isinstance(result, dict) and result.get("status") != "completed":
+                self.registry.submit_task(task)
+
             print(f"[DEBUG] run_auto RESULT → {result}")
 
             if isinstance(result, dict) and result.get("status") == "waiting_for_approval":
@@ -330,6 +376,8 @@ class DevAutonomousLoop:
                 if "repair_iterations" in result:
                     self.metrics.record_repair_iterations(result["repair_iterations"])
 
+                self._last_system_stable = bool(result.get("system_stable", False))
+
             else:
                 success = False
                 reason = "invalid_result_type"
@@ -338,6 +386,7 @@ class DevAutonomousLoop:
             print("[LOOP] Orchestrator execution failed:", str(e))
             success = False
             reason = str(e)
+            self._last_system_stable = False
 
         # ---------------------------------------------------------
         # RESULT HANDLING
@@ -397,7 +446,11 @@ class DevAutonomousLoop:
             # --- END SCORE-AWARE GENERATION ---
 
             self._sleep_if_dev()
-            return {"status": "completed", "task": task}
+            return {
+                "status": "completed",
+                "task": task,
+                "system_stable": self._last_system_stable
+            }
 
         task["retry_count"] = task.get("retry_count", 0) + 1
 
@@ -429,14 +482,16 @@ class DevAutonomousLoop:
             return {
                 "status": status,
                 "task": task,
-                "reason": reason or "execution_failed"
+                "reason": reason or "execution_failed",
+                "system_stable": self._last_system_stable
             }
 
         if getattr(self, "_stagnation", 0) > 2:
             return {
                 "status": "needs_review",
                 "task": task,
-                "reason": "stagnation_detected"
+                "reason": "stagnation_detected",
+                "system_stable": self._last_system_stable
             }
 
         if task.get("metadata"):
@@ -462,5 +517,6 @@ class DevAutonomousLoop:
         return {
             "status": "failed",
             "task": task,
-            "error": reason or "orchestrator_failed"
+            "error": reason or "orchestrator_failed",
+            "system_stable": self._last_system_stable
         }
