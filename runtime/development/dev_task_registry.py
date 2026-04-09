@@ -129,6 +129,16 @@ class DevTaskRegistry:
         if not queued:
             return None
 
+        # --- DECISION SPINE v1: global score filter ---
+        MIN_SCORE_THRESHOLD = -0.7
+        filtered = [
+            t for t in queued
+            if t.get("metadata", {}).get("score", 0) >= MIN_SCORE_THRESHOLD
+        ]
+        if filtered:
+            queued = filtered
+        # --- END DECISION SPINE v1 ---
+
         # sort by priority (lower = higher priority)
         queued.sort(key=lambda t: t.get("priority", 999))
 
