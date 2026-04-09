@@ -132,6 +132,14 @@ class DevTaskRegistry:
         # sort by priority (lower = higher priority)
         queued.sort(key=lambda t: t.get("priority", 999))
 
+        # --- SCORE PRIORITIZATION (CAL integration, deterministic) ---
+        queued = sorted(
+            queued,
+            key=lambda t: t.get("metadata", {}).get("score", 0),
+            reverse=True
+        )
+        # --- END SCORE PRIORITIZATION ---
+
         return queued[0]
 
     # 🔥 NEW: pop + mark running
