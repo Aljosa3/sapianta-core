@@ -129,15 +129,27 @@ class DevTaskRegistry:
         if not queued:
             return None
 
-        # --- DECISION SPINE v1: global score filter ---
-        MIN_SCORE_THRESHOLD = -0.7
+        # --- DECISION SPINE v2: dynamic threshold filter ---
+        scores = [
+            t.get("metadata", {}).get("score", 0)
+            for t in queued
+        ]
+
+        if scores:
+            avg_score = sum(scores) / len(scores)
+        else:
+            avg_score = 0
+
+        MARGIN = 0.2
+        dynamic_threshold = avg_score - MARGIN
+
         filtered = [
             t for t in queued
-            if t.get("metadata", {}).get("score", 0) >= MIN_SCORE_THRESHOLD
+            if t.get("metadata", {}).get("score", 0) >= dynamic_threshold
         ]
         if filtered:
             queued = filtered
-        # --- END DECISION SPINE v1 ---
+        # --- END DECISION SPINE v2 ---
 
         # sort by priority (lower = higher priority)
         queued.sort(key=lambda t: t.get("priority", 999))
