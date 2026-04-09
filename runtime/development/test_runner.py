@@ -189,6 +189,28 @@ class TestRunner:
 
         _cleanup_invalid_tests(self.project_root / "runtime/development/generated")
         # =====================================================
+        # 🔒 PRE-TEST SYNTAX VALIDATION (STRICT, FAIL-CLOSED)
+        # =====================================================
+        import py_compile
+
+        generated_dir = self.project_root / "runtime/development/generated"
+
+        for file in generated_dir.glob("*.py"):
+            try:
+                py_compile.compile(str(file), doraise=True)
+            except Exception as e:
+                diagnostics = TestRunResult()
+                diagnostics.success = False
+                diagnostics.raw_error = f"[SYNTAX VALIDATION] {file}: {e}"
+                diagnostics.return_code = -4
+                diagnostics.failure_info = {
+                    "error": str(e),
+                    "type": "syntax_error",
+                    "file": str(file),
+                    "critical": True
+                }
+                return diagnostics
+        # =====================================================
 
         generated_path = self.project_root / "runtime/development/generated"
         env["PYTHONPATH"] = f"{generated_path}:{self.project_root}"
