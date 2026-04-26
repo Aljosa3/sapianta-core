@@ -176,3 +176,30 @@ tests/**/*.pyc
 runtime/development/task_registry.json
 runtime/development/dev_metrics.json
 runtime/development/fix_memory_store.json
+runtime/development/ccs/cert_registry.json
+
+# ============================================================
+# 🔥 FINAL RUNTIME OVERRIDES (AI FIREWALL / AUDIT FIX)
+# ============================================================
+
+# audit logs (NE SMEJO v git)
+runtime/audit_logs/
+runtime/audit_logs/**
+
+# generated execution folders
+runtime/development/generated/
+runtime/development/generated/**
+
+# pytest + cache (za vsak runtime nivo)
+runtime/**/.pytest_cache/
+runtime/**/__pycache__/
+runtime/**/*.pyc
+
+# generic generated dirs anywhere
+**/generated/
+
+# dodatno (varnost)
+*.logvenv_firewall/
+
+# crypto keys (NEVER COMMIT)
+*.pem
