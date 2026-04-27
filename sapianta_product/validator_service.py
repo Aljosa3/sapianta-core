@@ -8,13 +8,7 @@ import hashlib
 from datetime import datetime
 
 from runtime.development.architecture_guardian import ArchitectureGuardian
-
-# ✅ NEW (minimal extension)
 from sapianta_product.crypto import sign_hash
-
-# --------------------------------------------------
-# BASE PATH
-# --------------------------------------------------
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, ".."))
@@ -25,10 +19,6 @@ AUDIT_DIR = os.path.abspath(
     os.path.join(PROJECT_ROOT, "runtime", "audit_logs")
 )
 
-
-# --------------------------------------------------
-# UTILS
-# --------------------------------------------------
 
 def generate_id():
     return f"val_{uuid.uuid4().hex[:8]}"
@@ -64,15 +54,52 @@ def write_files(execution_dir: str, code: str, tests: str):
 
 
 # --------------------------------------------------
-# HASH (CRITICAL)
+# NEW: TEST EVIDENCE EXTRACTION
 # --------------------------------------------------
 
+def extract_test_evidence(stdout: str) -> str:
+    if not stdout:
+        return ""
+
+    lines = stdout.splitlines()
+
+    for i, line in enumerate(lines):
+        if "assert" in line:
+            next_line = lines[i + 1] if i + 1 < len(lines) else ""
+            return f"{line.strip()} | {next_line.strip()}"
+
+    return "test failed (no detailed assertion found)"
+
+
+# --------------------------------------------------
+# CONTROL LAYER (PROOF OF CONTROL)
+# --------------------------------------------------
+
+def build_controls(guardian_passed: bool, test_passed=None, test_stdout: str = ""):
+    guardian_status = "PASS" if guardian_passed else "FAIL"
+
+    if test_passed is None:
+        test_status = "NOT_RUN"
+        evidence = ""
+    else:
+        test_status = "PASS" if test_passed else "FAIL"
+        evidence = extract_test_evidence(test_stdout) if not test_passed else "all tests passed"
+
+    return [
+        {"rule": "no_eval", "enforced_by": "ArchitectureGuardian", "status": guardian_status},
+        {"rule": "no_exec", "enforced_by": "ArchitectureGuardian", "status": guardian_status},
+        {"rule": "no_subprocess", "enforced_by": "ArchitectureGuardian", "status": guardian_status},
+        {"rule": "syntax_valid", "enforced_by": "ArchitectureGuardian", "status": guardian_status},
+        {
+            "rule": "tests_passed",
+            "enforced_by": "pytest",
+            "status": test_status,
+            "evidence": evidence
+        },
+    ]
+
+
 def compute_hash(payload: dict) -> str:
-    """
-    IMPORTANT:
-    - deterministic JSON
-    - NO sha256 field inside payload
-    """
     canonical = json.dumps(
         payload,
         sort_keys=True,
@@ -82,10 +109,6 @@ def compute_hash(payload: dict) -> str:
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
-# --------------------------------------------------
-# AUDIT SAVE (IMMUTABLE)
-# --------------------------------------------------
-
 def save_audit(
     validation_id: str,
     code: str,
@@ -94,6 +117,7 @@ def save_audit(
     stage: str,
     reason: str,
     execution_dir: str,
+    controls: list,
     stdout: str = "",
     stderr: str = "",
     return_code=None,
@@ -101,7 +125,6 @@ def save_audit(
 ):
     os.makedirs(AUDIT_DIR, exist_ok=True)
 
-    # 🔒 payload WITHOUT hash (important)
     audit_payload = {
         "id": validation_id,
         "status": status,
@@ -109,6 +132,8 @@ def save_audit(
         "reason": reason,
         "code": code,
         "tests": tests,
+        "controls": controls,
+        "control_version": "v1",
         "stdout": stdout,
         "stderr": stderr,
         "return_code": return_code,
@@ -117,32 +142,22 @@ def save_audit(
         "timestamp": datetime.utcnow().isoformat() + "Z",
     }
 
-    # 🔐 compute hash
     audit_hash = compute_hash(audit_payload)
-
-    # ✅ NEW — SIGNATURE (minimal extension)
     signature = sign_hash(audit_hash)
 
-    # final data (hash appended AFTER computation)
     audit_payload["sha256"] = audit_hash
     audit_payload["signature"] = signature
 
     file_path = os.path.join(AUDIT_DIR, f"{validation_id}.json")
 
-    # 🔒 IMMUTABILITY (critical)
     if os.path.exists(file_path):
         raise RuntimeError(f"Audit file already exists: {file_path}")
 
     with open(file_path, "x") as f:
         json.dump(audit_payload, f, indent=2, ensure_ascii=False)
 
-    # ✅ UPDATED RETURN
     return audit_hash, signature
 
-
-# --------------------------------------------------
-# MAIN VALIDATOR
-# --------------------------------------------------
 
 def validate_code(code: str, tests: str):
     validation_id = generate_id()
@@ -150,13 +165,12 @@ def validate_code(code: str, tests: str):
     execution_dir = create_execution_dir(validation_id)
     module_file, test_file = write_files(execution_dir, code, tests)
 
-    # -------------------
-    # M1 — ARCHITECTURE GUARDIAN
-    # -------------------
     guardian = ArchitectureGuardian()
     guardian_result = guardian.validate(module_file, code)
 
+    # M1 FAIL
     if not guardian_result.get("success", False):
+        controls = build_controls(guardian_passed=False, test_passed=None, test_stdout="")
         reason = guardian_result.get("error", "guardian validation failed")
 
         audit_hash, signature = save_audit(
@@ -167,6 +181,7 @@ def validate_code(code: str, tests: str):
             stage="M1",
             reason=reason,
             execution_dir=execution_dir,
+            controls=controls,
             guardian_result=guardian_result,
         )
 
@@ -176,12 +191,11 @@ def validate_code(code: str, tests: str):
             "reason": reason,
             "id": validation_id,
             "sha256": audit_hash,
-            "signature": signature,  # ✅ NEW
+            "signature": signature,
+            "controls": controls,
+            "control_version": "v1",
         }
 
-    # -------------------
-    # M3 — TEST EXECUTION
-    # -------------------
     try:
         result = subprocess.run(
             ["pytest", "-q"],
@@ -195,7 +209,9 @@ def validate_code(code: str, tests: str):
         stderr = result.stderr
         return_code = result.returncode
 
+        # M3 FAIL
         if return_code != 0:
+            controls = build_controls(guardian_passed=True, test_passed=False, test_stdout=stdout)
             reason = "test execution failed"
 
             audit_hash, signature = save_audit(
@@ -206,6 +222,7 @@ def validate_code(code: str, tests: str):
                 stage="M3",
                 reason=reason,
                 execution_dir=execution_dir,
+                controls=controls,
                 stdout=stdout,
                 stderr=stderr,
                 return_code=return_code,
@@ -223,10 +240,13 @@ def validate_code(code: str, tests: str):
                 },
                 "id": validation_id,
                 "sha256": audit_hash,
-                "signature": signature,  # ✅ NEW
+                "signature": signature,
+                "controls": controls,
+                "control_version": "v1",
             }
 
     except Exception as e:
+        controls = build_controls(guardian_passed=True, test_passed=False, test_stdout="")
         reason = "execution error"
 
         audit_hash, signature = save_audit(
@@ -237,6 +257,7 @@ def validate_code(code: str, tests: str):
             stage="M3",
             reason=reason,
             execution_dir=execution_dir,
+            controls=controls,
             stderr=str(e),
             return_code=None,
             guardian_result=guardian_result,
@@ -249,12 +270,13 @@ def validate_code(code: str, tests: str):
             "details": str(e),
             "id": validation_id,
             "sha256": audit_hash,
-            "signature": signature,  # ✅ NEW
+            "signature": signature,
+            "controls": controls,
+            "control_version": "v1",
         }
 
-    # -------------------
     # SUCCESS
-    # -------------------
+    controls = build_controls(guardian_passed=True, test_passed=True, test_stdout=stdout)
     reason = "all checks passed"
 
     audit_hash, signature = save_audit(
@@ -265,6 +287,7 @@ def validate_code(code: str, tests: str):
         stage="M3",
         reason=reason,
         execution_dir=execution_dir,
+        controls=controls,
         stdout=stdout,
         stderr=stderr,
         return_code=return_code,
@@ -277,5 +300,7 @@ def validate_code(code: str, tests: str):
         "reason": reason,
         "id": validation_id,
         "sha256": audit_hash,
-        "signature": signature,  # ✅ NEW
+        "signature": signature,
+        "controls": controls,
+        "control_version": "v1",
     }
