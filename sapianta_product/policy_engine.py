@@ -156,13 +156,20 @@ def validate_policy(payload: Dict[str, Any]):
             "evidence": result.get("evidence")
         })
 
+    # --------------------------------------------------
+    # 🔥 MULTI-VIOLATION SUPPORT (MINIMAL PATCH)
+    # --------------------------------------------------
     if failed:
         top = failed[0]
+
+        # 🔥 collect ALL violations
+        violations = [f.get("reason") for f in failed if f.get("reason")]
 
         return {
             "status": "REJECTED",
             "stage": "M2",
-            "reason": top["reason"],
+            "reason": top["reason"],  # backward compatibility
+            "violations": violations,  # 🔥 NEW
             "risk": top["risk"],
             "severity": top["severity"],
             "controls": controls,

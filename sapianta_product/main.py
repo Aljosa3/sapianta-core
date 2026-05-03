@@ -136,6 +136,7 @@ def audit_viewer(validation_id: str):
 
     message = data.get("message")
     risk = data.get("risk")
+    violations = data.get("violations", [])
 
     # --------------------------------------------------
     # 🔥 RISK BLOCK (NEW)
@@ -290,7 +291,13 @@ def audit_viewer(validation_id: str):
             </div>
 
             <p>Stage: {data.get("stage")}</p>
+
             <p>Reason: {data.get("reason")}</p>
+
+            {"".join([
+                f"<div style='color:#dc2626; font-weight:bold;'>❌ {v}</div>"
+                for v in data.get("violations", [])
+            ]) if data.get("violations") else ""}
 
             {"<div class='message'><strong>Why it was blocked:</strong><br>" + message + "</div>" if message else ""}
 
