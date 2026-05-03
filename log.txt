@@ -1,0 +1,853 @@
+nohup: ignoring input
+INFO:     Started server process [26706]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     46.122.65.233:47445 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47445 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47445 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47445 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [26706]
+while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27079]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27080]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27104]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27119]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27142]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27143]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27144]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27145]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27146]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27147]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27148]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27149]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27150]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27151]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27152]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27153]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27156]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27157]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27158]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27159]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27160]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27161]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27162]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27163]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27164]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27165]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27166]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27167]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27168]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27171]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27172]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27173]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27181]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27189]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27190]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27194]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27195]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27196]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27197]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27198]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27199]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27200]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27201]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27203]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27204]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27212]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [27225]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     46.122.65.233:47447 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47447 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [27225]
+INFO:     Started server process [27599]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     46.122.65.233:47449 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47449 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47451 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47451 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47456 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47457 - "GET /audit-viewer/val_6de8a39d HTTP/1.1" 200 OK
+INFO:     45.135.193.131:34900 - "POST / HTTP/1.1" 404 Not Found
+INFO:     46.122.65.233:47462 - "GET /audit-viewer/val_6de8a39d HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47463 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47463 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47465 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47468 - "GET /audit-viewer/val_50b84202 HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47474 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47474 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47476 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47477 - "GET /audit-viewer/val_859b19cf HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [27599]
+INFO:     Started server process [28191]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     46.122.65.233:47482 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47482 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47484 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47485 - "GET /audit-viewer/val_83aec944 HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47490 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47491 - "GET /audit-viewer/val_6def1aea HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47681 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47681 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47683 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47685 - "GET /audit-viewer/val_1b359083 HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47685 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [28191]
+INFO:     Started server process [28683]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     46.122.65.233:47689 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47689 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47690 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     104.243.43.7:55674 - "GET /v1/models HTTP/1.1" 404 Not Found
+INFO:     46.122.65.233:47694 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47696 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47697 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47697 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47698 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     45.135.193.131:39298 - "POST / HTTP/1.1" 404 Not Found
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [28683]
+INFO:     Started server process [28923]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     46.122.65.233:47713 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47713 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47714 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47716 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47718 - "GET /audit-viewer/val_56fbdb1a HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47718 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     46.122.65.233:47721 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47721 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47723 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47724 - "GET /audit-viewer/val_36f0d41d HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47724 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [28923]
+INFO:     Started server process [29218]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     46.122.65.233:47729 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47729 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47731 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47733 - "GET /audit-viewer/val_a5fa21d1 HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47733 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     46.122.65.233:47738 - "GET /audit-viewer/val_a5fa21d1 HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47738 - "GET /audit-viewer/val_a5fa21d1 HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47739 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47739 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47739 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47739 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [29218]
+INFO:     Started server process [29904]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     46.122.65.233:47960 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47960 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47961 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47961 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47967 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47974 - "GET /audit-viewer/val_39dbf1bd HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47974 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     46.122.65.233:47987 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     46.122.65.233:47988 - "GET /audit-viewer/val_7baca571 HTTP/1.1" 200 OK
+INFO:     45.135.193.131:54010 - "POST / HTTP/1.1" 404 Not Found
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [29904]
+INFO:     Started server process [30129]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     46.122.65.233:48176 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:48176 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     46.122.65.233:48177 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:48177 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     46.122.65.233:48178 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     46.122.65.233:48180 - "GET /audit-viewer/val_1a910f48 HTTP/1.1" 200 OK
+INFO:     64.62.197.32:33480 - "GET / HTTP/1.1" 404 Not Found
+INFO:     64.62.197.46:30189 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     64.62.197.32:24975 - "GET http%3A//api.ipify.org/?format=json HTTP/1.1" 404 Not Found
+INFO:     64.62.197.45:62353 - "CONNECT www.shadowserver.org%3A443 HTTP/1.1" 404 Not Found
+INFO:     45.135.193.131:5364 - "POST /session HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     66.132.172.189:31080 - "GET / HTTP/1.1" 404 Not Found
+INFO:     66.132.172.189:31112 - "PRI %2A HTTP/2.0" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     66.132.172.189:23906 - "POST /mcp HTTP/1.1" 404 Not Found
+INFO:     66.132.172.189:23926 - "POST /jsonrpc HTTP/1.1" 404 Not Found
+INFO:     66.132.172.189:23946 - "POST / HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     66.132.172.189:43404 - "GET /wiki HTTP/1.1" 404 Not Found
+INFO:     85.217.140.28:55560 - "GET / HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:35552 - "GET / HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     165.154.138.79:47274 - "GET / HTTP/1.1" 404 Not Found
+INFO:     165.154.138.79:47288 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     165.154.138.79:47302 - "GET /robots.txt HTTP/1.1" 404 Not Found
+INFO:     165.154.138.79:47310 - "GET /sitemap.xml HTTP/1.1" 404 Not Found
+INFO:     165.154.138.79:47312 - "GET /sse HTTP/1.1" 404 Not Found
+INFO:     165.154.138.79:47318 - "GET /mcp HTTP/1.1" 404 Not Found
+INFO:     165.154.138.79:47332 - "GET /mcp-sse HTTP/1.1" 404 Not Found
+INFO:     165.154.138.79:47338 - "GET /get_server_info HTTP/1.1" 404 Not Found
+INFO:     165.154.138.79:47350 - "POST /update_weights_from_tensor HTTP/1.1" 404 Not Found
+INFO:     87.236.176.146:51589 - "GET / HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+WARNING:  Invalid HTTP request received.
+WARNING:  Invalid HTTP request received.
+INFO:     87.121.79.59:50234 - "GET / HTTP/1.1" 404 Not Found
+INFO:     198.235.24.24:62034 - "GET / HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:52220 - "GET /server.ejs HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:52238 - "GET /server.mjs HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:52234 - "GET /server.cjs HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:52242 - "GET /server.ts HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:52260 - "GET /index.cjs HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:52252 - "GET /index.ejs HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:52270 - "GET /index.mjs HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:52282 - "GET /index.ts HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+WARNING:  Invalid HTTP request received.
+INFO:     147.185.132.72:59466 - "GET /v1/metadata HTTP/1.1" 404 Not Found
+INFO:     205.210.31.67:58010 - "GET /metrics HTTP/1.1" 404 Not Found
+INFO:     205.210.31.242:60414 - "GET /metrics HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:58190 - "GET /server.js HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:58204 - "GET /api/server.js HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:58212 - "GET /backend/server.js HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:58220 - "GET /backend/src/server.js HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:58224 - "GET /bot/server.js HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:58228 - "GET /server/server.js HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:58240 - "GET /src/server.js HTTP/1.1" 404 Not Found
+INFO:     65.49.20.68:45136 - "GET / HTTP/1.1" 404 Not Found
+INFO:     65.49.20.88:27859 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     65.49.20.120:43961 - "GET http%3A//api.ipify.org/?format=json HTTP/1.1" 404 Not Found
+INFO:     65.49.20.112:46795 - "CONNECT www.shadowserver.org%3A443 HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:58308 - "GET /index.js HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:58314 - "GET /api/index.js HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:58320 - "GET /backend/index.js HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:58326 - "GET /backend/src/index.js HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:58328 - "GET /bot/index.js HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:58344 - "GET /server/index.js HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:58350 - "GET /src/index.js HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+WARNING:  Invalid HTTP request received.
+INFO:     139.162.101.16:50758 - "GET / HTTP/1.1" 404 Not Found
+INFO:     139.162.101.16:50766 - "GET /login HTTP/1.1" 404 Not Found
+INFO:     139.162.101.16:50770 - "GET /AGENTS.md HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:37932 - "GET /.env HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:37944 - "GET /.env.production HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:37946 - "GET /src/.env HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:37960 - "GET /backend/.env HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:37966 - "GET /server/.env HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:37980 - "GET /bot/.env HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:39124 - "GET /ecosystem.config.js HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:39130 - "GET /src/ecosystem.config.js HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:35320 - "GET /deploy.sh HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:35328 - "GET /build.sh HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:35334 - "GET /start.sh HTTP/1.1" 404 Not Found
+INFO:     66.132.172.193:26690 - "GET / HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     66.132.172.193:26822 - "GET / HTTP/1.1" 404 Not Found
+INFO:     66.132.172.193:46172 - "PRI %2A HTTP/2.0" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     66.132.172.193:46194 - "POST /mcp HTTP/1.1" 404 Not Found
+INFO:     66.132.172.193:46200 - "POST /jsonrpc HTTP/1.1" 404 Not Found
+INFO:     66.132.172.193:46214 - "POST / HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     66.132.172.193:13728 - "GET /login HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:51202 - "GET /DEPLOY.md HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:51210 - "GET /README.md HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:51220 - "GET /docs.md HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     104.243.34.165:45992 - "GET / HTTP/1.1" 404 Not Found
+INFO:     104.243.34.165:46006 - "GET /v1/models HTTP/1.1" 404 Not Found
+INFO:     104.243.34.165:45992 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     104.243.34.165:46006 - "GET /mcp HTTP/1.1" 404 Not Found
+INFO:     104.243.34.165:45992 - "GET /.well-known/mcp.json HTTP/1.1" 404 Not Found
+INFO:     104.243.34.165:46006 - "GET /.well-known/agent.json HTTP/1.1" 404 Not Found
+INFO:     104.243.34.165:45992 - "GET /invocations HTTP/1.1" 404 Not Found
+INFO:     160.119.76.43:55436 - "GET / HTTP/1.1" 404 Not Found
+INFO:     3.129.187.38:54140 - "GET / HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     3.129.187.38:41732 - "GET / HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     87.121.79.59:56822 - "GET /package.json HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:56838 - "GET /server/package.json HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:56832 - "GET /src/package.json HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:56844 - "GET /api/package.json HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:56850 - "GET /bot/package.json HTTP/1.1" 404 Not Found
+INFO:     87.121.79.59:56866 - "GET /backend/package.json HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     160.119.76.43:51846 - "GET / HTTP/1.1" 404 Not Found
+INFO:     160.119.76.43:51854 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     160.119.76.43:51856 - "GET /robots.txt HTTP/1.1" 404 Not Found
+INFO:     160.119.76.43:51860 - "GET /.well-known/security.txt HTTP/1.1" 404 Not Found
+INFO:     174.138.90.228:38706 - "GET / HTTP/1.1" 404 Not Found
+INFO:     174.138.90.228:38718 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     91.230.168.132:48843 - "GET / HTTP/1.1" 404 Not Found
+INFO:     91.230.168.237:33781 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     198.235.24.135:63190 - "GET / HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     5.61.209.224:43538 - "GET /../../../../../../etc/passwd HTTP/1.1" 404 Not Found
+INFO:     92.180.72.62:42016 - "GET / HTTP/1.0" 404 Not Found
+INFO:     89.248.168.227:56944 - "GET /%27%22%3E%3Cspan%20style%3D%27text-decoration%3Aunderline HTTP/1.1" 404 Not Found
+INFO:     199.45.155.86:25946 - "GET / HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     199.45.155.86:2232 - "GET / HTTP/1.1" 404 Not Found
+INFO:     199.45.155.86:2248 - "PRI %2A HTTP/2.0" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     199.45.155.86:2290 - "POST /mcp HTTP/1.1" 404 Not Found
+INFO:     199.45.155.86:2300 - "POST /jsonrpc HTTP/1.1" 404 Not Found
+INFO:     199.45.155.86:2302 - "POST / HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     199.45.155.86:43482 - "GET /wiki HTTP/1.1" 404 Not Found
+INFO:     64.62.197.227:34804 - "GET / HTTP/1.1" 404 Not Found
+INFO:     64.62.197.241:10727 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     64.62.197.239:63517 - "GET http%3A//api.ipify.org/?format=json HTTP/1.1" 404 Not Found
+INFO:     64.62.197.237:24107 - "CONNECT www.shadowserver.org%3A443 HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     85.11.183.19:52108 - "GET / HTTP/1.1" 404 Not Found
+INFO:     176.65.149.35:36454 - "GET / HTTP/1.1" 404 Not Found
+INFO:     147.185.132.88:63310 - "GET / HTTP/1.1" 404 Not Found
+INFO:     3.131.220.121:40670 - "GET / HTTP/1.1" 404 Not Found
+INFO:     3.131.220.121:47236 - "GET / HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+WARNING:  Invalid HTTP request received.
+WARNING:  Invalid HTTP request received.
+INFO:     5.61.209.224:35990 - "GET /../../../../../../etc/passwd HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     167.94.146.55:19106 - "GET / HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     167.94.146.55:16474 - "GET / HTTP/1.1" 404 Not Found
+INFO:     167.94.146.55:16490 - "PRI %2A HTTP/2.0" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     167.94.146.55:16594 - "POST /mcp HTTP/1.1" 404 Not Found
+INFO:     167.94.146.55:16600 - "POST /jsonrpc HTTP/1.1" 404 Not Found
+INFO:     167.94.146.55:16606 - "POST / HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     167.94.146.55:1318 - "GET /wiki HTTP/1.1" 404 Not Found
+INFO:     147.185.132.171:63340 - "GET /metrics HTTP/1.1" 404 Not Found
+INFO:     147.185.132.171:63354 - "GET /metrics HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+WARNING:  Invalid HTTP request received.
+INFO:     45.79.115.59:53251 - "GET / HTTP/1.1" 404 Not Found
+INFO:     45.79.211.97:46651 - "GET / HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+WARNING:  Invalid HTTP request received.
+WARNING:  Invalid HTTP request received.
+WARNING:  Invalid HTTP request received.
+INFO:     118.193.56.246:35432 - "GET / HTTP/1.1" 404 Not Found
+INFO:     118.193.56.246:35622 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     118.193.56.246:35798 - "GET /robots.txt HTTP/1.1" 404 Not Found
+INFO:     118.193.56.246:35800 - "GET /sitemap.xml HTTP/1.1" 404 Not Found
+INFO:     20.65.193.137:42830 - "GET / HTTP/1.1" 404 Not Found
+INFO:     103.203.57.20:47118 - "GET / HTTP/1.1" 404 Not Found
+INFO:     205.210.31.104:57896 - "GET / HTTP/1.1" 404 Not Found
+INFO:     205.210.31.102:63186 - "GET /v1/metadata HTTP/1.1" 404 Not Found
+INFO:     64.62.197.137:59558 - "GET / HTTP/1.1" 404 Not Found
+INFO:     64.62.197.148:37737 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     64.62.197.150:39669 - "GET http%3A//api.ipify.org/?format=json HTTP/1.1" 404 Not Found
+INFO:     64.62.197.148:4417 - "CONNECT www.shadowserver.org%3A443 HTTP/1.1" 404 Not Found
+INFO:     66.228.53.204:31638 - "GET / HTTP/1.1" 404 Not Found
+INFO:     3.129.187.38:55636 - "GET / HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     3.129.187.38:37284 - "GET / HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+WARNING:  Invalid HTTP request received.
+INFO:     14.48.220.251:40187 - "GET / HTTP/1.0" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     66.132.195.112:13532 - "GET / HTTP/1.1" 404 Not Found
+INFO:     66.132.195.112:13548 - "PRI %2A HTTP/2.0" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     66.132.195.112:16296 - "POST /mcp HTTP/1.1" 404 Not Found
+INFO:     66.132.195.112:16310 - "POST /jsonrpc HTTP/1.1" 404 Not Found
+INFO:     66.132.195.112:16342 - "POST / HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     66.132.195.112:47398 - "GET /login HTTP/1.1" 404 Not Found
+INFO:     106.75.9.25:53848 - "GET /api/v2/heartbeat HTTP/1.1" 404 Not Found
+INFO:     106.75.9.25:53872 - "GET / HTTP/1.1" 404 Not Found
+INFO:     106.75.9.25:53894 - "GET / HTTP/1.1" 404 Not Found
+INFO:     106.75.9.25:54078 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     85.217.140.39:60746 - "GET / HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     43.159.59.202:31091 - "GET / HTTP/1.1" 404 Not Found
+INFO:     172.236.228.245:37272 - "GET / HTTP/1.1" 404 Not Found
+INFO:     46.122.65.233:49965 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:49965 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     46.122.65.233:49967 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     46.122.65.233:49970 - "GET /audit-viewer/val_dad0fa31 HTTP/1.1" 200 OK
+INFO:     46.122.65.233:49972 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50160 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50163 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50167 - "POST /firewall/validate HTTP/1.1" 200 OK
+WARNING:  Invalid HTTP request received.
+WARNING:  Invalid HTTP request received.
+INFO:     46.122.65.233:50169 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50170 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50170 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50170 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50170 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50173 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50177 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50177 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50178 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50180 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50180 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50180 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50180 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50181 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50185 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50185 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50186 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50188 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50188 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50189 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     194.246.38.42:42522 - "GET /api/tags HTTP/1.1" 404 Not Found
+INFO:     194.246.38.42:42524 - "GET /models HTTP/1.1" 404 Not Found
+INFO:     60.191.125.35:51758 - "HEAD http%3A//112.124.42.80%3A63435/ HTTP/1.1" 404 Not Found
+INFO:     194.246.38.42:40342 - "GET /api/config HTTP/1.1" 404 Not Found
+INFO:     194.246.38.42:40356 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     194.246.38.42:40364 - "GET /api/providers HTTP/1.1" 404 Not Found
+INFO:     194.246.38.42:40386 - "GET /api/v1/config HTTP/1.1" 404 Not Found
+INFO:     194.246.38.42:49224 - "GET /api/chat/config HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     87.236.176.142:33727 - "GET / HTTP/1.1" 404 Not Found
+INFO:     66.132.195.74:52766 - "GET / HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     66.132.195.74:12944 - "GET / HTTP/1.1" 404 Not Found
+INFO:     66.132.195.74:12966 - "PRI %2A HTTP/2.0" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     66.132.195.74:37706 - "POST /mcp HTTP/1.1" 404 Not Found
+INFO:     66.132.195.74:37718 - "POST /jsonrpc HTTP/1.1" 404 Not Found
+INFO:     66.132.195.74:18170 - "POST / HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     66.132.195.74:1190 - "GET /login HTTP/1.1" 404 Not Found
+INFO:     23.88.73.94:49474 - "CONNECT login.live.com%3A443 HTTP/1.1" 404 Not Found
+INFO:     147.185.132.84:63262 - "GET / HTTP/1.1" 404 Not Found
+INFO:     64.62.197.32:29974 - "GET / HTTP/1.1" 404 Not Found
+INFO:     64.62.197.41:40719 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     64.62.197.33:10269 - "GET http%3A//api.ipify.org/?format=json HTTP/1.1" 404 Not Found
+INFO:     64.62.197.46:31103 - "CONNECT www.shadowserver.org%3A443 HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39044 - "GET / HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39048 - "GET / HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39052 - "GET /.e5 HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39052 - "GET /.env HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39058 - "GET /.env.local HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39062 - "GET /.env.production HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39070 - "GET /.env.development HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39072 - "GET /.env.dev HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39076 - "GET /.env.prod HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39082 - "GET /.env.test HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39086 - "GET /.env.staging HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39090 - "GET /.env.backup HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39094 - "GET /.env.save HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39096 - "GET /.env.old HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39100 - "GET /.env.bak HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39104 - "GET /.env.tmp HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39108 - "GET /.env.swp HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39112 - "GET /.env~ HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39118 - "GET /.env.example HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39122 - "GET /.env.sample HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39130 - "GET /.env.dist HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39134 - "GET /.env.template HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39142 - "GET /.env.production.local HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39146 - "GET /.env.development.local HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39150 - "GET /.env.test.local HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39154 - "GET /.envrc HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39158 - "GET /.flaskenv HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39164 - "GET /env HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39168 - "GET /env.js HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39172 - "GET /env.json HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39176 - "GET /app/.env HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39182 - "GET /src/.env HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39186 - "GET /config/.env HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39190 - "GET /backend/.env HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39194 - "GET /frontend/.env HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39198 - "GET /api/.env HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39202 - "GET /server/.env HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39206 - "GET /client/.env HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39212 - "GET /web/.env HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39214 - "GET /public/.env HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39218 - "GET /private/.env HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39220 - "GET /var/.env HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39224 - "GET /docker-compose.yml HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39226 - "GET /docker-compose.yaml HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39232 - "GET /docker-compose.override.yml HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39238 - "GET /docker-compose.dev.yml HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39244 - "GET /docker-compose.prod.yml HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39250 - "GET /config.js HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39252 - "GET /config.json HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39260 - "GET /settings.js HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39264 - "GET /settings.json HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39270 - "GET /secrets.json HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39272 - "GET /credentials.json HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39276 - "GET /app.js HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39280 - "GET /main.js HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39284 - "GET /index.js HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39288 - "GET /server.js HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39292 - "GET /bundle.js HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39296 - "GET /app.bundle.js HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39302 - "GET /main.bundle.js HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39306 - "GET /vendor.js HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39310 - "GET /chunk.js HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39314 - "GET /static/js/main.js HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39320 - "GET /static/js/app.js HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39322 - "GET /static/js/bundle.js HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39328 - "GET /dist/main.js HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39332 - "GET /dist/app.js HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39336 - "GET /dist/bundle.js HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39338 - "GET /build/static/js/main.js HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39342 - "GET /assets/index.js HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39344 - "GET /assets/app.js HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39346 - "GET /_next/static/chunks/main.js HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39348 - "GET /_next/static/chunks/app.js HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39350 - "GET /js/app.js HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39352 - "GET /js/main.js HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39354 - "GET /settings.py HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39356 - "GET /config.py HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39358 - "GET /secrets.py HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39360 - "GET /config/secrets.yml HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39362 - "GET /config/master.key HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39364 - "GET /wp-config.php.bak HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39366 - "GET /wp-config.php.old HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39368 - "GET /wp-config.php.save HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39370 - "GET /wp-config.php.txt HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39372 - "GET /wp-config.php~ HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39374 - "GET /config/app.php HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39376 - "GET /application.properties HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39378 - "GET /application.yml HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39380 - "GET /application.yaml HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39382 - "GET /application-dev.properties HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39384 - "GET /application-prod.properties HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39386 - "GET /appsettings.json HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39388 - "GET /appsettings.Development.json HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39390 - "GET /appsettings.Production.json HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39392 - "GET /config.yaml HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39396 - "GET /config.yml HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39398 - "GET /config.toml HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39400 - "GET /serverless.yml HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39402 - "GET /serverless.yaml HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39404 - "GET /config/production.json HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39406 - "GET /config/development.json HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39408 - "GET /config/default.json HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39412 - "GET /config/local.json HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39414 - "GET /conf/settings.json HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39416 - "GET /data/config.json HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39418 - "GET /actuator/env HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39422 - "GET /actuator/configprops HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39424 - "GET /api/config HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39426 - "GET /api/settings HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39428 - "GET /api/env HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39432 - "GET /backup/.env HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39434 - "GET /backups/.env HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39438 - "GET /old/.env HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39440 - "GET /temp/.env HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39442 - "GET /tmp/.env HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39444 - "GET /.streamlit/secrets.toml HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39446 - "GET /root/.streamlit/secrets.toml HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39450 - "GET /root/.aws/credentials HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39452 - "GET /home/ubuntu/.aws/credentials HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39454 - "GET /home/ec2-user/.aws/credentials HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39456 - "GET /home/node/.aws/credentials HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39458 - "GET /terraform.tfvars HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39462 - "GET /terraform.tfstate HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39464 - "GET /ecosystem.config.js HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39466 - "GET /secrets.yaml HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39468 - "GET /secrets.yml HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39470 - "GET /.secrets HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39474 - "GET /.env.vault HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39478 - "GET /.aws/credentials HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39480 - "GET /.aws/config HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39482 - "GET /.docker/config.json HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39484 - "GET /storage/framework/.env HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39486 - "GET /laravel/.env HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39488 - "GET /debug/vars HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39490 - "GET /.git/logs/HEAD HTTP/1.1" 404 Not Found
+INFO:     176.65.148.177:39492 - "GET /.git/config HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     176.65.148.55:52632 - "GET / HTTP/1.1" 404 Not Found
+INFO:     3.129.187.38:53460 - "GET / HTTP/1.1" 404 Not Found
+INFO:     3.129.187.38:50076 - "GET / HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+WARNING:  Invalid HTTP request received.
+WARNING:  Invalid HTTP request received.
+INFO:     46.122.65.233:50437 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50437 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50438 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50442 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50442 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50443 - "POST /firewall/validate HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [30129]
+INFO:     Started server process [131898]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     46.122.65.233:50447 - "GET /docs HTTP/1.1" 200 OK
+INFO:     46.122.65.233:50447 - "GET /openapi.json HTTP/1.1" 200 OK
+DEBUG CAPITAL: 0.2
+INFO:     46.122.65.233:50448 - "POST /firewall/validate HTTP/1.1" 200 OK

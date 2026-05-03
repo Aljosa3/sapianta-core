@@ -29,6 +29,9 @@ __pycache__/
 venv/
 env/
 
+# 🔥 FIX (AI FIREWALL VENV)
+venv_firewall/
+
 # ------------------------------------------------------------
 # Environment / Secrets (NEVER COMMIT)
 # ------------------------------------------------------------
@@ -198,8 +201,8 @@ runtime/**/*.pyc
 # generic generated dirs anywhere
 **/generated/
 
-# dodatno (varnost)
-*.logvenv_firewall/
+# 🔥 FIX (log typo correction)
+*.log
 
 # crypto keys (NEVER COMMIT)
 *.pem
