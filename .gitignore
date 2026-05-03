@@ -206,3 +206,4 @@ runtime/**/*.pyc
 
 # crypto keys (NEVER COMMIT)
 *.pem
+log.txt
