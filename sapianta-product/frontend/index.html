@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Decision Validator</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: radial-gradient(circle at top, #0b1220, #02050a);
+  color: #e6edf3;
+}
+
+/* HERO */
+.hero {
+  text-align: center;
+  padding: 100px 20px;
+}
+
+.hero h1 {
+  font-size: 42px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 6px 14px;
+  margin-top: 10px;
+  border-radius: 20px;
+  background: #1f6feb;
+}
+
+.hero p {
+  margin-top: 20px;
+  color: #aab8d4;
+}
+
+/* SECTION */
+.section {
+  padding: 80px 20px;
+  text-align: center;
+  max-width: 900px;
+  margin: auto;
+}
+
+/* LEGAL GRID */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 40px;
+}
+
+.card {
+  background: rgba(10,20,40,0.8);
+  padding: 20px;
+  border-radius: 14px;
+}
+
+.final {
+  color: #7cffc4;
+  font-weight: bold;
+}
+
+/* DEMO */
+textarea {
+  width: 100%;
+  height: 150px;
+  background: #111827;
+  color: white;
+  border: none;
+  padding: 10px;
+}
+
+button {
+  margin-top: 20px;
+  padding: 12px 20px;
+  background: #238636;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.result {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.rejected { background: rgba(255,0,0,0.15); }
+.certified { background: rgba(0,255,0,0.15); }
+
+</style>
+</head>
+
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>AI Decision Validator</h1>
+  <div class="badge">EU AI ACT COMPLIANT</div>
+  <p>From uncontrolled AI → to governed decision systems</p>
+</div>
+
+<!-- PROBLEM -->
+<div class="section">
+  <h2>AI is Making Decisions — Without Control</h2>
+  <p>
+    AI outputs look correct — but may be wrong, unsafe or non-compliant.
+    There is no validation before execution.
+  </p>
+</div>
+
+<!-- LEGAL ANALOGY -->
+<div class="section">
+  <h2>AI Needs a Legal System</h2>
+
+  <div class="grid">
+    <div class="card">
+      <b>Legal System</b><br><br>
+      Constitution<br>
+      Laws<br>
+      Courts<br>
+      Enforcement<br>
+      Case Record<br>
+      <span class="final">Judgment</span>
+    </div>
+
+    <div class="card">
+      <b>AI Decision Validator</b><br><br>
+      Core constraints<br>
+      M2 policy rules<br>
+      M1 correctness<br>
+      M3 security<br>
+      Audit log<br>
+      <span class="final">CERTIFIED / REJECTED</span>
+    </div>
+  </div>
+</div>
+
+<!-- DEMO -->
+<div class="section">
+  <h2>Try Live Validation</h2>
+
+  <textarea id="input" placeholder="Paste AI output here..."></textarea>
+  <br>
+  <button onclick="validate()">VALIDATE</button>
+
+  <div id="output"></div>
+</div>
+
+<!-- SCRIPT -->
+<script>
+async function validate() {
+  const code = document.getElementById("input").value;
+
+  try {
+    const res = await fetch("http://178.105.26.164:8000/firewall/validate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": "demo-secret-123"
+      },
+      body: JSON.stringify({
+        code: code
+      })
+    });
+
+    // 🔍 če API vrne error (npr. 401)
+    if (!res.ok) {
+      const errorText = await res.text();
+      document.getElementById("output").innerHTML = `
+        <div class="result rejected">
+          <h3>ERROR ${res.status}</h3>
+          <p>${errorText}</p>
+        </div>
+      `;
+      return;
+    }
+
+    const data = await res.json();
+
+    document.getElementById("output").innerHTML = `
+  <div class="result ${data.status === 'CERTIFIED' ? 'certified' : 'rejected'}">
+    <h3>${data.status}</h3>
+
+    <p><b>Reason:</b> ${data.reason || ''}</p>
+    <p><b>Message:</b> ${data.message || ''}</p>
+
+    ${data.risk ? `<p><b>Risk:</b> ${data.risk}</p>` : ""}
+
+    <p><b>Stage:</b> ${data.stage}</p>
+
+    <br>
+
+    <a href="http://178.105.26.164:8000/audit-viewer/${data.id}" 
+       target="_blank"
+       style="color:#7cffc4; font-weight:bold;">
+       🔍 Open Full Audit
+    </a>
+  </div>
+`;
+
+  } catch (err) {
+    // 🔥 network / fetch error
+    document.getElementById("output").innerHTML = `
+      <div class="result rejected">
+        <h3>Connection Error</h3>
+        <p>${err.message}</p>
+      </div>
+    `;
+  }
+}
+</script>
+
+</body>
+</html>

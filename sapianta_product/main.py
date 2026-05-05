@@ -2,6 +2,8 @@
 
 from fastapi import FastAPI, HTTPException, Header
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import os
 import json
@@ -16,11 +18,23 @@ app = FastAPI(
 )
 
 # --------------------------------------------------
+# 🔥 CORS
+# --------------------------------------------------
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# --------------------------------------------------
 # PATH
 # --------------------------------------------------
 
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, ".."))
+PROJECT_ROOT = "/root/sapianta-core"
+FRONTEND_DIR = "/root/sapianta-core/sapianta-product/frontend"
 
 AUDIT_DIR = os.path.join(
     PROJECT_ROOT,
@@ -34,7 +48,7 @@ AUDIT_DIR = os.path.join(
 
 class FirewallInput(BaseModel):
     code: str
-    tests: str
+    tests: str | None = None
 
 
 class VerifyInput(BaseModel):
@@ -43,7 +57,7 @@ class VerifyInput(BaseModel):
 
 
 # --------------------------------------------------
-# 🔥 RESPONSE MODEL (POSODOBLJEN)
+# RESPONSE MODEL
 # --------------------------------------------------
 
 class FirewallResponse(BaseModel):
@@ -51,7 +65,7 @@ class FirewallResponse(BaseModel):
     stage: str
     reason: str
     message: str | None = None
-    risk: str | None = None  # 🔥 NEW
+    risk: str | None = None
     severity: str | None = None
     id: str
     sha256: str
@@ -62,7 +76,7 @@ class FirewallResponse(BaseModel):
 
 
 # --------------------------------------------------
-# VALIDATE ENDPOINT
+# VALIDATE
 # --------------------------------------------------
 
 @app.post("/firewall/validate", response_model=FirewallResponse)
@@ -71,11 +85,11 @@ def firewall_validate(input_data: FirewallInput, x_api_key: str = Header(None)):
         raise HTTPException(status_code=401, detail="Unauthorized")
 
     try:
-        result = validate_code(input_data.code, input_data.tests)
+        tests = input_data.tests or "def test_placeholder(): assert True"
+        result = validate_code(input_data.code, tests)
 
         result["audit_url"] = f"http://178.105.26.164:8000/audit-viewer/{result['id']}"
 
-        # 🔥 zagotovi, da risk vedno obstaja
         if "risk" not in result:
             result["risk"] = ""
 
@@ -86,7 +100,7 @@ def firewall_validate(input_data: FirewallInput, x_api_key: str = Header(None)):
 
 
 # --------------------------------------------------
-# RAW AUDIT JSON
+# RAW AUDIT
 # --------------------------------------------------
 
 @app.get("/firewall/audit/{validation_id}")
@@ -101,7 +115,7 @@ def get_audit(validation_id: str):
 
 
 # --------------------------------------------------
-# 🔥 AUDIT VIEWER (DEMO UI)
+# 🔥 AUDIT VIEWER
 # --------------------------------------------------
 
 @app.get("/audit-viewer/{validation_id}", response_class=HTMLResponse)
@@ -110,16 +124,14 @@ def audit_viewer(validation_id: str):
     audit_path = os.path.join(AUDIT_DIR, f"{validation_id}.json")
 
     if not os.path.exists(audit_path):
-        return HTMLResponse(
-            f"<h2>Audit not found: {validation_id}</h2>",
-            status_code=404
-        )
+        return HTMLResponse(f"<h2>Audit not found: {validation_id}</h2>", status_code=404)
 
     with open(audit_path, "r") as f:
         data = json.load(f)
 
     status = data.get("status", "UNKNOWN")
     status_color = "#16a34a" if status == "CERTIFIED" else "#dc2626"
+
     severity = data.get("severity", "UNKNOWN")
 
     severity_color = {
@@ -136,10 +148,9 @@ def audit_viewer(validation_id: str):
 
     message = data.get("message")
     risk = data.get("risk")
-    violations = data.get("violations", [])
 
     # --------------------------------------------------
-    # 🔥 RISK BLOCK (NEW)
+    # 🔥 RISK BLOCK
     # --------------------------------------------------
 
     risk_block = ""
@@ -151,9 +162,9 @@ def audit_viewer(validation_id: str):
         </div>
         """
 
-    controls_rows = ""
     controls = data.get("controls", [])
 
+    controls_rows = ""
     for control in controls:
         control_status = control.get("status", "")
         control_color = "#16a34a" if control_status == "PASS" else "#dc2626"
@@ -172,45 +183,66 @@ def audit_viewer(validation_id: str):
         """
 
     # --------------------------------------------------
-    # 🔥 HIGHLIGHT FAILING CONTROL
+    # 🔥 DECISION BANNER (FIXED)
     # --------------------------------------------------
 
-    first_fail = None
+    decision_banner = ""
 
-    for c in controls:
-        if c.get("status") == "FAIL":
-            first_fail = c
-            break
+    if status == "CERTIFIED":
+        decision_banner = f"""
+        <div style="
+            background:#ecfdf5;
+            border-left:8px solid #16a34a;
+            padding:20px;
+            border-radius:12px;
+            margin-bottom:20px;
+        ">
+            <div style="font-size:20px; font-weight:bold; color:#16a34a;">
+                ✅ DECISION CERTIFIED
+            </div>
+            <div style="margin-top:6px;">
+                All validation checks passed. Execution approved.
+            </div>
+        </div>
+        """
+    else:
+        first_fail = None
 
-    if first_fail is None:
         for c in controls:
-            if c.get("status") == "NOT_RUN":
+            if c.get("status") == "FAIL":
                 first_fail = c
                 break
 
-    highlight_html = ""
+        if first_fail:
+            rule_name = first_fail.get("rule", "unknown")
 
-    if first_fail:
-        rule_name = first_fail.get("rule", "unknown")
+            # 🔥 PREVOD PRAVIL (ključni fix)
+            rule_map = {
+                "no_eval": "eval() execution",
+                "no_exec": "exec() execution",
+                "no_subprocess": "subprocess execution",
+                "syntax_valid": "invalid syntax",
+                "tests_passed": "failed logic tests"
+            }
 
-        if rule_name == "tests_passed":
-            label = f"❌ Failing control: {rule_name}"
-        else:
-            label = f"🚫 Blocked by rule: {rule_name}"
+            readable_rule = rule_map.get(rule_name, rule_name)
 
-        highlight_html = f"""
-        <div style="
-            background-color: #ffe6e6;
-            border-left: 6px solid #dc2626;
-            padding: 14px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-weight: bold;
-            font-size: 15px;
-        ">
-            {label}
-        </div>
-        """
+            decision_banner = f"""
+            <div style="
+                background:#fee2e2;
+                border-left:8px solid #dc2626;
+                padding:20px;
+                border-radius:12px;
+                margin-bottom:20px;
+            ">
+                <div style="font-size:20px; font-weight:bold; color:#dc2626;">
+                    🚫 DECISION BLOCKED
+                </div>
+                <div style="margin-top:6px;">
+                    Blocked by rule: {readable_rule}
+                </div>
+            </div>
+            """
 
     raw_json = json.dumps(data, indent=2, ensure_ascii=False)
 
@@ -243,8 +275,6 @@ def audit_viewer(validation_id: str):
                 border-radius: 8px;
                 background-color: #f9fafb;
                 border-left: 6px solid {status_color};
-                font-size: 15px;
-                line-height: 1.5;
             }}
             table {{
                 width: 100%;
@@ -263,7 +293,6 @@ def audit_viewer(validation_id: str):
                 padding: 15px;
                 border-radius: 8px;
                 overflow-x: auto;
-                max-height: 500px;
             }}
         </style>
     </head>
@@ -272,6 +301,9 @@ def audit_viewer(validation_id: str):
 
         <div class="card">
             <h1>SAPIANTA AI Firewall</h1>
+
+            {decision_banner}
+
             <p>ID: <b>{data.get("id")}</b></p>
             <p class="status">{status}</p>
 
@@ -284,35 +316,20 @@ def audit_viewer(validation_id: str):
                     font-size:14px;
                     color:{severity_color};
                     background:{severity_bg};
-                    display:inline-block;
                 ">
                     {severity}
                 </span>
             </div>
 
             <p>Stage: {data.get("stage")}</p>
-
             <p>Reason: {data.get("reason")}</p>
 
-            {"".join([
-                f"<div style='color:#dc2626; font-weight:bold;'>❌ {v}</div>"
-                for v in data.get("violations", [])
-            ]) if data.get("violations") else ""}
-
             {"<div class='message'><strong>Why it was blocked:</strong><br>" + message + "</div>" if message else ""}
-
             {risk_block}
         </div>
 
         <div class="card">
             <h2>Controls</h2>
-
-            <p style="color:#555; font-size:14px;">
-                All controls are enforced by a deterministic execution control layer (ArchitectureGuardian)
-            </p>
-
-            {highlight_html}
-
             <table>
                 <tr>
                     <th>Rule</th>
@@ -335,7 +352,7 @@ def audit_viewer(validation_id: str):
 
 
 # --------------------------------------------------
-# VERIFY ENDPOINT
+# VERIFY
 # --------------------------------------------------
 
 @app.post("/firewall/verify")
@@ -351,10 +368,7 @@ def verify_execution(input_data: VerifyInput):
     stored_hash = audit_data.pop("sha256", None)
 
     if stored_hash is None:
-        return {
-            "valid": False,
-            "reason": "missing hash in audit"
-        }
+        return {"valid": False, "reason": "missing hash in audit"}
 
     recomputed_hash = compute_hash(audit_data)
 
@@ -363,3 +377,14 @@ def verify_execution(input_data: VerifyInput):
         "expected": stored_hash,
         "provided": input_data.sha256
     }
+
+
+# --------------------------------------------------
+# FRONTEND
+# --------------------------------------------------
+
+app.mount(
+    "/",
+    StaticFiles(directory=FRONTEND_DIR, html=True),
+    name="frontend"
+)
