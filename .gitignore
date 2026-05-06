@@ -203,3 +203,24 @@ runtime/**/*.pyc
 
 # crypto keys (NEVER COMMIT)
 *.pem
+
+# Virtual environments
+venv/
+.venv/
+venv_firewall/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Governance runtime history (append-only local artifacts)
+runtime/history/*.jsonl
+
+# Local quarantine artifacts
+runtime/development/quarantine/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
