@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Decision Validator</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: radial-gradient(circle at top, #0b1220, #02050a);
+  color: #e6edf3;
+}
+
+.hero {
+  text-align: center;
+  padding: 100px 20px;
+}
+
+.hero h1 {
+  font-size: 42px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 6px 14px;
+  margin-top: 10px;
+  border-radius: 20px;
+  background: #1f6feb;
+}
+
+.hero p {
+  margin-top: 20px;
+  color: #aab8d4;
+}
+
+.section {
+  padding: 80px 20px;
+  text-align: center;
+  max-width: 900px;
+  margin: auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 40px;
+}
+
+.card {
+  background: rgba(10,20,40,0.8);
+  padding: 20px;
+  border-radius: 14px;
+}
+
+.final {
+  color: #7cffc4;
+  font-weight: bold;
+}
+
+textarea {
+  width: 100%;
+  height: 150px;
+  background: #111827;
+  color: white;
+  border: none;
+  padding: 10px;
+}
+
+button {
+  margin-top: 10px;
+  margin-right: 10px;
+  padding: 12px 20px;
+  background: #238636;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.guided-actions {
+  margin-top: 20px;
+}
+
+.guided-actions button:first-child {
+  background: #1f6feb;
+  font-weight: 700;
+}
+
+.scenario-group {
+  margin-top: 36px;
+}
+
+.scenario-group p {
+  color: #aab8d4;
+  margin: 6px 0 0;
+}
+
+.scenario-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.scenario-buttons button {
+  width: 100%;
+  min-height: 56px;
+  margin: 0;
+  background: #374151;
+  text-align: left;
+}
+
+.result {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.result-subtitle {
+  margin-top: -4px;
+  color: #aab8d4;
+  font-size: 14px;
+}
+
+.rejected { background: rgba(255,0,0,0.15); }
+.certified { background: rgba(0,255,0,0.15); }
+
+.pipeline {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  margin: 30px 0;
+}
+
+.pipeline-step {
+  position: relative;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(124, 255, 196, 0.15);
+  color: #94a3b8;
+  min-width: 140px;
+  transition: all 0.35s ease;
+}
+
+.pipeline-badge {
+  display: block;
+  width: fit-content;
+  margin: 0 auto 8px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.14);
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.pipeline-title {
+  display: block;
+  color: #e6edf3;
+  font-weight: 700;
+}
+
+.pipeline-step small {
+  display: block;
+  margin-top: 4px;
+}
+
+.pipeline-step.active {
+  color: #7cffc4;
+  background: rgba(12, 45, 36, 0.95);
+  border-color: #7cffc4;
+  box-shadow:
+    0 0 0 2px rgba(124, 255, 196, 0.18),
+    0 0 24px rgba(124, 255, 196, 0.3);
+  transform: translateY(-3px);
+}
+
+.pipeline-step.active .pipeline-badge {
+  background: rgba(124, 255, 196, 0.18);
+  color: #7cffc4;
+}
+
+.pipeline-step.active .pipeline-title {
+  color: #7cffc4;
+}
+
+.pipeline-step.failed {
+  color: #fecaca;
+  border-color: #ef4444;
+  box-shadow: 0 0 22px rgba(239, 68, 68, 0.28);
+  transform: translateY(-3px);
+}
+
+.pipeline-step.failed .pipeline-badge {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fecaca;
+}
+
+.pipeline-step.failed .pipeline-title {
+  color: #fecaca;
+}
+
+.pipeline-arrow {
+  color: #64748b;
+  font-size: 22px;
+}
+
+@media (max-width: 720px) {
+  .scenario-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .pipeline {
+    flex-direction: column;
+  }
+
+  .pipeline-arrow {
+    transform: rotate(90deg);
+  }
+
+  .pipeline-step {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="hero">
+  <h1>AI Decision Validator</h1>
+  <div class="badge">EU AI ACT COMPLIANT</div>
+  <p>From uncontrolled AI → to governed decision systems</p>
+</div>
+
+<div class="section">
+  <h2>AI is Making Decisions — Without Control</h2>
+  <p>
+    AI outputs look correct — but may be wrong, unsafe or non-compliant.
+    There is no validation before execution.
+  </p>
+</div>
+
+<div class="section">
+  <h2>AI Needs a Legal System</h2>
+
+  <div class="grid">
+    <div class="card">
+      <b>Legal System</b><br><br>
+      Constitution<br>
+      Laws<br>
+      Courts<br>
+      Enforcement<br>
+      Case Record<br>
+      <span class="final">Judgment</span>
+    </div>
+
+    <div class="card">
+      <b>AI Decision Validator</b><br><br>
+      Core constraints<br>
+      Policy rules<br>
+      Decision checks<br>
+      Execution safety<br>
+      Audit log<br>
+      <span class="final">CERTIFIED / REJECTED</span>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Try Live Validation</h2>
+
+  <textarea id="input" placeholder="Paste AI output here..."></textarea>
+  <br>
+  <button onclick="validate()">VALIDATE</button>
+
+  <div id="output"></div>
+</div>
+
+<div class="section">
+  <h2>Guided AI Decision Demo</h2>
+
+  <div class="guided-actions">
+    <button onclick="startGuided()">Start Guided Demo</button>
+    <button onclick="startAutoplay()">Autoplay Demo</button>
+    <button onclick="nextStep()">Next</button>
+    <button onclick="toggleVoice()">Voice: ON</button>
+  </div>
+
+  <div id="guidedStatus" style="margin-top:15px; color:#7cffc4;"></div>
+
+  <div class="pipeline">
+    <div id="pipe-m1" class="pipeline-step">
+      <span class="pipeline-badge">M1</span>
+      <span class="pipeline-title">Decision Logic</span>
+      <small>Is the answer reliable?</small>
+    </div>
+    <div class="pipeline-arrow">→</div>
+    <div id="pipe-m2" class="pipeline-step">
+      <span class="pipeline-badge">M2</span>
+      <span class="pipeline-title">Policy Check</span>
+      <small>Is it allowed?</small>
+    </div>
+    <div class="pipeline-arrow">→</div>
+    <div id="pipe-m3" class="pipeline-step">
+      <span class="pipeline-badge">M3</span>
+      <span class="pipeline-title">Execution Safety</span>
+      <small>Can it run?</small>
+    </div>
+  </div>
+
+  <div class="scenario-group">
+    <h3>Explore scenarios</h3>
+    <p>Explore real-world AI decision risks</p>
+    <div class="scenario-buttons">
+      <button onclick="runDemo('m1_logic_fail')">An AI loan calculator approves a customer using the wrong math.</button>
+      <button onclick="runDemo('m2_policy_fail')">An AI credit decision ignores the bank's lending policy.</button>
+      <button onclick="runDemo('m3_eval')">An AI-generated workflow tries to run new code inside production.</button>
+      <button onclick="runDemo('m3_subprocess')">An AI assistant tries to launch a server command without approval.</button>
+    </div>
+  </div>
+
+  <div id="demoNarration" style="margin-top:20px;"></div>
+</div>
+
+<script>
+
+const PRODUCTION_API_ORIGIN = "http://178.105.26.164:8000";
+const API_ORIGIN = (
+  window.location.protocol === "file:" ||
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1"
+) ? PRODUCTION_API_ORIGIN : window.location.origin;
+
+function apiUrl(path) {
+  return `${API_ORIGIN}${path}`;
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function renderValidationResult(data) {
+  const status = data.status || "UNKNOWN";
+  const statusClass = status === "CERTIFIED" ? "certified" : "rejected";
+  const auditUrl = data.audit_url || (data.id ? `/audit-viewer/${data.id}` : "");
+  const subtitle = data.demo_subtitle || "This would have been executed without validation";
+
+  document.getElementById("output").innerHTML = `
+    <div class="result ${statusClass}">
+      <h3>${escapeHtml(status)}</h3>
+      <p class="result-subtitle">${escapeHtml(subtitle)}</p>
+      ${data.stage ? `<p><b>Stage:</b> ${escapeHtml(data.stage)}</p>` : ""}
+      ${data.reason ? `<p>${escapeHtml(data.reason)}</p>` : ""}
+      ${data.message ? `<p>${escapeHtml(data.message)}</p>` : ""}
+      ${data.risk ? `<p>${escapeHtml(data.risk)}</p>` : ""}
+      ${auditUrl ? `
+        <a href="${escapeHtml(auditUrl)}" target="_blank"
+          style="
+            display:inline-block;
+            margin-top:12px;
+            padding:10px 16px;
+            background:#2563eb;
+            color:white;
+            border-radius:8px;
+            text-decoration:none;
+            font-weight:500;
+          ">
+          Open Full Audit
+        </a>
+      ` : ""}
+    </div>
+  `;
+}
+
+function renderRequestFailure(targetId, label, err) {
+  const message = err?.message || "Request failed.";
+  document.getElementById(targetId).innerHTML = `
+    <div class="result rejected">
+      <h3>${escapeHtml(label)}</h3>
+      <p>${escapeHtml(message)}</p>
+    </div>
+  `;
+}
+
+async function fetchJsonResponse(url, options = {}) {
+  const res = await fetch(url, options);
+
+  const redirectedAuditMatch = res.url.match(/\/audit-viewer\/([^/?#]+)/);
+  if (res.redirected && redirectedAuditMatch) {
+    const location = new URL(res.url);
+    const auditId = redirectedAuditMatch[1];
+    const auditOrigin = location.origin || API_ORIGIN;
+    const auditUrl = `${auditOrigin}/firewall/audit/${auditId}`;
+    const auditRes = await fetch(auditUrl);
+
+    if (!auditRes.ok) {
+      const details = await auditRes.text();
+      throw new Error(details || `Audit fetch failed with HTTP ${auditRes.status}`);
+    }
+
+    const auditData = await auditRes.json();
+    auditData.audit_url = res.url;
+    return auditData;
+  }
+
+  if (!res.ok) {
+    const details = await res.text();
+    throw new Error(details || `Request failed with HTTP ${res.status}`);
+  }
+
+  const contentType = res.headers.get("content-type") || "";
+  if (!contentType.includes("application/json")) {
+    throw new Error("Expected JSON but the server returned a non-JSON response.");
+  }
+
+  return res.json();
+}
+
+async function validate() {
+  const code = document.getElementById("input").value;
+
+  try {
+    const data = await fetchJsonResponse(apiUrl("/firewall/validate"), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": "demo-secret-123"
+      },
+      body: JSON.stringify({ code })
+    });
+
+    renderValidationResult(data);
+
+  } catch (err) {
+    renderRequestFailure("output", "Validation failed", err);
+  }
+}
+
+// 🔥 GUIDED FLOW STATE
+let guidedSteps = ["m1_logic_fail", "m2_policy_fail", "m3_eval"];
+let currentStep = -1;
+let autoplayActive = false;
+let autoplayTimer = null;
+let autoplayStepIndex = 0;
+let demoMode = null;
+let voiceEnabled = true;
+
+function speak(text) {
+  if (!voiceEnabled) return;
+
+  if (!("speechSynthesis" in window)) {
+    console.warn("Speech synthesis not supported in this browser.");
+    return;
+  }
+
+  window.speechSynthesis.cancel();
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "en-US";
+  utterance.rate = 0.92;
+  utterance.pitch = 1;
+  utterance.volume = 1;
+
+  window.speechSynthesis.speak(utterance);
+}
+
+function toggleVoice() {
+  voiceEnabled = !voiceEnabled;
+
+  const buttons = document.querySelectorAll("button");
+  buttons.forEach(btn => {
+    if (btn.innerText.startsWith("Voice:")) {
+      btn.innerText = voiceEnabled ? "Voice: ON" : "Voice: OFF";
+    }
+  });
+
+  if (!voiceEnabled && "speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
+}
+
+function startGuided() {
+  stopAutoplay();
+  demoMode = "guided";
+  currentStep = -1;
+
+  document.getElementById("demoNarration").innerHTML = "";
+  document.getElementById("guidedStatus").innerHTML =
+    "Guided demo ready. Use Next to validate each stage.";
+  clearPipelineState();
+
+  speak("Starting AI decision validation demo.");
+}
+
+function startAutoplay() {
+  stopAutoplay();
+  demoMode = "autoplay";
+  autoplayActive = true;
+  autoplayStepIndex = 0;
+
+  clearPipelineState();
+
+  autoplayStep();
+}
+
+function nextStep() {
+  stopAutoplay();
+  demoMode = "guided";
+
+  if (currentStep < guidedSteps.length - 1) {
+    currentStep++;
+    updateGuidedStatus();
+    runDemo(guidedSteps[currentStep]);
+  } else {
+    document.getElementById("guidedStatus").innerHTML =
+      "✔ Demo complete — system validated across all layers.";
+  }
+}
+
+function stopAutoplay() {
+  autoplayActive = false;
+
+  if (autoplayTimer !== null) {
+    clearTimeout(autoplayTimer);
+    autoplayTimer = null;
+  }
+
+  autoplayStepIndex = 0;
+}
+
+function updatePipeline(stepIndex = currentStep) {
+  clearPipelineState();
+
+  if (stepIndex === 0) {
+    document.getElementById("pipe-m1").classList.add("active");
+  }
+
+  if (stepIndex === 1) {
+    document.getElementById("pipe-m2").classList.add("active");
+  }
+
+  if (stepIndex === 2) {
+    document.getElementById("pipe-m3").classList.add("active");
+  }
+}
+
+function clearPipelineState() {
+  document.getElementById("pipe-m1").classList.remove("active", "failed");
+  document.getElementById("pipe-m2").classList.remove("active", "failed");
+  document.getElementById("pipe-m3").classList.remove("active", "failed");
+}
+
+function highlightResultStage(data) {
+  const stageId = {
+    M1: "pipe-m1",
+    M2: "pipe-m2",
+    M3: "pipe-m3"
+  }[data.stage];
+
+  if (!stageId) return;
+
+  clearPipelineState();
+
+  const step = document.getElementById(stageId);
+  if (data.status === "REJECTED") {
+    step.classList.add("failed");
+  } else {
+    step.classList.add("active");
+  }
+}
+
+function updateGuidedStatus() {
+  const labels = [
+    "Step 1: Check whether the decision logic is reliable",
+    "Step 2: Check whether the decision follows policy",
+    "Step 3: Check whether the decision is safe to execute"
+  ];
+  document.getElementById("guidedStatus").innerHTML = labels[currentStep];
+  updatePipeline();
+}
+
+function updateAutoplayStatus(stepIndex) {
+  const labels = [
+    "Step 1: Check whether the decision logic is reliable",
+    "Step 2: Check whether the decision follows policy",
+    "Step 3: Check whether the decision is safe to execute"
+  ];
+  document.getElementById("guidedStatus").innerHTML = labels[stepIndex];
+  updatePipeline(stepIndex);
+}
+
+// 🎬 AUTOPLAY ENGINE
+async function autoplayStep() {
+  if (!autoplayActive || demoMode !== "autoplay") {
+    return;
+  }
+
+  if (autoplayStepIndex >= guidedSteps.length) {
+    document.getElementById("guidedStatus").innerHTML =
+      "🎬 Demo complete — full AI validation lifecycle.";
+
+    speak("The system validates AI decisions before execution, ensuring correctness, compliance, and security.");
+
+    stopAutoplay();
+    return;
+  }
+
+  updateAutoplayStatus(autoplayStepIndex);
+
+  await runDemo(guidedSteps[autoplayStepIndex]);
+
+  autoplayStepIndex++;
+
+  autoplayTimer = setTimeout(() => {
+    autoplayTimer = null;
+    if (autoplayActive && demoMode === "autoplay") {
+      autoplayStep();
+    }
+  }, 2500);
+}
+
+// 🔥 DEMO MACHINE
+async function runDemo(type) {
+  try {
+    const narrationMap = {
+      m1_logic_fail: "An AI loan calculator approves a customer using the wrong math. The system blocks the decision before a bad result can be trusted.",
+
+      m2_policy_fail: "An AI credit decision ignores the bank's lending policy. The system blocks the decision before it becomes a compliance risk.",
+
+      m3_eval: "An AI-generated workflow tries to run new code inside production. The system blocks the unsafe execution attempt.",
+
+      m3_subprocess: "An AI assistant tries to launch a server command without approval. The system blocks the operational risk before it can run."
+    };
+
+    const text = narrationMap[type] || "Validating...";
+
+    document.getElementById("demoNarration").innerHTML = `
+      <div class="result"><i>${text}</i></div>
+    `;
+
+    speak(text);
+
+    const data = await fetchJsonResponse(apiUrl(`/demo/${type}`));
+
+    renderValidationResult(data);
+    return data;
+
+  } catch (err) {
+    renderRequestFailure("demoNarration", "Demo unavailable", err);
+    renderRequestFailure("output", "Demo failed", err);
+    return null;
+  }
+}
+
+</script>
+
+</body>
+</html>

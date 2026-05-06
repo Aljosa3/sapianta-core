@@ -34,7 +34,7 @@ app.add_middleware(
 # --------------------------------------------------
 
 PROJECT_ROOT = "/root/sapianta-core"
-FRONTEND_DIR = "/root/sapianta-core/sapianta-product/frontend"
+FRONTEND_DIR = "/root/sapianta-core/frontend"
 
 AUDIT_DIR = os.path.join(
     PROJECT_ROOT,
@@ -187,6 +187,7 @@ def audit_viewer(validation_id: str):
     # --------------------------------------------------
 
     decision_banner = ""
+    banner_covers_reason = False  # 🔥 FIX: prepreči undefined variable
 
     if status == "CERTIFIED":
         decision_banner = f"""
@@ -216,16 +217,39 @@ def audit_viewer(validation_id: str):
         if first_fail:
             rule_name = first_fail.get("rule", "unknown")
 
-            # 🔥 PREVOD PRAVIL (ključni fix)
             rule_map = {
-                "no_eval": "eval() execution",
-                "no_exec": "exec() execution",
-                "no_subprocess": "subprocess execution",
-                "syntax_valid": "invalid syntax",
-                "tests_passed": "failed logic tests"
+                "no_eval": {
+                    "title": "🚫 DECISION BLOCKED",
+                    "subtitle": "Dynamic code execution is not allowed"
+                },
+                "no_exec": {
+                    "title": "🚫 DECISION BLOCKED",
+                    "subtitle": "Arbitrary code execution is not allowed"
+                },
+                "no_subprocess": {
+                    "title": "🚫 DECISION BLOCKED",
+                    "subtitle": "External process execution is restricted"
+                },
+                "syntax_valid": {
+                    "title": "❌ INVALID CODE",
+                    "subtitle": "Code contains syntax errors"
+                },
+                "tests_passed": {
+                    "title": "❌ LOGIC FAILURE",
+                    "subtitle": "Code failed validation tests"
+                }
             }
 
-            readable_rule = rule_map.get(rule_name, rule_name)
+            rule_data = rule_map.get(rule_name, {
+                "title": "🚫 DECISION BLOCKED",
+                "subtitle": rule_name
+            })
+
+            # 🔥 KLJUČ: banner pokriva razlog → ne podvajaj "Why"
+            banner_covers_reason = rule_name in [
+                "no_eval", "no_exec", "no_subprocess",
+                "syntax_valid", "tests_passed"
+            ]
 
             decision_banner = f"""
             <div style="
@@ -236,10 +260,10 @@ def audit_viewer(validation_id: str):
                 margin-bottom:20px;
             ">
                 <div style="font-size:20px; font-weight:bold; color:#dc2626;">
-                    🚫 DECISION BLOCKED
+                    {rule_data['title']}
                 </div>
                 <div style="margin-top:6px;">
-                    Blocked by rule: {readable_rule}
+                    {rule_data['subtitle']}
                 </div>
             </div>
             """
@@ -324,7 +348,9 @@ def audit_viewer(validation_id: str):
             <p>Stage: {data.get("stage")}</p>
             <p>Reason: {data.get("reason")}</p>
 
-            {"<div class='message'><strong>Why it was blocked:</strong><br>" + message + "</div>" if message else ""}
+            {"<div class='message'><strong>Why it was blocked:</strong><br>" + message + "</div>" 
+            if message and not banner_covers_reason else ""}
+
             {risk_block}
         </div>
 
@@ -378,6 +404,127 @@ def verify_execution(input_data: VerifyInput):
         "provided": input_data.sha256
     }
 
+# --------------------------------------------------
+# DEMO ENDPOINTS
+# --------------------------------------------------
+
+def _demo_response(result):
+    if "risk" not in result:
+        result["risk"] = ""
+    if "audit_url" not in result:
+        result["audit_url"] = f"/audit-viewer/{result['id']}"
+    return result
+
+
+# ---------------- M1 ----------------
+
+@app.get("/demo/m1_logic_fail")
+def demo_m1_logic_fail():
+    code = """
+# because this demo focuses on correctness risk
+def add(a, b):
+    return a - b
+"""
+    tests = """
+from ai_firewall_module import add
+
+def test_add():
+    assert add(2, 2) == 4
+"""
+    result = validate_code(code, tests)
+    return _demo_response(result)
+
+
+@app.get("/demo/m1_pass")
+def demo_m1_pass():
+    code = """
+# because this demo focuses on correctness risk
+def add(a, b):
+    return a + b
+"""
+    tests = """
+from ai_firewall_module import add
+
+def test_add():
+    assert add(2, 2) == 4
+"""
+    result = validate_code(code, tests)
+    return _demo_response(result)
+
+
+# ---------------- M2 ----------------
+
+@app.get("/demo/m2_policy_fail")
+def demo_m2_policy_fail():
+    code = """
+# because this lending decision carries policy risk
+def approve_loan(capital_ratio):
+    return capital_ratio > 10
+"""
+    tests = """
+from ai_firewall_module import approve_loan
+
+def test_policy():
+    # Policy: must be > 30
+    assert approve_loan(20) == False
+"""
+    result = validate_code(code, tests)
+    return _demo_response(result)
+
+
+@app.get("/demo/m2_pass")
+def demo_m2_pass():
+    code = """
+# because this lending decision carries policy risk
+def approve_loan(capital_ratio):
+    return capital_ratio > 30
+"""
+    tests = """
+from ai_firewall_module import approve_loan
+
+def test_policy():
+    assert approve_loan(40) == True
+"""
+    result = validate_code(code, tests)
+    return _demo_response(result)
+
+
+# ---------------- M3 ----------------
+
+@app.get("/demo/m3_eval")
+def demo_m3_eval():
+    code = 'eval("2+2")'
+    tests = "def test_placeholder(): assert True"
+    result = validate_code(code, tests)
+    return _demo_response(result)
+
+
+@app.get("/demo/m3_subprocess")
+def demo_m3_subprocess():
+    code = """
+import subprocess
+subprocess.run(["ls"])
+"""
+    tests = "def test_placeholder(): assert True"
+    result = validate_code(code, tests)
+    return _demo_response(result)
+
+
+@app.get("/demo/m3_pass")
+def demo_m3_pass():
+    code = """
+# because this demo focuses on execution risk
+def multiply(a, b):
+    return a * b
+"""
+    tests = """
+from ai_firewall_module import multiply
+
+def test_multiply():
+    assert multiply(2, 3) == 6
+"""
+    result = validate_code(code, tests)
+    return _demo_response(result)
 
 # --------------------------------------------------
 # FRONTEND
