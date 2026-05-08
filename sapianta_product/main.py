@@ -1,17 +1,19 @@
 # main.py
 
 from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import os
 import json
 
 from sapianta_product.validator_service import validate_code, compute_hash
+from sapianta_product.demo_experience import enterprise_demo_html
 
 # ✅ NEW (minimal extension)
 from sapianta_product.crypto import verify_signature
 
 app = FastAPI(
-    title="SAPIANTA AI Firewall",
+    title="SAPIANTA AI Decision Validator",
     version="0.1"
 )
 
@@ -21,12 +23,15 @@ app = FastAPI(
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, ".."))
+STATIC_DIR = os.path.join(BASE_DIR, "static")
 
 AUDIT_DIR = os.path.join(
     PROJECT_ROOT,
     "runtime",
     "audit_logs"
 )
+
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 # --------------------------------------------------
 # REQUEST MODELS
@@ -47,6 +52,20 @@ class VerifySignatureInput(BaseModel):
     id: str
     sha256: str
     signature: str
+
+
+# --------------------------------------------------
+# ENTERPRISE DEMO SURFACE
+# --------------------------------------------------
+
+@app.get("/", include_in_schema=False)
+def enterprise_demo_home():
+    return enterprise_demo_html()
+
+
+@app.get("/demo", include_in_schema=False)
+def enterprise_demo_alias():
+    return enterprise_demo_html()
 
 
 # --------------------------------------------------
