@@ -5,8 +5,6 @@ Creates deterministic decision envelope artifacts.
 
 import hashlib
 import json
-import uuid
-from datetime import datetime
 
 
 def _hash(data: dict) -> str:
@@ -23,22 +21,27 @@ def build_decision_envelope(proposal: dict, policy_result: dict) -> dict:
     policy_result: result from policy evaluation
     """
 
-    envelope = {
-        "decision_id": str(uuid.uuid4()),
+    base_payload = {
         "domain_id": proposal["domain_id"],
-
         "proposal_reference": {
             "proposal_id": proposal["proposal_id"],
             "strategy_reference": proposal.get("strategy_reference")
         },
-
         "decision_result": policy_result["decision"],
-        "decision_timestamp": datetime.utcnow().isoformat(),
-
+        "decision_timestamp": (
+            proposal.get("decision_timestamp")
+            or proposal.get("proposal_timestamp")
+            or proposal.get("timestamp")
+            or "UNSPECIFIED_DETERMINISTIC_TIMESTAMP"
+        ),
         "policy_trace": policy_result["policy_trace"],
-
         "action": proposal["action"],
         "risk_context": proposal["risk_context"]
+    }
+
+    envelope = {
+        "decision_id": f"DEC-{_hash(base_payload)[:16]}",
+        **base_payload,
     }
 
     envelope["envelope_hash"] = _hash(envelope)

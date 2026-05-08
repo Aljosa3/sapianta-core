@@ -217,7 +217,7 @@ def test_auto_generated_basic():
             }
         }
 
-    def run_cycle(self):
+    def run_cycle(self, context=None):
 
         if not self._bootstrap_done:
             print("[CAL] BOOTSTRAP: generating initial task")
@@ -260,6 +260,10 @@ def test_auto_generated_basic():
             description = gap["description"]
 
             if description.startswith("System idle detected"):
+
+                if context and context.get("system_stable"):
+                    print("[CAL] QUIESCENCE → system stable → no task generated")
+                    return None
 
                 idx = len(self._seen_descriptions) % len(self._EXPLORATION_TARGETS)
                 target = self._EXPLORATION_TARGETS[idx]

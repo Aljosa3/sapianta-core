@@ -89,16 +89,8 @@ class DevGovernanceGate:
 
     def final_decision(self, decision: str) -> str:
         """
-        Applies DEV_MODE override to governance decisions.
-
-        Purpose:
-        - allow full pipeline execution during development
-        - preserve strict governance for production
+        Return the evaluated governance decision without development bypasses.
         """
-
-        if decision == self.REVIEW and DEV_MODE:
-            print("[DEV_MODE] AUTO-BYPASS REVIEW → continuing execution")
-            return self.ALLOW
 
         return decision
 
@@ -108,7 +100,10 @@ class DevGovernanceGate:
 
     def request_approval(self, change: dict) -> bool:
         """
-        Minimal approval stub (NON-BLOCKING)
+        Fail-closed approval placeholder.
+
+        Real approval must be recorded by an explicit governance workflow before
+        execution continues. A missing approval system is not approval.
         """
 
-        return True
+        return bool(change.get("approved_by_human") and change.get("approval_id"))

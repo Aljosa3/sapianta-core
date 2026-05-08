@@ -27,6 +27,7 @@ def run(args=None):
     print()
 
     idle_cycles = 0
+    last_system_stable = False
 
     try:
 
@@ -68,6 +69,15 @@ def run(args=None):
             result = loop.run_once()
 
             print("cycle result:", result)
+
+            if isinstance(result, dict):
+                last_system_stable = result.get("system_stable", False)
+
+            print("[DEBUG] last_system_stable =", last_system_stable)
+
+            if last_system_stable:
+                print("[GLOBAL QUIESCENCE] system stable → stopping loop")
+                break
 
             status = result.get("status")
 

@@ -110,6 +110,8 @@ class TestRunner:
             "pytest",
             "runtime/development/generated",
             "--ignore=runtime/development/generated/_quarantine",  # ✅ CRITICAL FIX
+            "--ignore-glob=*_quarantine/*",
+            "--ignore-glob=*/_quarantine/*",
             "--cache-clear",
             "--import-mode=importlib",
             "-q",
@@ -123,71 +125,6 @@ class TestRunner:
         env = os.environ.copy()
         env["SAPIANTA_TEST_RUNNER"] = "1"
 
-        # =====================================================
-        # 🔥 PRE-FIX: ensure missing modules exist (CRITICAL)
-        # =====================================================
-
-        def _ensure_modules_from_tests():
-
-            import re
-            from pathlib import Path
-
-            test_path = self.project_root / "runtime/development/generated"
-
-            if not test_path.exists():
-                return
-
-            for test_file in test_path.glob("test_*.py"):
-
-                try:
-                    content = test_file.read_text(encoding="utf-8")
-
-                    imports = re.findall(r"from\s+([a-zA-Z0-9_]+)\s+import", content)
-
-                    for module_name in imports:
-
-                        module_file = test_path / f"{module_name}.py"
-
-                        if not module_file.exists():
-
-                            print(f"[PRE-FIX] Creating missing module → {module_file}")
-
-                            module_file.write_text(
-                                "def generated_function(*args, **kwargs):\n    return True\n",
-                                encoding="utf-8"
-                            )
-
-                except Exception:
-                    continue
-
-
-        _ensure_modules_from_tests()
-
-        # =====================================================
-        # 🧹 CLEANUP: remove syntactically invalid test files
-        # =====================================================
-        def _cleanup_invalid_tests(path):
-            import ast
-            import importlib.util
-            from pathlib import Path
-
-            for f in Path(path).glob("test_*.py"):
-                try:
-                    code = f.read_text()
-
-                    # 1. syntax check
-                    ast.parse(code)
-
-                    # 2. import-time execution check
-                    spec = importlib.util.spec_from_file_location("tmp_test", f)
-                    module = importlib.util.module_from_spec(spec)
-                    spec.loader.exec_module(module)
-
-                except Exception:
-                    print(f"[CLEANUP] removing invalid test → {f}")
-                    f.unlink()
-
-        _cleanup_invalid_tests(self.project_root / "runtime/development/generated")
         # =====================================================
         # 🔒 PRE-TEST SYNTAX VALIDATION (STRICT, FAIL-CLOSED)
         # =====================================================
@@ -251,12 +188,8 @@ class TestRunner:
                 diagnostics.failure_info = self._build_failure_info(stdout, stderr)
 
             if diagnostics.tests_total == 0:
-                if "passed" in combined_output or process.returncode == 0:
-                    diagnostics.success = True
-                    print("[TEST RUNNER] fallback success detection (no collected line)")
-                else:
-                    diagnostics.success = False
-                    diagnostics.raw_error = "No tests were executed"
+                diagnostics.success = False
+                diagnostics.raw_error = "No tests were executed"
             else:
                 diagnostics.success = True
 

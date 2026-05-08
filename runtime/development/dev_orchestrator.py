@@ -197,13 +197,6 @@ def run_strict_generated_tests(execution_root=None):
 
     tests_passed = has_pass and not has_fail
 
-    # =====================================================
-    # 🔥 FIX: fallback success when no failure keywords
-    # =====================================================
-
-    if not has_fail and combined_output.strip():
-        tests_passed = True
-
     # 🔥 ROBUST DETECTION
     no_runnable_tests = (
         "no runnable" in output_lower
@@ -376,14 +369,16 @@ class DevelopmentOrchestrator:
             if f"def {func}(" in existing_code:
                 continue
 
-            if len(args) == 2:
-                body = f"return {args[0]} + {args[1]}"
-            elif len(args) == 1:
-                body = f"return {args[0]}"
+            safe_args = [f"arg{i}" for i in range(len(args))]
+
+            if len(safe_args) == 2:
+                body = f"return {safe_args[0]} + {safe_args[1]}"
+            elif len(safe_args) == 1:
+                body = f"return {safe_args[0]}"
             else:
                 body = "return None"
 
-            func_code = f"\n\ndef {func}({', '.join(args)}):\n    {body}\n"
+            func_code = f"\n\ndef {func}({', '.join(safe_args)}):\n    {body}\n"
 
             new_code += func_code
 
@@ -441,6 +436,19 @@ class DevelopmentOrchestrator:
                 compile(path.read_text(encoding="utf-8"), str(path), "exec")
             except SyntaxError as e:
                 _log("[HARD FIX] SyntaxError detected via compile → signature-preserving repair")
+
+                # 🔥 FORCED FIX: if fix already has valid code, write it directly
+                if fix_code and isinstance(fix_code, str):
+                    try:
+                        compile(fix_code, "<fix>", "exec")
+                    except SyntaxError:
+                        print("[FIX REJECTED] Invalid syntax in fix_code")
+                        return False
+                    print(f"[APPLY FIX] Writing fix to {target_file}")
+                    print(f"[APPLY FIX CODE]\n{fix_code}")
+                    with open(path, "w", encoding="utf-8") as f:
+                        f.write(fix_code)
+                    return True
 
                 import re
 
@@ -1116,7 +1124,7 @@ class DevelopmentOrchestrator:
 
             try:
                 _gen_dir = self.execution_root / "runtime" / "development" / "generated"
-                _quarantine_dir = _gen_dir / "_quarantine"
+                _quarantine_dir = _gen_dir / ".quarantine"
                 _quarantine_dir.mkdir(exist_ok=True)
 
                 for _test_file in _gen_dir.glob("test_*.py"):
@@ -1257,7 +1265,7 @@ def test_basic_function_exists():
 
                     try:
                         _gen_dir = self.execution_root / "runtime" / "development" / "generated"
-                        _q_dir = _gen_dir / "_quarantine"
+                        _q_dir = _gen_dir / ".quarantine"
                         _q_dir.mkdir(exist_ok=True)
 
                         for _tf in _gen_dir.glob("test_*.py"):
@@ -1324,10 +1332,13 @@ def test_basic_function_exists():
 
                 # =====================================================
                 # 🔥 TEST VALIDATOR (SAFE MODE - FULL VALIDATION)
+                # TestValidator validates Python source, not pytest output.
+                # Only run when tests actually failed and output may contain
+                # malformed generated code worth inspecting.
                 # =====================================================
                 test_output = strict_result.get("test_output") or ""
 
-                if hasattr(self, "test_validator") and test_output:
+                if hasattr(self, "test_validator") and test_output and not strict_result.get("success"):
 
                     validation = self.test_validator.validate(test_output)
 
@@ -1349,6 +1360,59 @@ def test_basic_function_exists():
 
                 if strict_result["success"]:
 
+                    # =====================================================
+                    # 🔒 QUALITY LAYER v1 — signal filter + score gate
+                    #
+                    # Only trigger AutoFixEngine when failure_info contains
+                    # a structured, actionable error — not pytest dot output.
+                    # =====================================================
+                    from runtime.development.quality_signal_filter import (
+                        is_actionable_signal,
+                        compute_quality_score,
+                        is_improvement_needed,
+                    )
+
+                    test_output = strict_result.get("test_output") or ""
+
+                    quality_failure_info = {
+                        "error": test_output,
+                        "test_output": test_output,
+                        "output": test_output,
+                        "file": implementation_plan[0] if implementation_plan else None,
+                    }
+
+                    if is_actionable_signal(quality_failure_info):
+                        _log("[QUALITY] Actionable signal detected → triggering improvement")
+
+                        fixes = self.auto_fix_engine.generate_fixes(quality_failure_info)
+
+                        if fixes:
+                            best_fix = fixes[0]
+                            applied = self.apply_fix(best_fix, implementation_plan)
+
+                            if applied:
+                                _log("[QUALITY] Fix applied → re-running loop")
+
+                                import sys
+                                for m in list(sys.modules.keys()):
+                                    if "runtime.development.generated" in m:
+                                        del sys.modules[m]
+
+                                continue
+
+                    else:
+                        # Non-actionable signal (pytest success output, dots, etc.)
+                        # Compute quality score to detect trivial stub implementations.
+                        _q_score = compute_quality_score(generated_dir)
+                        if is_improvement_needed(_q_score):
+                            _log(f"[QUALITY] Trivial implementation detected → quality gap: {_q_score}")
+                        else:
+                            _log(f"[QUALITY] Score acceptable → proceeding to completion: {_q_score}")
+
+                    # =====================================================
+                    # ORIGINAL BEHAVIOR (NE SPREMINJAJ)
+                    # =====================================================
+
                     if isinstance(discussion_context, dict):
                         task_for_approval = discussion_context
                     else:
@@ -1360,14 +1424,12 @@ def test_basic_function_exists():
                         status="success"
                     )
 
-                    # 🔥 KLJUČNI FIX: preveri ali je že approved
                     if isinstance(discussion_context, dict) and discussion_context.get("state") == "approved":
                         _log("[DEV_ORCH] Task already approved → continuing")
                         return True
 
                     approval_required = requires_human_approval(approval)
 
-                    # AUTO-APPROVE override (DEV MODE ONLY)
                     if DEV_MODE:
                         _log("[DEV_MODE] AUTO-APPROVE ENABLED → skipping approval")
                         approval_required = False
@@ -1386,10 +1448,12 @@ def test_basic_function_exists():
 
                     _log("[AUTO-APPROVED]")
                     _log(f"[LEARNING] repair_iterations: {repair_attempts}")
+
                     return {
                         "success": True,
                         "reason": "execution_completed",
-                        "repair_iterations": repair_attempts
+                        "repair_iterations": repair_attempts,
+                        "system_stable": True
                     }
 
                 failure_info = {
@@ -1600,7 +1664,8 @@ def test_basic_function_exists():
                         return {
                             "success": True,
                             "reason": "execution_completed_after_fix",
-                            "repair_iterations": repair_attempts
+                            "repair_iterations": repair_attempts,
+                            "system_stable": True
                         }
 
             try:

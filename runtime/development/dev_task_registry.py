@@ -17,6 +17,7 @@ survive across CLI processes.
 import json
 import os
 import hashlib
+import tempfile
 from typing import List, Dict, Optional
 
 
@@ -53,8 +54,7 @@ class DevTaskRegistry:
                 "rejected_tasks": []
             }
 
-            with open(REGISTRY_FILE, "w") as f:
-                json.dump(data, f, indent=2)
+            self._atomic_write(data)
 
         with open(REGISTRY_FILE, "r") as f:
             data = json.load(f)
@@ -73,8 +73,25 @@ class DevTaskRegistry:
                 "rejected_tasks": []
             }
 
-            with open(REGISTRY_FILE, "w") as f:
+            self._atomic_write(data)
+
+    def _atomic_write(self, data: Dict) -> None:
+        directory = os.path.dirname(REGISTRY_FILE)
+        fd, tmp_path = tempfile.mkstemp(
+            prefix=".task_registry.",
+            suffix=".tmp",
+            dir=directory,
+            text=True,
+        )
+        try:
+            with os.fdopen(fd, "w") as f:
                 json.dump(data, f, indent=2)
+                f.flush()
+                os.fsync(f.fileno())
+            os.replace(tmp_path, REGISTRY_FILE)
+        finally:
+            if os.path.exists(tmp_path):
+                os.unlink(tmp_path)
 
     def _persist(self):
 
@@ -84,12 +101,19 @@ class DevTaskRegistry:
             "rejected_tasks": self.rejected_tasks
         }
 
-        with open(REGISTRY_FILE, "w") as f:
-            json.dump(data, f, indent=2)
+        self._atomic_write(data)
 
     # 🔑 deterministic ID
     def _generate_task_id(self, task: Dict) -> str:
-        base = f"{task.get('goal','')}|{task.get('priority',0)}"
+        base_payload = {
+            "description": task.get("description", ""),
+            "goal": task.get("goal", ""),
+            "idea": task.get("idea", ""),
+            "metadata": task.get("metadata", {}),
+            "priority": task.get("priority", 0),
+            "task_type": task.get("task_type", ""),
+        }
+        base = json.dumps(base_payload, sort_keys=True, separators=(",", ":"))
         return hashlib.sha256(base.encode()).hexdigest()
 
     def _ensure_state(self, task: Dict) -> None:
@@ -114,9 +138,16 @@ class DevTaskRegistry:
         self.active_tasks.append(task)
         self._persist()
 
+
+    # ✅ ADAPTER (FIX ZA dev_loop)
+    def submit_task(self, task: Dict) -> None:
+        return self.add_task(task)
+
+
     # 🔥 NEW: check if tasks exist
     def has_pending_tasks(self) -> bool:
         return any(t.get("state") == "queued" for t in self.active_tasks)
+
 
     # 🔥 NEW: get next task (priority-aware)
     def get_next_task(self) -> Optional[Dict]:
@@ -151,16 +182,14 @@ class DevTaskRegistry:
             queued = filtered
         # --- END DECISION SPINE v2 ---
 
-        # sort by priority (lower = higher priority)
-        queued.sort(key=lambda t: t.get("priority", 999))
-
-        # --- SCORE PRIORITIZATION (CAL integration, deterministic) ---
         queued = sorted(
             queued,
-            key=lambda t: t.get("metadata", {}).get("score", 0),
-            reverse=True
+            key=lambda t: (
+                -t.get("metadata", {}).get("score", 0),
+                t.get("priority", 999),
+                t.get("id") or self._generate_task_id(t),
+            ),
         )
-        # --- END SCORE PRIORITIZATION ---
 
         return queued[0]
 

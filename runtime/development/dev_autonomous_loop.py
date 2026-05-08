@@ -180,24 +180,16 @@ class DevAutonomousLoop:
 
         if waiting_tasks:
 
-            if DEV_MODE:
-                print("[DEV_MODE] AUTO-APPROVE ALL WAITING TASKS")
+            print("[DEV_LOOP] STOP — waiting for approval")
 
-                for t in waiting_tasks:
-                    t["state"] = "approved"
-                    t["approved"] = True
+            execution_time = time.time() - start
+            self.metrics.record_cycle("waiting_for_approval", execution_time)
 
-            else:
-                print("[DEV_LOOP] STOP — waiting for approval")
-
-                execution_time = time.time() - start
-                self.metrics.record_cycle("waiting_for_approval", execution_time)
-
-                return {
-                    "status": "waiting_for_approval",
-                    "tasks": waiting_tasks,
-                    "system_stable": self._last_system_stable
-                }
+            return {
+                "status": "waiting_for_approval",
+                "tasks": waiting_tasks,
+                "system_stable": self._last_system_stable
+            }
 
         # ---------------------------------------------------------
         # PRIORITY-AWARE TASK SELECTION (FIXED)
@@ -247,14 +239,6 @@ class DevAutonomousLoop:
         decision = self.gate.final_decision(
             self.gate.evaluate(task)
         )
-
-        # ---------------------------------------------------------
-        # 🔥 DEV MODE OVERRIDE (CRITICAL FIX)
-        # ---------------------------------------------------------
-
-        if DEV_MODE and decision == DevGovernanceGate.REVIEW:
-            print("[DEV_MODE] FORCING EXECUTION (bypass REVIEW)")
-            decision = DevGovernanceGate.ALLOW
 
         # ---------------------------------------------------------
         # PROMOTION GATE
@@ -348,16 +332,7 @@ class DevAutonomousLoop:
 
             if isinstance(result, dict) and result.get("status") == "waiting_for_approval":
 
-                if DEV_MODE:
-                    print("[DEV_MODE] AUTO-APPROVE (orchestrator result)")
-
-                    task["state"] = "approved"
-                    task["approved"] = True
-
-                    success = False
-                    reason = "approval_auto_handled"
-
-                elif task.get("approved"):
+                if task.get("approved"):
                     success = False
                     reason = "approval_already_granted"
 
