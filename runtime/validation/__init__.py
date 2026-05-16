@@ -1,0 +1,1 @@
+"""Deterministic runtime validation helpers."""
