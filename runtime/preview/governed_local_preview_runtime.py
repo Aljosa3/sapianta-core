@@ -9,6 +9,8 @@ from typing import Any
 from sapianta_system.runtime.codex_handoff import create_governed_codex_handoff, create_governed_codex_handoff_request
 from sapianta_system.runtime.codex_synthesis import create_governed_codex_task_request, synthesize_governed_codex_task
 from sapianta_system.runtime.execution_gate import create_execution_authorization_request, authorize_downstream_execution
+from sapianta_system.runtime.execution_consumer import create_execution_consumer_request, consume_execution_authority
+from sapianta_system.runtime.codex_execution_adapter import create_codex_execution_request, execute_governed_codex
 from sapianta_system.runtime.intent import create_governed_intent_request, interpret_governed_intent
 from sapianta_system.runtime.ux import create_governed_interaction_session
 from sapianta_system.runtime.wiring import (
@@ -144,6 +146,8 @@ class _PreviewRequestHandler(BaseHTTPRequestHandler):
             "/governed-codex-synthesize",
             "/governed-codex-handoff",
             "/governed-execution-authorize",
+            "/governed-execution-consume",
+            "/governed-codex-execute",
         }:
             self.send_error(404)
             return
@@ -175,6 +179,26 @@ class _PreviewRequestHandler(BaseHTTPRequestHandler):
                     approval_timestamp=request.get("approval_timestamp", ""),
                 )
             )
+        elif self.path == "/governed-execution-consume":
+            result = consume_execution_authority(
+                create_execution_consumer_request(
+                    handoff_package=request.get("handoff_package", {}),
+                    authority_token=request.get("authority_token", {}),
+                    now=request.get("now", ""),
+                    revoked_token_ids=set(request.get("revoked_token_ids", [])),
+                )
+            )
+        elif self.path == "/governed-codex-execute":
+            result = execute_governed_codex(
+                create_codex_execution_request(
+                    handoff_package=request.get("handoff_package", {}),
+                    authority_token=request.get("authority_token", {}),
+                    now=request.get("now", ""),
+                    revoked_token_ids=set(request.get("revoked_token_ids", [])),
+                    codex_executable=request.get("codex_executable", "codex"),
+                    timeout_seconds=request.get("timeout_seconds", 30),
+                )
+            )
         else:
             result = handle_preview_invoke(
                 request=request,
@@ -187,7 +211,18 @@ class _PreviewRequestHandler(BaseHTTPRequestHandler):
             )
         encoded = json.dumps(result, sort_keys=True, separators=(",", ":")).encode("utf-8")
         self.send_response(
-            200 if result["status"] in {"RETURNED", "INTERPRETED", "SYNTHESIZED", "HANDOFF_READY", "AUTHORIZED"} else 400
+            200
+            if result["status"]
+            in {
+                "RETURNED",
+                "INTERPRETED",
+                "SYNTHESIZED",
+                "HANDOFF_READY",
+                "AUTHORIZED",
+                "MOCK_EXECUTION_ACCEPTED",
+                "EXECUTION_ACCEPTED",
+            }
+            else 400
         )
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(encoded)))
