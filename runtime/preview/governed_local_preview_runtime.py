@@ -15,6 +15,7 @@ from sapianta_system.runtime.execution_observability import (
     observe_governed_execution,
 )
 from sapianta_system.runtime.codex_execution_adapter import create_codex_execution_request, execute_governed_codex
+from sapianta_system.runtime.chatgpt_bridge_v2 import create_chatgpt_bridge_request, bridge_chatgpt_conversation
 from sapianta_system.runtime.intent import create_governed_intent_request, interpret_governed_intent
 from sapianta_system.runtime.ux import create_governed_interaction_session
 from sapianta_system.runtime.wiring import (
@@ -153,6 +154,7 @@ class _PreviewRequestHandler(BaseHTTPRequestHandler):
             "/governed-execution-consume",
             "/governed-codex-execute",
             "/governed-execution-observe",
+            "/governed-chatgpt-bridge",
         }:
             self.send_error(404)
             return
@@ -215,6 +217,10 @@ class _PreviewRequestHandler(BaseHTTPRequestHandler):
                     revoked_token_ids=set(request.get("revoked_token_ids", [])),
                 )
             )
+        elif self.path == "/governed-chatgpt-bridge":
+            result = bridge_chatgpt_conversation(
+                create_chatgpt_bridge_request(conversational_input=request.get("conversational_input", ""))
+            )
         else:
             result = handle_preview_invoke(
                 request=request,
@@ -238,6 +244,7 @@ class _PreviewRequestHandler(BaseHTTPRequestHandler):
                 "MOCK_EXECUTION_ACCEPTED",
                 "EXECUTION_ACCEPTED",
                 "OBSERVED",
+                "NORMALIZED",
             }
             else 400
         )
