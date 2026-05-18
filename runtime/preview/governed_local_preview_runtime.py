@@ -10,6 +10,10 @@ from sapianta_system.runtime.codex_handoff import create_governed_codex_handoff,
 from sapianta_system.runtime.codex_synthesis import create_governed_codex_task_request, synthesize_governed_codex_task
 from sapianta_system.runtime.execution_gate import create_execution_authorization_request, authorize_downstream_execution
 from sapianta_system.runtime.execution_consumer import create_execution_consumer_request, consume_execution_authority
+from sapianta_system.runtime.execution_observability import (
+    create_execution_observability_request,
+    observe_governed_execution,
+)
 from sapianta_system.runtime.codex_execution_adapter import create_codex_execution_request, execute_governed_codex
 from sapianta_system.runtime.intent import create_governed_intent_request, interpret_governed_intent
 from sapianta_system.runtime.ux import create_governed_interaction_session
@@ -148,6 +152,7 @@ class _PreviewRequestHandler(BaseHTTPRequestHandler):
             "/governed-execution-authorize",
             "/governed-execution-consume",
             "/governed-codex-execute",
+            "/governed-execution-observe",
         }:
             self.send_error(404)
             return
@@ -199,6 +204,17 @@ class _PreviewRequestHandler(BaseHTTPRequestHandler):
                     timeout_seconds=request.get("timeout_seconds", 30),
                 )
             )
+        elif self.path == "/governed-execution-observe":
+            result = observe_governed_execution(
+                create_execution_observability_request(
+                    handoff_package=request.get("handoff_package", {}),
+                    authority_token=request.get("authority_token", {}),
+                    consumer_response=request.get("consumer_response", {}),
+                    adapter_response=request.get("adapter_response", {}),
+                    now=request.get("now", ""),
+                    revoked_token_ids=set(request.get("revoked_token_ids", [])),
+                )
+            )
         else:
             result = handle_preview_invoke(
                 request=request,
@@ -221,6 +237,7 @@ class _PreviewRequestHandler(BaseHTTPRequestHandler):
                 "AUTHORIZED",
                 "MOCK_EXECUTION_ACCEPTED",
                 "EXECUTION_ACCEPTED",
+                "OBSERVED",
             }
             else 400
         )
