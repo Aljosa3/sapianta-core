@@ -6,6 +6,9 @@ import json
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
 
+from sapianta_system.runtime.codex_handoff import create_governed_codex_handoff, create_governed_codex_handoff_request
+from sapianta_system.runtime.codex_synthesis import create_governed_codex_task_request, synthesize_governed_codex_task
+from sapianta_system.runtime.execution_gate import create_execution_authorization_request, authorize_downstream_execution
 from sapianta_system.runtime.intent import create_governed_intent_request, interpret_governed_intent
 from sapianta_system.runtime.ux import create_governed_interaction_session
 from sapianta_system.runtime.wiring import (
@@ -135,7 +138,13 @@ class _PreviewRequestHandler(BaseHTTPRequestHandler):
     server_version = "SapiantaPreviewRuntime/1"
 
     def do_POST(self) -> None:  # noqa: N802
-        if self.path not in {"/governed-invoke", "/governed-interpret"}:
+        if self.path not in {
+            "/governed-invoke",
+            "/governed-interpret",
+            "/governed-codex-synthesize",
+            "/governed-codex-handoff",
+            "/governed-execution-authorize",
+        }:
             self.send_error(404)
             return
         length = int(self.headers.get("Content-Length", "0"))
@@ -146,6 +155,25 @@ class _PreviewRequestHandler(BaseHTTPRequestHandler):
         if self.path == "/governed-interpret":
             result = interpret_governed_intent(
                 create_governed_intent_request(natural_language=request.get("natural_language", ""))
+            )
+        elif self.path == "/governed-codex-synthesize":
+            result = synthesize_governed_codex_task(
+                create_governed_codex_task_request(natural_language=request.get("natural_language", ""))
+            )
+        elif self.path == "/governed-codex-handoff":
+            result = create_governed_codex_handoff(
+                create_governed_codex_handoff_request(
+                    synthesis_response=request.get("synthesis_response", {}),
+                    original_human_request=request.get("original_human_request", ""),
+                )
+            )
+        elif self.path == "/governed-execution-authorize":
+            result = authorize_downstream_execution(
+                create_execution_authorization_request(
+                    handoff_package=request.get("handoff_package", {}),
+                    approved_by=request.get("approved_by", ""),
+                    approval_timestamp=request.get("approval_timestamp", ""),
+                )
             )
         else:
             result = handle_preview_invoke(
@@ -158,7 +186,9 @@ class _PreviewRequestHandler(BaseHTTPRequestHandler):
                 transport_lineage=_default_transport_lineage(),
             )
         encoded = json.dumps(result, sort_keys=True, separators=(",", ":")).encode("utf-8")
-        self.send_response(200 if result["status"] in {"RETURNED", "INTERPRETED"} else 400)
+        self.send_response(
+            200 if result["status"] in {"RETURNED", "INTERPRETED", "SYNTHESIZED", "HANDOFF_READY", "AUTHORIZED"} else 400
+        )
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(encoded)))
         self.end_headers()
