@@ -16,6 +16,7 @@ from sapianta_system.runtime.execution_observability import (
 )
 from sapianta_system.runtime.codex_execution_adapter import create_codex_execution_request, execute_governed_codex
 from sapianta_system.runtime.chatgpt_bridge_v2 import create_chatgpt_bridge_request, bridge_chatgpt_conversation
+from sapianta_system.runtime.intent_transfer import create_intent_transfer_request, create_governed_intent_transfer
 from sapianta_system.runtime.intent import create_governed_intent_request, interpret_governed_intent
 from sapianta_system.runtime.ux import create_governed_interaction_session
 from sapianta_system.runtime.wiring import (
@@ -155,6 +156,7 @@ class _PreviewRequestHandler(BaseHTTPRequestHandler):
             "/governed-codex-execute",
             "/governed-execution-observe",
             "/governed-chatgpt-bridge",
+            "/governed-intent-transfer",
         }:
             self.send_error(404)
             return
@@ -221,6 +223,15 @@ class _PreviewRequestHandler(BaseHTTPRequestHandler):
             result = bridge_chatgpt_conversation(
                 create_chatgpt_bridge_request(conversational_input=request.get("conversational_input", ""))
             )
+        elif self.path == "/governed-intent-transfer":
+            result = create_governed_intent_transfer(
+                create_intent_transfer_request(
+                    conversational_input=request.get("conversational_input", ""),
+                    normalized_governed_request=request.get("normalized_governed_request", {}),
+                    governance_mode=request.get("governance_mode", ""),
+                    replay_identity=request.get("replay_identity", ""),
+                )
+            )
         else:
             result = handle_preview_invoke(
                 request=request,
@@ -245,6 +256,7 @@ class _PreviewRequestHandler(BaseHTTPRequestHandler):
                 "EXECUTION_ACCEPTED",
                 "OBSERVED",
                 "NORMALIZED",
+                "TRANSFER_READY",
             }
             else 400
         )
