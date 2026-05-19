@@ -256,9 +256,10 @@ class _PreviewRequestHandler(BaseHTTPRequestHandler):
                 transport_lineage=_default_transport_lineage(),
             )
         encoded = json.dumps(result, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        result_status = result.get("status", result.get("ingestion_status", "BLOCKED"))
         self.send_response(
             200
-            if result["status"]
+            if result_status
             in {
                 "RETURNED",
                 "INTERPRETED",
@@ -288,3 +289,14 @@ def create_local_preview_server(*, host: str = "127.0.0.1", port: int = 8010) ->
     if not validation["valid"]:
         raise ValueError("localhost-only binding required")
     return ThreadingHTTPServer((host, port), _PreviewRequestHandler)
+
+if __name__ == "__main__":
+    server = create_local_preview_server(host="127.0.0.1", port=8110)
+
+    print("Governed local preview runtime running on http://127.0.0.1:8110")
+
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print("\nShutting down governed local preview runtime...")
+        server.server_close()
