@@ -29,7 +29,15 @@ def create_execution_observability_request(
         "now": now,
         "revoked_token_ids": sorted(revoked_token_ids or set()),
     }
-    replay_identity = stable_hash(value)
+    identity_value = deepcopy(value)
+    identity_adapter = identity_value["adapter_response"]
+    for diagnostics in (
+        identity_adapter.get("dispatch", {}).get("diagnostics", {}),
+        identity_adapter.get("receipt", {}).get("transport_diagnostics", {}),
+        identity_adapter.get("evidence", {}).get("transport_diagnostics", {}),
+    ):
+        diagnostics.pop("duration_seconds", None)
+    replay_identity = stable_hash(identity_value)
     return {
         "execution_observability_request_id": f"EXEC-OBS-REQUEST-{replay_identity[:24]}",
         **value,

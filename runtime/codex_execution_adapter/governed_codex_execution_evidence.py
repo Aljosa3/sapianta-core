@@ -12,6 +12,7 @@ def governed_codex_execution_evidence(*, request: dict, validation: dict, dispat
         "authority_token": request["authority_token"],
         "execution_validation_results": validation,
         "bounded_execution_metadata": dispatch["metadata"],
+        "transport_diagnostics": dispatch.get("diagnostics", {}),
         "stdout_hash": receipt["stdout_hash"],
         "stderr_hash": receipt["stderr_hash"],
         "execution_receipt": receipt,

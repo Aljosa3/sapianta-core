@@ -6,10 +6,13 @@ from sapianta_bridge.human_interaction_continuity.interaction_session import sta
 
 
 def build_codex_execution_replay_identity(*, request: dict, validation: dict, dispatch: dict) -> str:
+    deterministic_dispatch = {
+        key: value for key, value in dispatch.items() if key != "diagnostics"
+    }
     return stable_hash(
         {
             "codex_execution_request_id": request["codex_execution_request_id"],
             "validation": validation,
-            "dispatch": dispatch,
+            "dispatch": deterministic_dispatch,
         }
     )

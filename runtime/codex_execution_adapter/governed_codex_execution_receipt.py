@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+from copy import deepcopy
 
 from sapianta_bridge.human_interaction_continuity.interaction_session import stable_hash
 
@@ -33,6 +34,7 @@ def create_codex_execution_receipt(
         "execution_status": execution_status,
         "stdout_hash": stdout_hash,
         "stderr_hash": stderr_hash,
+        "transport_diagnostics": deepcopy(dispatch.get("diagnostics", {})),
         "bounded_execution_metadata": dispatch.get("metadata", {}),
         "closure": {"state": execution_status, "deterministic": True},
         "blocked_capability_guarantees": authority_token.get("blocked_capabilities", []),
