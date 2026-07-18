@@ -21,6 +21,8 @@ def build_handoff_package(*, synthesis_response: dict, replay_identity: str, exp
         "allowed_to_execute_automatically": False,
         "downstream_execution_authority": False,
         "codex_prompt": synthesis_response["codex_prompt_preview"],
+        "bounded_prompt_sha256": synthesis_response["bounded_prompt_sha256"],
+        "worker_execution_contract": synthesis_response.get("worker_execution_contract"),
         "blocked_capabilities": synthesis_response["blocked_capability_checks"],
         "constitutional_boundary_statement": BOUNDARY_STATEMENT,
         "closure": {"state": "HANDOFF_READY", "deterministic": True},

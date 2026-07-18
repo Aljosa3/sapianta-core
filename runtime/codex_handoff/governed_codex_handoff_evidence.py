@@ -8,6 +8,8 @@ def governed_codex_handoff_evidence(*, request: dict, package: dict, validation:
         "governed_codex_handoff_request_id": request.get("governed_codex_handoff_request_id", ""),
         "original_human_request": request.get("original_human_request", ""),
         "synthesized_prompt": package.get("codex_prompt"),
+        "bounded_prompt_sha256": package.get("bounded_prompt_sha256"),
+        "worker_execution_contract": package.get("worker_execution_contract"),
         "handoff_package": package,
         "replay_identity": package.get("replay_identity", ""),
         "blocked_capability_guarantees": package.get("blocked_capabilities", []),

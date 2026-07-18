@@ -27,6 +27,8 @@ def create_governed_codex_handoff(request: dict) -> dict:
         "task_class": synthesis.get("task_class"),
         "governance_mode": synthesis.get("governance_mode"),
         "codex_prompt": synthesis.get("codex_prompt_preview"),
+        "bounded_prompt_sha256": synthesis.get("bounded_prompt_sha256"),
+        "worker_execution_contract": synthesis.get("worker_execution_contract"),
         "blocked_capabilities": synthesis.get("blocked_capability_checks"),
     }
     replay_identity = build_handoff_replay_identity(request=request, package_seed=package_seed)

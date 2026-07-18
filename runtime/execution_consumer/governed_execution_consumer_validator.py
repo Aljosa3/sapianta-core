@@ -21,6 +21,8 @@ def validate_execution_consumer_request(request: dict) -> dict:
         errors.append({"field": "handoff_package", "reason": "handoff mismatch"})
     if token.get("handoff_package_sha256") != request.get("handoff_package_sha256"):
         errors.append({"field": "handoff_package_sha256", "reason": "handoff mismatch"})
+    if token.get("bounded_prompt_sha256") != package.get("bounded_prompt_sha256"):
+        errors.append({"field": "bounded_prompt_sha256", "reason": "prompt hash mismatch"})
     token_validation = validate_authority_token(
         token,
         now=request.get("now", ""),

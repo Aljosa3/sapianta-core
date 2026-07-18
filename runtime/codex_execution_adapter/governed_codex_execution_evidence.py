@@ -15,6 +15,7 @@ def governed_codex_execution_evidence(*, request: dict, validation: dict, dispat
         "transport_diagnostics": dispatch.get("diagnostics", {}),
         "stdout_hash": receipt["stdout_hash"],
         "stderr_hash": receipt["stderr_hash"],
+        "bounded_prompt_sha256": receipt["bounded_prompt_sha256"],
         "execution_receipt": receipt,
         "blocked_capability_checks": request["authority_token"]["blocked_capabilities"],
         "deterministic_closure": receipt["closure"],

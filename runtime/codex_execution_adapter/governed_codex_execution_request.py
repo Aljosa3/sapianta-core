@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from hashlib import sha256
 
 from sapianta_bridge.human_interaction_continuity.interaction_session import stable_hash
 
@@ -19,9 +20,11 @@ def create_codex_execution_request(
     package = deepcopy(handoff_package)
     token = deepcopy(authority_token)
     package_hash = stable_hash(package)
+    prompt_hash = sha256(package.get("codex_prompt", "").encode("utf-8")).hexdigest()
     value = {
         "handoff_package": package,
         "handoff_package_sha256": package_hash,
+        "bounded_prompt_sha256": prompt_hash,
         "authority_token": token,
         "now": now,
         "revoked_token_ids": sorted(revoked_token_ids or set()),

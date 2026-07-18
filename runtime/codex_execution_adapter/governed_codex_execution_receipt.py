@@ -24,6 +24,7 @@ def create_codex_execution_receipt(
         "execution_status": execution_status,
         "stdout_hash": stdout_hash,
         "stderr_hash": stderr_hash,
+        "bounded_prompt_sha256": validation.get("bounded_prompt_sha256", ""),
         "metadata": dispatch.get("metadata", {}),
     }
     replay_identity = stable_hash(value)
@@ -34,6 +35,7 @@ def create_codex_execution_receipt(
         "execution_status": execution_status,
         "stdout_hash": stdout_hash,
         "stderr_hash": stderr_hash,
+        "bounded_prompt_sha256": validation.get("bounded_prompt_sha256", ""),
         "transport_diagnostics": deepcopy(dispatch.get("diagnostics", {})),
         "bounded_execution_metadata": dispatch.get("metadata", {}),
         "closure": {"state": execution_status, "deterministic": True},

@@ -19,6 +19,7 @@ def create_execution_authority_token(*, request: dict) -> dict:
     expires_at = approved_at + timedelta(seconds=EXECUTION_WINDOW_SECONDS)
     seed = {
         "handoff_package_sha256": request["handoff_package_sha256"],
+        "bounded_prompt_sha256": request["handoff_package"]["bounded_prompt_sha256"],
         "approved_task_class": request["handoff_package"]["task_class"],
         "approval_timestamp": request["approval_timestamp"],
         "authorization_expiration": expires_at.isoformat().replace("+00:00", "Z"),
@@ -37,4 +38,5 @@ def create_execution_authority_token(*, request: dict) -> dict:
         "revocation_supported": True,
         "constitutional_boundary_statement": BOUNDARY_STATEMENT,
         "handoff_package_sha256": request["handoff_package_sha256"],
+        "bounded_prompt_sha256": request["handoff_package"]["bounded_prompt_sha256"],
     }

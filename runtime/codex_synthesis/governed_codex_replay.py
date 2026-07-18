@@ -10,6 +10,7 @@ def build_codex_synthesis_replay_identity(*, request: dict, synthesis: dict) -> 
         {
             "governed_codex_task_request_id": request.get("governed_codex_task_request_id", ""),
             "natural_language": request.get("natural_language", ""),
+            "worker_execution_contract": request.get("worker_execution_contract"),
             "synthesis": synthesis,
         }
     )

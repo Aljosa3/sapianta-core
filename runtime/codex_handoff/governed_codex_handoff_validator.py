@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from hashlib import sha256
+
 SUPPORTED_TASK_CLASSES = {
     "GOVERNANCE_ARTIFACT_TASK",
     "VALIDATION_TASK",
@@ -45,4 +47,8 @@ def validate_handoff_package(package: dict) -> dict:
             errors.append({"field": field, "reason": "prohibited capability"})
     if not isinstance(package.get("codex_prompt"), str) or not package["codex_prompt"].strip():
         errors.append({"field": "codex_prompt", "reason": "missing prompt"})
+    elif package.get("bounded_prompt_sha256") != sha256(
+        package["codex_prompt"].encode("utf-8")
+    ).hexdigest():
+        errors.append({"field": "bounded_prompt_sha256", "reason": "prompt hash mismatch"})
     return {"valid": not errors, "errors": errors}
